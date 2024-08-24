@@ -2,6 +2,7 @@ package Controller;
 
 /* Event list manager realized as singleton */
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventListManager {
@@ -29,6 +30,55 @@ public class EventListManager {
     }
 
     private EventListManager() {
+        this.antipasto1 = new ArrayList<>();
+        this.antipasto2 = new ArrayList<>();
+        this.primo1 = new ArrayList<>();
+        this.primo2 = new ArrayList<>();
+        this.secondo1 = new ArrayList<>();
+        this.secondo2 = new ArrayList<>();
+        this.contorno1 = new ArrayList<>();
+        this.contorno2 = new ArrayList<>();
+        this.cassa1 = new ArrayList<>();
+        this.cassa2 = new ArrayList<>();
+    }
 
+    public List<EventListManager> getAntipasto1() {
+        return antipasto1;
+    }
+
+    public List<EventListManager> getAntipasto2() {
+        return antipasto2;
+    }
+
+    public List<EventListManager> getPrimo1() {
+        return primo1;
+    }
+
+    public List<EventListManager> getPrimo2() {
+        return primo2;
+    }
+
+    public List<EventListManager> getSecondo1() {
+        return secondo1;
+    }
+
+    public List<EventListManager> getSecondo2() {
+        return secondo2;
+    }
+
+    public List<EventListManager> getContorno1() {
+        return contorno1;
+    }
+
+    public List<EventListManager> getContorno2() {
+        return contorno2;
+    }
+
+    public List<EventListManager> getCassa1() {
+        return cassa1;
+    }
+
+    public List<EventListManager> getCassa2() {
+        return cassa2;
     }
 }
