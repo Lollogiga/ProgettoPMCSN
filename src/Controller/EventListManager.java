@@ -29,7 +29,7 @@ public class EventListManager {
         return instance;
     }
 
-    private EventListManager() {
+    public EventListManager() {
         this.antipasto1 = new ArrayList<>();
         this.antipasto2 = new ArrayList<>();
         this.primo1 = new ArrayList<>();
