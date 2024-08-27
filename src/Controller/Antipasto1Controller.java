@@ -1,7 +1,5 @@
 package Controller;
 
-/* Generalizzazione per Antipasto1 e Antipasto2? */
-
 import Model.EventListEntry;
 
 import java.util.ArrayList;
