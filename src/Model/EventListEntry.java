@@ -11,21 +11,19 @@ public class EventListEntry {
         this.x = x;
     }
 
-    public static int getNextEvent(List<EventListEntry> event) {
-        int e = -1; // initialization of "e"
+    public static int getNextEvent(List<EventListEntry> event, int servers) {
+        int e;
+        int i = 0;
 
-        for (int i = 0; i < event.size(); i++) {
-            if (event.get(i).x == 1) {
+        while (event.get(i).x == 0)       /* find the index of the first 'active' */
+            i++;                        /* element in the event list            */
+        e = i;
+        while (i < servers) {         /* now, check the others to find which  */
+            i++;                        /* event type is most imminent          */
+            if ((event.get(i).x == 1) && (event.get(i).t < event.get(e).t))
                 e = i;
-                break;
-            }
         }
-
-        if (e == -1) {
-            throw new IllegalStateException("No active events found.");
-        }
-
-        return e;
+        return (e);
     }
 
     public double getT() {

@@ -5,9 +5,14 @@ import Model.EventListEntry;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Antipasto1Controller {
+public class ServenteController {
     private final EventListManager eventListManager;
-    int e; // event index
+
+    long   number = 0;             /* number in the node                 */
+    int    e;                      /* next event index                   */
+    int    s;                      /* server index                       */
+    long   index  = 0;             /* used to count processed jobs       */
+    double service;
 
     private double nodeArea;
     private double nodeQueue;
@@ -15,7 +20,7 @@ public class Antipasto1Controller {
 
     private List<EventListEntry> antipasto1List;
 
-    private Antipasto1Controller(EventListManager eventListManager) {
+    private ServenteController(EventListManager eventListManager) {
         this.eventListManager = EventListManager.getInstance();
 
         // inizializzare lo stato del sistema
