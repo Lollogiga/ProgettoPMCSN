@@ -1,9 +1,8 @@
 package Controller;
 
-import Model.MsqEvent;
+import Utils.Rngs;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ServenteController {
     private final EventListManager eventListManager;
@@ -12,13 +11,10 @@ public class ServenteController {
     int    e;                      /* next event index                   */
     int    s;                      /* server index                       */
     long   index  = 0;             /* used to count processed jobs       */
+    private double area   = 0.0;           /* time integrated number in the node */
     double service;
 
-    private double nodeArea;
-    private double nodeQueue;
-    private double nodeService;
-
-    private List<MsqEvent> antipasto1List;
+    private Rngs r = new Rngs();
 
     private ServenteController(EventListManager eventListManager) {
         this.eventListManager = EventListManager.getInstance();
