@@ -13,5 +13,10 @@ public class Constants {
 
     /* Probabilities */
     public static final double P_RICARICA = ;
-    public static final double P_LOSS = ;
+    public static final double P_LOSS = 0.2;
+
+    /* Arrival (passenger/sec) */
+    public static final double LAMBDA = 0.0067; /*  It is like 10 arrivals every 25 minutes  */
+
+
 }

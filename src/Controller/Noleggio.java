@@ -3,7 +3,8 @@ package Controller;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
-import Utils.Rngs;
+import Libs.Rngs;
+import Util.Distribution;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +18,15 @@ public class Noleggio {
     int e;                      /* next event index                   */
     int s;                      /* server index                       */
     long index  = 0;             /* used to count processed jobs       */
-    private double area   = 0.0;           /* time integrated number in the node */
+    private double area = 0.0;           /* time integrated number in the node */
     double service;
 
     private Rngs r = new Rngs();
     private List<MsqEvent> eventList = new ArrayList<>(NOLEGGIO_SERVER + 1);
     private List<MsqSum> sumList = new ArrayList<>(NOLEGGIO_SERVER + 1);
     private MsqT msqT = new MsqT();
+
+    private Distribution distro = Distribution.getInstance();
 
     public Noleggio() {
         this.eventListManager = EventListManager.getInstance();
@@ -32,9 +35,14 @@ public class Noleggio {
             this.eventList.add(s, new MsqEvent(0, 0));
             this.sumList.add(s, new MsqSum());
         }
-        // inizializzare lo stato del sistema
-        // inizializzare il clock di sistema (t)
 
-        this.eventList.set(0, )
+        // Evento di arrivo dell'utente che vuole noleggiare un'auto
+        double arrival = this.distro.getArrival();
+
+        // Aggiunta dell'arrivo con inizializzazione del tempo pari all'arrivo del primo evento
+        this.eventList.set(0, new MsqEvent(arrival, 1));
+
+        // Settata lista di eventi nel manager
+        this.eventListManager.setNoleggio(eventList);
     }
 }
