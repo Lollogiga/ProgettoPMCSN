@@ -19,7 +19,6 @@ public class EventListManager {
         if (instance == null) {
             instance = new EventListManager();
         }
-
         return instance;
     }
 

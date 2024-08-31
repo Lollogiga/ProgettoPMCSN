@@ -4,6 +4,11 @@ public class MsqSum {
     private double service; /* Number served */
     private long served;    /* Number served */
 
+    public MsqSum() {
+        this.service = 0;
+        this.served = 0;
+    }
+
     public double getService() {
         return service;
     }

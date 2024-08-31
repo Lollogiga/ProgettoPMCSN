@@ -4,6 +4,11 @@ public class MsqT {
     private double current; /* Current time */
     private double next;    /* Next (most imminent) event time  */
 
+    public MsqT() {
+        this.current = 0;
+        this.next = 0;
+    }
+
     public double getCurrent() {
         return current;
     }

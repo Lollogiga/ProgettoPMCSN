@@ -3,10 +3,10 @@ package Model;
 import java.util.List;
 
 public class MsqEvent {
-    private double t;
-    private int x;
+    private double t;   /*   next event time      */
+    private int x;  /*   event status, 0 or 1 */
 
-    private MsqEvent(double t, int x) {
+    public MsqEvent(double t, int x) {
         this.t = t;
         this.x = x;
     }
