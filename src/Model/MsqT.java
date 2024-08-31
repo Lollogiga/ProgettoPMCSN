@@ -1,8 +1,8 @@
 package Model;
 
 public class MsqT {
-    private double current;
-    private double next;
+    private double current; /* Current time */
+    private double next;    /* Next (most imminent) event time  */
 
     public double getCurrent() {
         return current;

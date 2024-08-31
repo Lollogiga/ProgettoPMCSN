@@ -1,6 +1,6 @@
 package Controller;
 
-import Model.EventListEntry;
+import Model.MsqEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ public class ServenteController {
     private double nodeQueue;
     private double nodeService;
 
-    private List<EventListEntry> antipasto1List;
+    private List<MsqEvent> antipasto1List;
 
     private ServenteController(EventListManager eventListManager) {
         this.eventListManager = EventListManager.getInstance();

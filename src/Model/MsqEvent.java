@@ -2,16 +2,17 @@ package Model;
 
 import java.util.List;
 
-public class EventListEntry {
+public class MsqEvent {
     private double t;
     private int x;
 
-    private EventListEntry (double t, int x) {
+    private MsqEvent(double t, int x) {
         this.t = t;
         this.x = x;
     }
 
-    public static int getNextEvent(List<EventListEntry> event, int servers) {
+    /* Return the index of the next event type */
+    public static int getNextEvent(List<MsqEvent> event, int servers) {
         int e;
         int i = 0;
 

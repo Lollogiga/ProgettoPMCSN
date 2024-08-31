@@ -1,8 +1,8 @@
 package Model;
 
 public class MsqSum {
-    private double service;
-    private long served;
+    private double service; /* Number served */
+    private long served;    /* Number served */
 
     public double getService() {
         return service;
