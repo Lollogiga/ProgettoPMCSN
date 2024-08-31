@@ -36,13 +36,13 @@ public class Noleggio {
             this.sumList.add(s, new MsqSum());
         }
 
-        // Evento di arrivo dell'utente che vuole noleggiare un'auto
+        // First arrival event
         double arrival = this.distro.getArrival();
 
-        // Aggiunta dell'arrivo con inizializzazione del tempo pari all'arrivo del primo evento
+        // Add this new event and setting time to arrival time
         this.eventList.set(0, new MsqEvent(arrival, 1));
 
-        // Settata lista di eventi nel manager
+        // Setting event list in eventListManager
         this.eventListManager.setNoleggio(eventList);
     }
 }
