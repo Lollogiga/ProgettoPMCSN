@@ -1,4 +1,3 @@
-
 /* -------------------------------------------------------------------------
  * This program simulates a single-server FIFO service node using arrival
  * times and service times read from a text file.  The server is assumed
@@ -16,6 +15,7 @@
  * Program ssq1      : Section 1.2
  * ------------------------------------------------------------------------- 
  */
+package Libs;
 
 import java.io.*;
 import java.util.*;
