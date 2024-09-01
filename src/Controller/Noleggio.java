@@ -38,10 +38,10 @@ public class Noleggio implements Center {
         }
 
         // First arrival event
-        double arrival = this.distro.getArrival();
+        //double arrival = this.distro.getArrival();
 
         // Add this new event and setting time to arrival time
-        this.eventList.set(0, new MsqEvent(arrival, 1));
+        //this.eventList.set(0, new MsqEvent(arrival, 1));
 
         // Setting event list in eventListManager
         this.eventListManager.setServerNoleggio(eventList);
