@@ -24,4 +24,12 @@ public class MsqSum {
     public void setServed(long served) {
         this.served = served;
     }
+
+    public void incrementServed() {
+        served++;
+    }
+
+    public void incrementService(double service) {
+        this.service += service;
+    }
 }

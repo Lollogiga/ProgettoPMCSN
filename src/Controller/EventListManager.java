@@ -7,14 +7,31 @@ import Model.MsqEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import static Model.Constants.*;
+
 public class EventListManager {
     private static EventListManager instance = null;
 
-    /* Each list handle one server */
-    private List<MsqEvent> strada;
-    private List<MsqEvent> noleggio;
-    private List<MsqEvent> ricarica;
-    private List<MsqEvent> parcheggio;
+    /* Each list handle one server queue */
+    private List<MsqEvent> serverStrada;
+    private List<MsqEvent> serverNoleggio;
+    private List<MsqEvent> serverRicarica;
+    private List<MsqEvent> serverParcheggio;
+
+    private List<MsqEvent> intQueueNoleggio;
+    private List<MsqEvent> intQueueParcheggio;
+    private List<MsqEvent> intQueueRicarica;
+
+    private EventListManager() {
+        this.serverStrada = new ArrayList<>();
+        this.serverNoleggio = new ArrayList<>(NOLEGGIO_SERVER + 1);
+        this.serverRicarica = new ArrayList<>(RICARICA_SERVER + 2);
+        this.serverParcheggio = new ArrayList<>(PARCHEGGIO_SERVER + 2);
+
+        this.intQueueParcheggio = new ArrayList<>();
+        this.intQueueNoleggio = new ArrayList<>();
+        this.intQueueRicarica = new ArrayList<>();
+    }
 
     public static synchronized EventListManager getInstance() {
         /* If instance doesn't exist create a new one */
@@ -24,26 +41,47 @@ public class EventListManager {
         return instance;
     }
 
-    public EventListManager() {
-        this.strada = new ArrayList<>();
-        this.noleggio = new ArrayList<>();
-        this.ricarica = new ArrayList<>();
-        this.parcheggio = new ArrayList<>();
+    public void setServerNoleggio(List<MsqEvent> noleggio) {
+        this.serverNoleggio = noleggio;
     }
 
-    public void setNoleggio(List<MsqEvent> noleggio) {
-        this.noleggio = noleggio;
+    public void setServerRicarica(List<MsqEvent> serverRicarica) {
+        this.serverRicarica = serverRicarica;
     }
 
-    public void setRicarica(List<MsqEvent> ricarica) {
-        this.ricarica = ricarica;
+    public void setServerStrada(List<MsqEvent> serverStrada) {
+        this.serverStrada = serverStrada;
     }
 
-    public void setParcheggio(List<MsqEvent> parcheggio) {
-        this.parcheggio = parcheggio;
+    public void setIntQueueNoleggio(List<MsqEvent> intQueueNoleggio) {
+        this.intQueueNoleggio = intQueueNoleggio;
     }
 
-    public void setStrada(List<MsqEvent> strada) {
-        this.strada = strada;
+    public void setIntQueueParcheggio(List<MsqEvent> intQueueParcheggio) {
+        this.intQueueParcheggio = intQueueParcheggio;
+    }
+
+    public List<MsqEvent> getServerParcheggio() {
+        return serverParcheggio;
+    }
+
+    public List<MsqEvent> getServerRicarica() {
+        return serverRicarica;
+    }
+
+    public void setServerParcheggio(List<MsqEvent> parcheggio) {
+        this.serverParcheggio = parcheggio;
+    }
+
+    public List<MsqEvent> getIntQueueParcheggio() {
+        return intQueueParcheggio;
+    }
+
+    public List<MsqEvent> getIntQueueNoleggio() {
+        return intQueueNoleggio;
+    }
+
+    public List<MsqEvent> getIntQueueRicarica() {
+        return intQueueRicarica;
     }
 }

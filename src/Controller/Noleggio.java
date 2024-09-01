@@ -11,7 +11,7 @@ import java.util.List;
 
 import static Model.Constants.*;
 
-public class Noleggio {
+public class Noleggio implements Center {
     private final EventListManager eventListManager;
 
     long number = 0;                /* number in the node                 */
@@ -22,6 +22,7 @@ public class Noleggio {
     double service;
 
     private Rngs r = new Rngs();
+
     private List<MsqEvent> eventList = new ArrayList<>(NOLEGGIO_SERVER + 1);
     private List<MsqSum> sumList = new ArrayList<>(NOLEGGIO_SERVER + 1);
     private MsqT msqT = new MsqT();
@@ -43,6 +44,10 @@ public class Noleggio {
         this.eventList.set(0, new MsqEvent(arrival, 1));
 
         // Setting event list in eventListManager
-        this.eventListManager.setNoleggio(eventList);
+        this.eventListManager.setServerNoleggio(eventList);
+    }
+
+    public void simpleSimulation() {
+
     }
 }
