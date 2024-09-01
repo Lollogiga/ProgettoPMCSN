@@ -1,5 +1,4 @@
-
-/* ------------------------------------------------------------------------- 
+/* -------------------------------------------------------------------------
  * This program is a next-event simulation of a multi-user time-sharing
  * system.  All users begin with the thinking task and the simulation ends 
  * when the simulation clock time meets or exceeds the terminal time STOP.
@@ -11,6 +10,7 @@
  * Latest Revision   : 6-16-06 
  * ------------------------------------------------------------------------- 
  */
+package Libs;
 
 import java.text.*;
 

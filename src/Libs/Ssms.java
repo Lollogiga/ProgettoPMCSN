@@ -10,7 +10,8 @@
  * Latest Revision : 6-16-06
  * -----------------------------------------------------------------------
  */
- 
+package Libs;
+
 import java.lang.Math;
 import java.text.DecimalFormat;
 

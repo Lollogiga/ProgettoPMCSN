@@ -1,4 +1,4 @@
-package Libs;/* -------------------------------------------------------------------------
+/* -------------------------------------------------------------------------
  * This is an Java library for multi-stream random number generation.
  * The use of this library is recommended as a replacement for the Java
  * class Random, particularly in simulation applications where the
@@ -30,8 +30,10 @@ package Libs;/* ----------------------------------------------------------------
  * Translated by   : Jun Wang & Richard Dutton
  * Language        : Java
  * Latest Revision : 6-10-04
- * ------------------------------------------------------------------------- 
+ * -------------------------------------------------------------------------
  */
+
+package Libs;
 
 import java.io.*;
 import java.util.*;

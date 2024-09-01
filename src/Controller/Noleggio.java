@@ -14,11 +14,11 @@ import static Model.Constants.*;
 public class Noleggio {
     private final EventListManager eventListManager;
 
-    long number = 0;             /* number in the node                 */
-    int e;                      /* next event index                   */
-    int s;                      /* server index                       */
-    long index  = 0;             /* used to count processed jobs       */
-    private double area = 0.0;           /* time integrated number in the node */
+    long number = 0;                /* number in the node                 */
+    int e;                          /* next event index                   */
+    int s;                          /* server index                       */
+    long index  = 0;                /* used to count processed jobs       */
+    private double area = 0.0;      /* time integrated number in the node */
     double service;
 
     private Rngs r = new Rngs();

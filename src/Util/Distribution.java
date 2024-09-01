@@ -42,8 +42,8 @@ public class Distribution {
                     exponential(1.0 / PARKING_SERVICE);
             case 2 -> /* Charging station */
                     exponential(1.0 / CHARGING_SERVICE);
-            case 3 -> /* Route station */
-                    exponential(1.0 / ROUTE_SERVICE);
+//            case 3 -> /* Route station */
+//                    exponential(1.0 / ROUTE_SERVICE);
             default -> throw new IllegalArgumentException("Invalid service type");
         };
     }
