@@ -50,22 +50,22 @@ public class Sistema {
 
         /* 0 - noleggio, 1 - ricarica, 2 - parcheggio, 3 - strada */
 
-        // noleggio
+        // Initialize noleggio
         List<MsqEvent> noleggioList = eventListManager.getServerNoleggio();
         int nextEventNoleggio = MsqEvent.getNextEvent(noleggioList, NOLEGGIO_SERVER);
         systemList.addFirst(new MsqEvent(noleggioList.get(nextEventNoleggio).getT(), 1));
         sumList.addFirst(new MsqSum());
 
-        // ricarica
+        // Initialize ricarica
         systemList.add(1, new MsqEvent(0, 0));
         sumList.add(1, new MsqSum());
 
 
-        // parcheggio
+        // Initialize parcheggio
         systemList.add(2, new MsqEvent(0, 0));
         sumList.add(2, new MsqSum());
 
-        // strada
+        // Initialize strada
         systemList.add(3, new MsqEvent(0, 0));
         sumList.add(3, new MsqSum());
 
@@ -79,64 +79,20 @@ public class Sistema {
 
     private void simpleSimulation() throws Exception {
         int e;
-        //prende la lista di eventi per il sistema
         List<MsqEvent> eventList = eventListManager.getSystemEventsList();
-        /*
-         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
-         */
+
         while (getNextEvent(eventList) != -1) {
-            //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
-            //imposta il tempo del prossimo evento
             msqT.setNext(eventList.get(e).getT());
-            //si calcola l'area dell'integrale
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
-            //imposta il tempo corrente a quello dell'evento corrente
             msqT.setCurrent(msqT.getNext());
 
-            //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
-            if (e > 3) {
-                throw new Exception("Errore nessun evento tra i precedenti");
-            }
-
-            controllerList.get(e).simpleSimulation();
-
-            eventList=eventListManager.getSystemEventsList();
+            if (e < 3) {
+                controllerList.get(e).simpleSimulation();
+                eventList = eventListManager.getSystemEventsList();
+            } else throw new Exception("Invalid event");
         }
     }
-
-    /*public void simpleSimulation() throws Exception {
-        int e;
-        MsqT msqT = new MsqT();
-        msqT.setCurrent(START);
-        msqT.setNext(START);
-
-        List<MsqEvent> eventList;
-
-        while(breakCondition()) {
-
-            eventList = eventListManager.getSystemEventsList();
-
-            e = getNextEvent(eventList);
-            msqT.setNext(eventList.get(e).getT());
-
-            area += (msqT.getNext() - msqT.getCurrent()) * number;
-
-            if (e < 0 || e > 3) {
-                throw new Exception("Invalid event");
-            }
-
-
-            controllerList.get(e).simpleSimulation();
-            msqT.setCurrent(msqT.getNext());
-        }
-
-        // END
-    }*/
-
-    /*private boolean breakCondition() {
-
-    }*/
 
     /* Fetch index of most imminent event */
     private int getNextEvent(List<MsqEvent> eventList) {

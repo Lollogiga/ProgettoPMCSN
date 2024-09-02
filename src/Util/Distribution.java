@@ -42,14 +42,16 @@ public class Distribution {
      * */
     public double getArrival(int arrivalType) {
         rngs.selectStream(0);
+        double paramPark = LAMBDA_EXOGENOUS * (1-P_RICARICA);
+        double paramCharge = LAMBDA_EXOGENOUS * P_RICARICA;
 
         return switch (arrivalType) {
             case 0 -> /* Passenger arrival at rental station */
                     passengerArrival = exponential(1.0 / LAMBDA);
             case 1 -> /* Exogenous arrival at parking station */
-                    exogenous_park = exponential(1.0 / LAMBDA); // TODO right
+                    exogenous_park = exponential(1.0 / paramPark);
             case 2 -> /* Exogenous arrival at charge station */
-                    exogenous_charge = exponential(1.0 / LAMBDA); // TODO right
+                    exogenous_charge = exponential(1.0 / paramCharge);
             default -> throw new IllegalArgumentException("Invalid arrival type");
         };
     }
