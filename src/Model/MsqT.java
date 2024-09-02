@@ -1,5 +1,6 @@
 package Model;
 
+/* Clock di sistema (mantiene il tempo) */
 public class MsqT {
     private double current; /* Current time */
     private double next;    /* Next (most imminent) event time  */

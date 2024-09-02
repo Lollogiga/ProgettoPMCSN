@@ -54,7 +54,8 @@ public class Noleggio implements Center {
         /* No event to process */
         if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0) return;
 
-        int e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER + 1);
+        int e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER);
+
         msqT.setNext(eventList.get(e).getT());
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());

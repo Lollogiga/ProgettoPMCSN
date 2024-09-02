@@ -53,35 +53,17 @@ public class Sistema {
         // noleggio
         List<MsqEvent> noleggioList = eventListManager.getServerNoleggio();
         int nextEventNoleggio = MsqEvent.getNextEvent(noleggioList, NOLEGGIO_SERVER);
-        if (nextEventNoleggio != -1) {
-            systemList.addFirst(new MsqEvent(noleggioList.get(nextEventNoleggio).getT(), 1));
-            sumList.addFirst(new MsqSum());
-        } else {
-            systemList.addFirst(new MsqEvent(0, 0));
-            sumList.addFirst(new MsqSum());
-        }
+        systemList.addFirst(new MsqEvent(noleggioList.get(nextEventNoleggio).getT(), 1));
+        sumList.addFirst(new MsqSum());
 
         // ricarica
-        List<MsqEvent> ricaricaList = eventListManager.getServerRicarica();
-        int nextEventRicarica = MsqEvent.getNextEvent(ricaricaList, RICARICA_SERVER);
-        if (nextEventRicarica != -1) {
-            systemList.add(1, new MsqEvent(ricaricaList.get(nextEventRicarica).getT(), 1));
-            sumList.add(1, new MsqSum());
-        } else {
-            systemList.add(1, new MsqEvent(0, 0));
-            sumList.add(1, new MsqSum());
-        }
+        systemList.add(1, new MsqEvent(0, 0));
+        sumList.add(1, new MsqSum());
+
 
         // parcheggio
-        List<MsqEvent> parcheggioList = eventListManager.getServerParcheggio();
-        int nextEventParcheggio = MsqEvent.getNextEvent(parcheggioList, PARCHEGGIO_SERVER);
-        if (nextEventParcheggio != -1) {
-            systemList.add(2, new MsqEvent(ricaricaList.get(nextEventParcheggio).getT(), 1));
-            sumList.add(2, new MsqSum());
-        } else {
-            systemList.add(2, new MsqEvent(0, 0));
-            sumList.add(2, new MsqSum());
-        }
+        systemList.add(2, new MsqEvent(0, 0));
+        sumList.add(2, new MsqSum());
 
         // strada
         systemList.add(3, new MsqEvent(0, 0));
@@ -95,17 +77,16 @@ public class Sistema {
         simpleSimulation();
     }
 
-    public void simpleSimulation() throws Exception {
+    private void simpleSimulation() throws Exception {
         int e;
         //prende la lista di eventi per il sistema
         List<MsqEvent> eventList = eventListManager.getSystemEventsList();
         /*
          * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
          */
-        while(getNextEvent(eventList)!=-1) {
+        while (getNextEvent(eventList) != -1) {
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
-
             //imposta il tempo del prossimo evento
             msqT.setNext(eventList.get(e).getT());
             //si calcola l'area dell'integrale
@@ -122,24 +103,6 @@ public class Sistema {
 
             eventList=eventListManager.getSystemEventsList();
         }
-
-        System.out.println("Sistema\n\n");
-        System.out.println("for " + index + " jobs the service node statistics are:\n\n");
-        System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
-        System.out.println("  avg wait ........... = " + area / index);
-        System.out.println("  avg # in node ...... = " + area / msqT.getCurrent());
-
-        for(int i = 1; i < NODES; i++) {
-            this.area -= sumList.get(i).getService();
-        }
-        System.out.println("  avg delay .......... = " + this.area / index);
-        System.out.println("  avg # in queue ..... = " + this.area / msqT.getCurrent());
-        System.out.println("\nthe server statistics are:\n\n");
-        System.out.println("    server     utilization     avg service        share\n");
-        for(int i = 1; i < NODES; i++) {
-            System.out.println(i + "\t" + sumList.get(i).getService() / msqT.getCurrent() + "\t" + sumList.get(i).getService() / sumList.get(i).getServed() + "\t" + ((double)sumList.get(i).getServed() / index));
-        }
-        System.out.println("\n");
     }
 
     /*public void simpleSimulation() throws Exception {
@@ -188,7 +151,6 @@ public class Sistema {
             }
             i++;
         }
-
         return e;
     }
 }
