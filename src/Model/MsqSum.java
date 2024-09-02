@@ -1,12 +1,17 @@
 package Model;
 
 public class MsqSum {
-    private double service; /* Number served */
+    private double service; /* Time spent in service */
     private long served;    /* Number served */
 
     public MsqSum() {
         this.service = 0;
         this.served = 0;
+    }
+
+    public MsqSum(double service, long served) {
+        this.service = service;
+        this.served = served;
     }
 
     public double getService() {

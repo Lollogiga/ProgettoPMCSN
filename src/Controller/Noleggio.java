@@ -3,7 +3,6 @@ package Controller;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
-import Libs.Rngs;
 import Util.Distribution;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ public class Noleggio implements Center {
     int s;                          /* server index                       */
     long index = 0;                 /* used to count processed jobs       */
     double service;
-    private double area = 0.0;      /* time integrated number in the node */
+    double area = 0.0;      /* time integrated number in the node */
 
     private final List<MsqEvent> eventList = new ArrayList<>(NOLEGGIO_SERVER + 1);
     private final List<MsqSum> sumList = new ArrayList<>(NOLEGGIO_SERVER + 1);
@@ -66,7 +65,7 @@ public class Noleggio implements Center {
 
             eventList.getFirst().setT(distr.getArrival(0)); /* Get new arrival from passenger arrival */
 
-            if (eventList.getFirst().getT() > STOP) {
+            if (eventList.getFirst().getT() > STOP_FIN) {
                 eventList.getFirst().setX(0);
                 eventListManager.setServerNoleggio(eventList); // TODO superfluo? Fatto alla fine
             }
@@ -102,7 +101,11 @@ public class Noleggio implements Center {
 
             /* Virtual move of job from Noleggio to Strada */
             event = eventList.get(s);
-            eventListManager.setIntEventStrada(event);
+            event.setX(1);
+
+            List<MsqEvent> serverStrada = eventListManager.getServerStrada();
+            serverStrada.set(0, event);
+            eventListManager.setServerStrada(serverStrada);
 
             if (number >= NOLEGGIO_SERVER) {        /* there is some jobs in queue, place another job in this server */
                 service = distr.getService(0);

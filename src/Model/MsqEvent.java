@@ -23,12 +23,15 @@ public class MsqEvent {
         int e;
         int i = 0;
 
-        while (event.get(i).x == 0)       /* find the index of the first 'active' */
+        while (i < event.size() && event.get(i).x == 0)       /* find the index of the first 'active' */
             i++;                        /* element in the event list            */
-        e = i;
+        if (i == event.size()) return -1;
 
+        e = i;
         while (i < servers) {         /* now, check the others to find which  */
             i++;                        /* event type is most imminent          */
+            if (i >= servers) return -1;
+
             if ((event.get(i).x == 1) && (event.get(i).t < event.get(e).t))
                 e = i;
         }
@@ -40,8 +43,10 @@ public class MsqEvent {
         int s;
         int i = 1;
 
-        while (event.get(i).x == 1)       /* find the index of the first available */
+        while (i < event.size() && event.get(i).x == 1)       /* find the index of the first available */
             i++;                        /* (idle) server                         */
+        if (i == event.size()) return -1;
+
         s = i;
         while (i < servers) {         /* now, check the others to find which   */
             i++;                        /* has been idle longest                 */

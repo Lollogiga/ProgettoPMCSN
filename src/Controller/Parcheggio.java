@@ -1,6 +1,5 @@
 package Controller;
 
-import Libs.Rngs;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
@@ -18,7 +17,7 @@ public class Parcheggio implements Center {
     int e;                               /* next event index                   */
     int s;                               /* server index                       */
     long index = 0;                      /* used to count processed jobs       */
-    private double area = 0.0;           /* time integrated number in the node */
+    double area = 0.0;           /* time integrated number in the node */
     double service;
 
     private final MsqT msqT = new MsqT();
@@ -60,11 +59,10 @@ public class Parcheggio implements Center {
             this.number++;
 
             if (e == 0) {   /* Check if event is an external arrival */
-                event = eventList.getFirst();
-
                 eventList.getFirst().setT(distr.getArrival(1)); /* Get new arrival from exogenous arrival */
+                eventListManager.incrementCars();   /* New car in system */
 
-                if (eventList.getFirst().getT() > STOP) {
+                if (eventList.getFirst().getT() > STOP_FIN) {
                     eventList.getFirst().setX(0);
                     eventListManager.setServerParcheggio(eventList); // TODO superfluo? Fatto alla fine
                 }
@@ -97,7 +95,7 @@ public class Parcheggio implements Center {
             eventListManager.setIntQueueNoleggio(intQueueNoleggio);
 
             // Update number of available cars in the center depending on where the car comes from
-            if (eventListManager.incementCarsInRicarica() != 0)
+            if (eventListManager.incrementCarsInParcheggio() != 0)
                 throw new RuntimeException("ReduceCarsInParcheggio error");
 
             s = e;

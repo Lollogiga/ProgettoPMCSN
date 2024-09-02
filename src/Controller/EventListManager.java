@@ -17,29 +17,31 @@ public class EventListManager {
     private List<MsqEvent> serverNoleggio;
     private List<MsqEvent> serverRicarica;
     private List<MsqEvent> serverParcheggio;
+    private List<MsqEvent> systemEventsList;
 
     private List<MsqEvent> intQueueNoleggio;
     private List<MsqEvent> intQueueParcheggio;
     private List<MsqEvent> intQueueRicarica;
 
-    /* Not a queue! Used to transfer job from Noleggio to Strada */
-    private MsqEvent intEventStrada;
-
     private int carsInParcheggio;
     private int carsInRicarica;
 
+    private int cars;
+
     private EventListManager() {
-        this.serverStrada = new ArrayList<>();
+        this.serverStrada = new ArrayList<>(1);
         this.serverNoleggio = new ArrayList<>(NOLEGGIO_SERVER + 1);
         this.serverRicarica = new ArrayList<>(RICARICA_SERVER + 2);
         this.serverParcheggio = new ArrayList<>(PARCHEGGIO_SERVER + 2);
+        this.systemEventsList = new ArrayList<>(NODES);
 
         this.intQueueParcheggio = new ArrayList<>();
         this.intQueueNoleggio = new ArrayList<>();
         this.intQueueRicarica = new ArrayList<>();
 
-        carsInParcheggio = 0;
-        carsInRicarica = 0;
+        this.carsInParcheggio = 0;
+        this.carsInRicarica = 0;
+        this.cars = 0;
     }
 
     public static synchronized EventListManager getInstance() {
@@ -78,16 +80,16 @@ public class EventListManager {
         this.intQueueRicarica = intQueueRicarica;
     }
 
-    public void setIntEventStrada(MsqEvent event) {
-        this.intEventStrada = event;
-    }
-
     public void setCarsInParcheggio(int carsInParcheggio) {
         this.carsInParcheggio = carsInParcheggio;
     }
 
     public void setCarsInRicarica(int carsInRicarica) {
         this.carsInRicarica = carsInRicarica;
+    }
+
+    public void setSystemEventsList(List<MsqEvent> systemEventsList) {
+        this.systemEventsList = systemEventsList;
     }
 
     public List<MsqEvent> getServerStrada() {
@@ -118,8 +120,8 @@ public class EventListManager {
         return intQueueRicarica;
     }
 
-    public MsqEvent getIntEventStrada() {
-        return intEventStrada;
+    public List<MsqEvent> getSystemEventsList() {
+        return systemEventsList;
     }
 
     public int getCarsInParcheggio() {
@@ -130,7 +132,7 @@ public class EventListManager {
         return carsInRicarica;
     }
 
-    public int incementCarsInParcheggio() {
+    public int incrementCarsInParcheggio() {
         if (this.carsInParcheggio == PARCHEGGIO_SERVER) return 1;
 
         this.carsInParcheggio++;
@@ -138,12 +140,21 @@ public class EventListManager {
         return 0;
     }
 
-    public int incementCarsInRicarica() {
+    public int incrementCarsInRicarica() {
         if (this.carsInRicarica == RICARICA_SERVER) return 1;
 
         this.carsInRicarica++;
 
         return 0;
+    }
+
+    public void incrementCars() {
+        this.cars++;
+    }
+
+    public void decrementCars() {
+        if (this.cars != 0)
+            this.cars--;
     }
 
     public int reduceCarsInParcheggio() {
