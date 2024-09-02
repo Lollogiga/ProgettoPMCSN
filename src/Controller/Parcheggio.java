@@ -23,8 +23,6 @@ public class Parcheggio implements Center {
 
     private final MsqT msqT = new MsqT();
 
-    private final Rngs r = new Rngs();
-
     private final List<MsqEvent> serverList = new ArrayList<>(PARCHEGGIO_SERVER + 2);
     private final List<MsqSum> sumList = new ArrayList<>(PARCHEGGIO_SERVER + 2);
     private final Distribution distr;
@@ -42,7 +40,9 @@ public class Parcheggio implements Center {
         eventListManager.setServerParcheggio(serverList);
     }
 
+    @Override
     public void simpleSimulation() {
+        MsqEvent event;
         List<MsqEvent> eventList = eventListManager.getServerParcheggio();
         List<MsqEvent> internalEventList = eventListManager.getIntQueueParcheggio();
 
@@ -58,7 +58,6 @@ public class Parcheggio implements Center {
 
         if (e == 0 || e == eventList.size() - 1) {   /* Check if event is an arrival */
             this.number++;
-            MsqEvent event;
 
             if (e == 0) {   /* Check if event is an external arrival */
                 event = eventList.getFirst();
@@ -91,7 +90,15 @@ public class Parcheggio implements Center {
             this.index++;
             this.number--;
 
-            // TODO move job to Noleggio queue
+            /* Routing job to rental station */
+            event = new MsqEvent(msqT.getCurrent(), eventList.get(e).getX(), true);
+            List<MsqEvent> intQueueNoleggio = eventListManager.getIntQueueNoleggio();
+            intQueueNoleggio.add(event);
+            eventListManager.setIntQueueNoleggio(intQueueNoleggio);
+
+            // Update number of available cars in the center depending on where the car comes from
+            if (eventListManager.incementCarsInRicarica() != 0)
+                throw new RuntimeException("ReduceCarsInParcheggio error");
 
             s = e;
             if (number >= PARCHEGGIO_SERVER) {        /* there is some jobs in queue, place another job in this server */

@@ -3,12 +3,19 @@ package Model;
 import java.util.List;
 
 public class MsqEvent {
-    private double t;   /*   next event time      */
-    private int x;  /*   event status, 0 or 1 */
+    private double t;               /*   next event time      */
+    private int x;                  /*   event status, 0 or 1 */
+    private boolean fromParking;    /* true = arrival from parking station, false = arrival from charging station */
 
     public MsqEvent(double t, int x) {
         this.t = t;
         this.x = x;
+    }
+
+    public MsqEvent(double t, int x, boolean fromParking) {
+        this.t = t;
+        this.x = x;
+        this.fromParking = fromParking;
     }
 
     /* Return the index of the next event type */
@@ -56,4 +63,8 @@ public class MsqEvent {
     public int getX() {return x;}
 
     public void setX(int x) {this.x = x;}
+
+    public boolean isFromParking() {return fromParking;}
+
+    public void setFromParking(boolean fromParking) {this.fromParking = fromParking;}
 }

@@ -22,6 +22,12 @@ public class EventListManager {
     private List<MsqEvent> intQueueParcheggio;
     private List<MsqEvent> intQueueRicarica;
 
+    /* Not a queue! Used to transfer job from Noleggio to Strada */
+    private MsqEvent intEventStrada;
+
+    private int carsInParcheggio;
+    private int carsInRicarica;
+
     private EventListManager() {
         this.serverStrada = new ArrayList<>();
         this.serverNoleggio = new ArrayList<>(NOLEGGIO_SERVER + 1);
@@ -31,6 +37,9 @@ public class EventListManager {
         this.intQueueParcheggio = new ArrayList<>();
         this.intQueueNoleggio = new ArrayList<>();
         this.intQueueRicarica = new ArrayList<>();
+
+        carsInParcheggio = 0;
+        carsInRicarica = 0;
     }
 
     public static synchronized EventListManager getInstance() {
@@ -69,6 +78,18 @@ public class EventListManager {
         this.intQueueRicarica = intQueueRicarica;
     }
 
+    public void setIntEventStrada(MsqEvent event) {
+        this.intEventStrada = event;
+    }
+
+    public void setCarsInParcheggio(int carsInParcheggio) {
+        this.carsInParcheggio = carsInParcheggio;
+    }
+
+    public void setCarsInRicarica(int carsInRicarica) {
+        this.carsInRicarica = carsInRicarica;
+    }
+
     public List<MsqEvent> getServerStrada() {
         return serverStrada;
     }
@@ -95,5 +116,49 @@ public class EventListManager {
 
     public List<MsqEvent> getIntQueueRicarica() {
         return intQueueRicarica;
+    }
+
+    public MsqEvent getIntEventStrada() {
+        return intEventStrada;
+    }
+
+    public int getCarsInParcheggio() {
+        return carsInParcheggio;
+    }
+
+    public int getCarsInRicarica() {
+        return carsInRicarica;
+    }
+
+    public int incementCarsInParcheggio() {
+        if (this.carsInParcheggio == PARCHEGGIO_SERVER) return 1;
+
+        this.carsInParcheggio++;
+
+        return 0;
+    }
+
+    public int incementCarsInRicarica() {
+        if (this.carsInRicarica == RICARICA_SERVER) return 1;
+
+        this.carsInRicarica++;
+
+        return 0;
+    }
+
+    public int reduceCarsInParcheggio() {
+        if (this.carsInParcheggio == 0) return 1;
+
+        this.carsInParcheggio--;
+
+        return 0;
+    }
+
+    public int reduceCarsInRicarica() {
+        if (this.carsInRicarica == 0) return 1;
+
+        this.carsInRicarica--;
+
+        return 0;
     }
 }

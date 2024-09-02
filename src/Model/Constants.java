@@ -5,7 +5,7 @@ import Util.Distribution;
 public class Constants {
     /*  Number of servers in each center  */
     public static final int NOLEGGIO_SERVER = 1;
-    public static final int STRADA_SERVER = 1; // TODO set right number
+    public static final int STRADA_SERVER = Integer.MAX_VALUE; // Infinite server
     public static final int PARCHEGGIO_SERVER = 200;
     public static final int RICARICA_SERVER = 60;
 
