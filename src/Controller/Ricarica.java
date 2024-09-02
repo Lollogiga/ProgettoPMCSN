@@ -51,7 +51,7 @@ public class Ricarica implements Center {
 
         if (!internalEventList.isEmpty()) eventList.getLast().setT(internalEventList.getFirst().getT());
 
-        int e = MsqEvent.getNextEvent(serverList, RICARICA_SERVER);
+        int e = MsqEvent.getNextEvent(serverList, RICARICA_SERVER + 1);
         msqT.setNext(eventList.get(e).getT());
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
@@ -65,7 +65,7 @@ public class Ricarica implements Center {
 
                 if (eventList.getFirst().getT() > STOP) {
                     eventList.getFirst().setX(0);
-                    eventListManager.setServerRicarica(eventList);
+                    eventListManager.setServerRicarica(eventList); // TODO superfluo? Fatto alla fine
                 }
 
                 event = eventList.getFirst();
@@ -102,8 +102,9 @@ public class Ricarica implements Center {
                 sumList.get(s).incrementServed();
             } else                                    /* no job in queue, simply remove it from server */
                 eventList.get(s).setX(0);
-
-            eventListManager.setServerParcheggio(eventList);
         }
+
+        eventListManager.setServerRicarica(eventList);
+        eventListManager.setIntQueueRicarica(internalEventList);
     }
 }

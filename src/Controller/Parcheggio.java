@@ -12,14 +12,14 @@ import java.util.List;
 import static Model.Constants.*;
 
 public class Parcheggio implements Center {
+    private final EventListManager eventListManager;
+
     long number = 0;                     /* number of jobs in the node         */
     int e;                               /* next event index                   */
     int s;                               /* server index                       */
     long index = 0;                      /* used to count processed jobs       */
     private double area = 0.0;           /* time integrated number in the node */
     double service;
-
-    private final EventListManager eventListManager;
 
     private final MsqT msqT = new MsqT();
 
@@ -51,7 +51,7 @@ public class Parcheggio implements Center {
 
         if (!internalEventList.isEmpty()) eventList.getLast().setT(internalEventList.getFirst().getT());
 
-        int e = MsqEvent.getNextEvent(serverList, PARCHEGGIO_SERVER);
+        int e = MsqEvent.getNextEvent(eventList, PARCHEGGIO_SERVER + 1);
         msqT.setNext(eventList.get(e).getT());
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
@@ -61,14 +61,14 @@ public class Parcheggio implements Center {
             MsqEvent event;
 
             if (e == 0) {   /* Check if event is an external arrival */
+                event = eventList.getFirst();
+
                 eventList.getFirst().setT(distr.getArrival(1)); /* Get new arrival from exogenous arrival */
 
                 if (eventList.getFirst().getT() > STOP) {
                     eventList.getFirst().setX(0);
-                    eventListManager.setServerParcheggio(eventList);
+                    eventListManager.setServerParcheggio(eventList); // TODO superfluo? Fatto alla fine
                 }
-
-                event = eventList.getFirst();
             } else {    /* Event is an internal arrival */
                 event = internalEventList.getFirst();
                 internalEventList.removeFirst();
@@ -78,7 +78,7 @@ public class Parcheggio implements Center {
 
             if (number <= PARCHEGGIO_SERVER) {
                 service = distr.getService(1);
-                s = MsqEvent.findOne(serverList, PARCHEGGIO_SERVER);
+                s = MsqEvent.findOne(eventList, PARCHEGGIO_SERVER);
 
                 /* Set server as active */
                 eventList.get(s).setT(msqT.getCurrent() +  service);
@@ -102,9 +102,10 @@ public class Parcheggio implements Center {
                 sumList.get(s).incrementServed();
             } else                                    /* no job in queue, simply remove it from server */
                 eventList.get(s).setX(0);
-
-            eventListManager.setServerParcheggio(eventList);
         }
+
+        eventListManager.setServerParcheggio(eventList);
+        eventListManager.setIntQueueParcheggio(internalEventList);
     }
 }
 
