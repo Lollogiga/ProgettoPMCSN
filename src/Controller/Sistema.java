@@ -129,14 +129,14 @@ public class Sistema {
         System.out.println("  avg wait ........... = " + area / index);
         System.out.println("  avg # in node ...... = " + area / msqT.getCurrent());
 
-        for(int i = 1; i <= NODES; i++) {
+        for(int i = 1; i < NODES; i++) {
             this.area -= sumList.get(i).getService();
         }
         System.out.println("  avg delay .......... = " + this.area / index);
         System.out.println("  avg # in queue ..... = " + this.area / msqT.getCurrent());
         System.out.println("\nthe server statistics are:\n\n");
         System.out.println("    server     utilization     avg service        share\n");
-        for(int i = 1; i <= NODES; i++) {
+        for(int i = 1; i < NODES; i++) {
             System.out.println(i + "\t" + sumList.get(i).getService() / msqT.getCurrent() + "\t" + sumList.get(i).getService() / sumList.get(i).getServed() + "\t" + ((double)sumList.get(i).getServed() / index));
         }
         System.out.println("\n");
