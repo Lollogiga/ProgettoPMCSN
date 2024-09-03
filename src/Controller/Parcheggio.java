@@ -112,6 +112,27 @@ public class Parcheggio implements Center {
         eventListManager.setServerParcheggio(eventList);
         eventListManager.setIntQueueParcheggio(internalEventList);
     }
+
+    @Override
+    public void printResult() {
+        System.out.println("Parcheggio\n\n");
+        System.out.println("for " + index + " jobs the service node statistics are:\n\n");
+        System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
+        System.out.println("  avg wait ........... = " + area / index);
+        System.out.println("  avg # in node ...... = " + area / msqT.getCurrent());
+
+        for(int i = 1; i < NODES; i++) {
+            area -= sumList.get(i).getService();
+        }
+        System.out.println("  avg delay .......... = " + area / index);
+        System.out.println("  avg # in queue ..... = " + area / msqT.getCurrent());
+        System.out.println("\nthe server statistics are:\n\n");
+        System.out.println("    server     utilization     avg service        share\n");
+        for(int i = 1; i < NODES; i++) {
+            System.out.println(i + "\t" + sumList.get(i).getService() / msqT.getCurrent() + "\t" + sumList.get(i).getService() / sumList.get(i).getServed() + "\t" + ((double)sumList.get(i).getServed() / index));
+        }
+        System.out.println("\n");
+    }
 }
 
 

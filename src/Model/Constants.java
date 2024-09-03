@@ -40,4 +40,11 @@ public class Constants {
     public static final int NODES = 4;
 
     public static final long SEED = 123456789L;   // TODO set right number
+
+    /* Center names */
+    public static final String RICARICA = "Ricarica";
+    public static final String PARCHEGGIO = "Parcheggio";
+    public static final String NOLEGGIO = "Noleggio";
+    public static final String STRADA = "Strada";
+    public static final String SISTEMA = "Sistema";
 }
