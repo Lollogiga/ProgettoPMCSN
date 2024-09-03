@@ -19,10 +19,10 @@ public class Constants {
     public static final double P_LOSS = 0.2;
 
     /* Arrival rate (passenger/sec) */
-    public static final double LAMBDA = 0.0067; /*  It is like 10 arrivals every 25 minutes  */
+    public static final double LAMBDA = 0.0067; /* It is like 10 arrivals every 25 minutes */
 
     /* Exogenous rate */
-    public static final double LAMBDA_EXOGENOUS = 0.0067; // TODO
+    public static final double LAMBDA_EXOGENOUS = 0.0067; // TODO set right number
 
     /* Service rate of rental station (vehicle/sec) */
     public static final double RENTAL_SERVICE = LAMBDA;
@@ -39,12 +39,6 @@ public class Constants {
     /* Nodes in system */
     public static final int NODES = 4;
 
+    /* Seed to use for the simulation */
     public static final long SEED = 123456789L;   // TODO set right number
-
-    /* Center names */
-    public static final String RICARICA = "Ricarica";
-    public static final String PARCHEGGIO = "Parcheggio";
-    public static final String NOLEGGIO = "Noleggio";
-    public static final String STRADA = "Strada";
-    public static final String SISTEMA = "Sistema";
 }

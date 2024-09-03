@@ -79,10 +79,7 @@ public class Distribution {
         };
     }
 
-    /* ----------------------------------------------------------------
-     * Random returns a pseudo-random real number uniformly distributed
-     * between 0.0 and 1.0.
-     * ----------------------------------------------------------------
+    /** Random returns a pseudo-random real number uniformly distributed between 0.0 and 1.0.
      */
     public double random() {
         seed = new long[STREAMS];
