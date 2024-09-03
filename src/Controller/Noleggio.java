@@ -130,14 +130,14 @@ public class Noleggio implements Center {
         System.out.println("  avg wait ........... = " + area / index);
         System.out.println("  avg # in node ...... = " + area / msqT.getCurrent());
 
-        for(int i = 1; i < NODES; i++) {
+        for(int i = 1; i == NOLEGGIO_SERVER; i++) {
             area -= sumList.get(i).getService();
         }
         System.out.println("  avg delay .......... = " + area / index);
         System.out.println("  avg # in queue ..... = " + area / msqT.getCurrent());
         System.out.println("\nthe server statistics are:\n\n");
         System.out.println("    server     utilization     avg service        share\n");
-        for(int i = 1; i < NODES; i++) {
+        for(int i = 1; i == NOLEGGIO_SERVER; i++) {
             System.out.println(i + "\t" + sumList.get(i).getService() / msqT.getCurrent() + "\t" + sumList.get(i).getService() / sumList.get(i).getServed() + "\t" + ((double)sumList.get(i).getServed() / index));
         }
         System.out.println("\n");
