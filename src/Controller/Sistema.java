@@ -56,6 +56,12 @@ public class Sistema {
         systemList.addFirst(new MsqEvent(noleggioList.get(nextEventNoleggio).getT(), 1));
         sumList.addFirst(new MsqSum());
 
+        List<MsqEvent> carInRentalStation = eventListManager.getIntQueueNoleggio();
+        for (int i = 0; i < INIT_SYS_CARS; i++) {
+            carInRentalStation.add(i, new MsqEvent(0, 1, true));
+        }
+        eventListManager.setIntQueueNoleggio(carInRentalStation);
+
         // Initialize ricarica
         systemList.add(1, new MsqEvent(0, 0));
         sumList.add(1, new MsqSum());
@@ -87,7 +93,7 @@ public class Sistema {
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
             msqT.setCurrent(msqT.getNext());
 
-            if (e < 3) {
+            if (e < 4) {
                 controllerList.get(e).simpleSimulation();
                 eventList = eventListManager.getSystemEventsList();
             } else throw new Exception("Invalid event");
@@ -97,7 +103,7 @@ public class Sistema {
     }
 
     private void printResult() {
-        System.out.println("Ricarica\n\n");
+        System.out.println("Sistema\n\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
         System.out.println("  avg wait ........... = " + area / index);

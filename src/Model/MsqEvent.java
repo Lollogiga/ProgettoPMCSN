@@ -25,12 +25,10 @@ public class MsqEvent {
 
         while (i < event.size() && event.get(i).x == 0)       /* find the index of the first 'active' */
             i++;                        /* element in the event list            */
-        //if (i == event.size()) return -1;
 
         e = i;
         while (i < servers) {         /* now, check the others to find which  */
             i++;                        /* event type is most imminent          */
-            //if (i >= servers) return -1;
 
             if ((event.get(i).x == 1) && (event.get(i).t < event.get(e).t))
                 e = i;
@@ -45,7 +43,6 @@ public class MsqEvent {
 
         while (i < event.size() && event.get(i).x == 1)       /* find the index of the first available */
             i++;                        /* (idle) server                         */
-        if (i == event.size()) return -1;
 
         s = i;
         while (i < servers) {         /* now, check the others to find which   */
@@ -72,4 +69,9 @@ public class MsqEvent {
     public boolean isFromParking() {return fromParking;}
 
     public void setFromParking(boolean fromParking) {this.fromParking = fromParking;}
+
+    @Override
+    public String toString() {
+        return "{t=" + t + ", x=" + x + '}';
+    }
 }

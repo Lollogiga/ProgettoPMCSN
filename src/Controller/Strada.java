@@ -83,18 +83,27 @@ public class Strada implements Center {
             /* The job stays in this system */
             s = e;
 
+            /* Update centralized event list */
+            List<MsqEvent> systemList = eventListManager.getSystemEventsList();
             eventList.get(s).setX(1);
+
             double pRicarica = distr.random();
             if (pRicarica < P_RICARICA) {
                 // Event sent to Ricarica
                 List<MsqEvent> intQueueRicarica = eventListManager.getIntQueueRicarica();
                 intQueueRicarica.add(eventList.get(s));
                 eventListManager.setIntQueueRicarica(intQueueRicarica);
+
+                systemList.get(0).setX(1);
+                systemList.get(0).setT();
             } else {
                 // Event sent to Parcheggio
                 List<MsqEvent> intQueueParcheggio = eventListManager.getIntQueueParcheggio();
                 intQueueParcheggio.add(eventList.get(s));
                 eventListManager.setIntQueueParcheggio(intQueueParcheggio);
+
+                systemList.get(0).setX(1);
+                systemList.get(0).setT();
             }
 
             eventList.get(s).setX(0);   /* Set server as idle */

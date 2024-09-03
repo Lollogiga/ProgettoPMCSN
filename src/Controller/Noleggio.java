@@ -46,7 +46,8 @@ public class Noleggio implements Center {
 
     @Override
     public void simpleSimulation() {
-        MsqEvent event;
+        int e;
+        MsqEvent event = null;
 
         List<MsqEvent> eventList = eventListManager.getServerNoleggio();
         List<MsqEvent> internalEventList = eventListManager.getIntQueueNoleggio();
@@ -54,8 +55,7 @@ public class Noleggio implements Center {
         /* No event to process */
         if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0) return;
 
-        int e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER);
-
+        if((e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER)) >= eventList.size()) return;
         msqT.setNext(eventList.get(e).getT());
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
@@ -65,6 +65,8 @@ public class Noleggio implements Center {
             this.number++;
 
             eventList.getFirst().setT(distr.getArrival(0)); /* Get new arrival from passenger arrival */
+
+            event = eventList.getFirst();
 
             if (eventList.getFirst().getT() > STOP_FIN) {
                 eventList.getFirst().setX(0);
@@ -76,7 +78,7 @@ public class Noleggio implements Center {
                 s = MsqEvent.findOne(eventList, NOLEGGIO_SERVER);
 
                 /* Set server as active */
-                eventList.get(s).setT(msqT.getCurrent() +  service);
+                eventList.get(s).setT(msqT.getCurrent() + service);
                 eventList.get(s).setX(1);
                 internalEventList.removeFirst();
 
@@ -120,6 +122,12 @@ public class Noleggio implements Center {
 
         eventListManager.setServerNoleggio(eventList);
         eventListManager.setIntQueueNoleggio(internalEventList);
+
+        /* Update centralized event list */
+        List<MsqEvent> systemList = eventListManager.getSystemEventsList();
+        systemList.get(3).setX(1);
+        assert event != null;
+        systemList.get(3).setT(event.getT());
     }
 
     @Override

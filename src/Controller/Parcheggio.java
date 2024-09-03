@@ -41,6 +41,7 @@ public class Parcheggio implements Center {
 
     @Override
     public void simpleSimulation() {
+        int e;
         MsqEvent event;
         List<MsqEvent> eventList = eventListManager.getServerParcheggio();
         List<MsqEvent> internalEventList = eventListManager.getIntQueueParcheggio();
@@ -48,9 +49,12 @@ public class Parcheggio implements Center {
         /* no external arrivals, no internal arrivals and no jobs in the server */
         if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0) return;
 
-        if (!internalEventList.isEmpty()) eventList.getLast().setT(internalEventList.getFirst().getT());
+        if (!internalEventList.isEmpty()) {
+            eventList.getLast().setT(internalEventList.getFirst().getT());
+            eventList.getLast().setX(1);
+        }
 
-        int e = MsqEvent.getNextEvent(eventList, PARCHEGGIO_SERVER + 1);
+        if ((e = MsqEvent.getNextEvent(eventList, PARCHEGGIO_SERVER + 1)) >= eventList.size()) return;
         msqT.setNext(eventList.get(e).getT());
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
@@ -89,7 +93,7 @@ public class Parcheggio implements Center {
             this.number--;
 
             /* Routing job to rental station */
-            event = new MsqEvent(msqT.getCurrent(), eventList.get(e).getX(), true);
+            event = new MsqEvent(msqT.getCurrent(), 1, true);
             List<MsqEvent> intQueueNoleggio = eventListManager.getIntQueueNoleggio();
             intQueueNoleggio.add(event);
             eventListManager.setIntQueueNoleggio(intQueueNoleggio);
@@ -117,7 +121,7 @@ public class Parcheggio implements Center {
     public void printResult() {
         System.out.println("Parcheggio\n\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
-        System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
+//        System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
         System.out.println("  avg wait ........... = " + area / index);
         System.out.println("  avg # in node ...... = " + area / msqT.getCurrent());
 
@@ -129,7 +133,7 @@ public class Parcheggio implements Center {
         System.out.println("\nthe server statistics are:\n\n");
         System.out.println("    server     utilization     avg service        share\n");
         for(int i = 1; i <= PARCHEGGIO_SERVER; i++) {
-            System.out.println(i + "\t" + sumList.get(i).getService() / msqT.getCurrent() + "\t" + sumList.get(i).getService() / sumList.get(i).getServed() + "\t" + ((double)sumList.get(i).getServed() / index));
+            System.out.println("       " + i + "\t" + sumList.get(i).getService() / msqT.getCurrent() + "\t" + sumList.get(i).getService() / sumList.get(i).getServed() + "\t" + ((double)sumList.get(i).getServed() / index));
         }
         System.out.println("\n");
     }

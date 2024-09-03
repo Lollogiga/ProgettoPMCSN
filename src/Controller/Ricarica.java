@@ -49,7 +49,10 @@ public class Ricarica implements Center {
         /* no external arrivals, no internal arrivals and no jobs in the server */
         if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0) return;
 
-        if (!internalEventList.isEmpty()) eventList.getLast().setT(internalEventList.getFirst().getT());
+        if (!internalEventList.isEmpty()) {
+            eventList.getLast().setT(internalEventList.getFirst().getT());
+            eventList.getLast().setX(1);
+        }
 
         int e = MsqEvent.getNextEvent(serverList, RICARICA_SERVER + 1);
         msqT.setNext(eventList.get(e).getT());

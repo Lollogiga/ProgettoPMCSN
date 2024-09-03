@@ -83,6 +83,7 @@ class Msq {
 
             t.current = t.next;                         /* advance the clock*/
 
+
             if (e == 0) {                               /* process an arrival*/
                 number++;
                 event[0].t = m.getArrival(r);

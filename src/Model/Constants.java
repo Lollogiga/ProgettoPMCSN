@@ -41,4 +41,18 @@ public class Constants {
 
     /* Seed to use for the simulation */
     public static final long SEED = 123456789L;   // TODO set right number
+
+    public static final int CARS = 200; //Todo set right number (Should be 200, CHECK CARS AND PARCHEGGIO_SERVER)
+
+    public static final int INIT_SYS_CARS = 100;
+
+    /* Cost constants */
+    public static final int CAR_COST = 5; /* Yen/hour for each car */
+    public static final int PARKING_COST = 8; /* Yen/hour for each parking */
+    public static final int LOSS_COST = 300; /* Yen for each loss */
+
+    /* Profit constants */ /*Todo Variable or constant profit */
+    public static final int RENTAL_TIME_PROFIT = 118; /* (100 + 0.3*60) Yen/hour when a car is on the road */
+    public static final double RENTAL_KM_PROFIT = 0.99; /* Yen/km when a car is on the road */
+    public static final int RENTAL_PROFIT = 80; /* Yen/hour */
 }

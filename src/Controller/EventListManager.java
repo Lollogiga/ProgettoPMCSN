@@ -17,11 +17,12 @@ public class EventListManager {
     private List<MsqEvent> serverNoleggio;
     private List<MsqEvent> serverRicarica;
     private List<MsqEvent> serverParcheggio;
-    private List<MsqEvent> systemEventsList;
 
     private List<MsqEvent> intQueueNoleggio;
     private List<MsqEvent> intQueueParcheggio;
     private List<MsqEvent> intQueueRicarica;
+
+    private List<MsqEvent> systemEventsList;
 
     private int carsInParcheggio;
     private int carsInRicarica;
@@ -33,13 +34,14 @@ public class EventListManager {
         this.serverNoleggio = new ArrayList<>(NOLEGGIO_SERVER + 1);
         this.serverRicarica = new ArrayList<>(RICARICA_SERVER + 2);
         this.serverParcheggio = new ArrayList<>(PARCHEGGIO_SERVER + 2);
-        this.systemEventsList = new ArrayList<>(NODES);
 
         this.intQueueParcheggio = new ArrayList<>();
         this.intQueueNoleggio = new ArrayList<>();
         this.intQueueRicarica = new ArrayList<>();
 
-        this.carsInParcheggio = 0;
+        this.systemEventsList = new ArrayList<>(NODES);
+
+        this.carsInParcheggio = INIT_SYS_CARS;
         this.carsInRicarica = 0;
         this.cars = 0;
     }
@@ -171,5 +173,9 @@ public class EventListManager {
         this.carsInRicarica--;
 
         return 0;
+    }
+
+    public double getImminentEvent() {
+
     }
 }
