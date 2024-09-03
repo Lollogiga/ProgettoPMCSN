@@ -23,6 +23,10 @@ public class MsqEvent {
         int e;
         int i = 0;
 
+        if (event.size() == servers && event.size() == 1) {
+            return 0;
+        }
+
         while (i < event.size() && event.get(i).x == 0)       /* find the index of the first 'active' */
             i++;                        /* element in the event list            */
 
@@ -40,9 +44,14 @@ public class MsqEvent {
     public static int findOne(List<MsqEvent> event, int servers) {
         int s;
         int i = 1;
+        boolean found = false;
 
-        while (i < event.size() && event.get(i).x == 1)       /* find the index of the first available */
+        while (i < event.size() && event.get(i).x == 1) {       /* find the index of the first available */
             i++;                        /* (idle) server                         */
+            found = true;
+        }
+
+        if (!found) return -1;
 
         s = i;
         while (i < servers) {         /* now, check the others to find which   */
@@ -52,6 +61,15 @@ public class MsqEvent {
         }
 
         return (s);
+    }
+
+    public static double getImminentEvent(List<MsqEvent> eventList) {
+        double threshold = Double.MAX_VALUE;
+        for (MsqEvent e : eventList) {
+            if (e.x == 1 && e.t < threshold)
+                threshold = e.t;
+        }
+        return threshold;
     }
 
     public double getT() {

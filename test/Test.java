@@ -1,14 +1,59 @@
-import Controller.EventListManager;
-import Controller.Parcheggio;
+import Controller.*;
 import Model.MsqEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static Model.Constants.INIT_SYS_CARS;
+
 public class Test {
 
     public static void main(String[] args) {
-        new Test().testExternalParcheggio();
+        new Noleggio();
+        new Strada();
+        new Parcheggio();
+        new Ricarica();
+
+        new Sistema();
+
+        new Test().testStrada();
+    }
+
+    private void testStrada() {
+        EventListManager eventListManager = EventListManager.getInstance();
+
+        Strada strada = new Strada();
+
+        List<MsqEvent> eventList = eventListManager.getServerStrada();
+        eventList.set(0, new MsqEvent(2.324, 1));
+
+        strada.simpleSimulation();
+        strada.simpleSimulation();
+        strada.simpleSimulation();
+        strada.simpleSimulation();
+    }
+
+    private void testNoleggio() {
+        EventListManager eventListManager = EventListManager.getInstance();
+
+        new Strada();
+
+        List<MsqEvent> carInRentalStation = eventListManager.getIntQueueNoleggio();
+        for (int i = 0; i < INIT_SYS_CARS; i++) {
+            carInRentalStation.add(i, new MsqEvent(0, 1, true));
+        }
+        eventListManager.setIntQueueNoleggio(carInRentalStation);
+
+        Noleggio noleggio = new Noleggio();
+
+        noleggio.simpleSimulation();
+        noleggio.simpleSimulation();
+        noleggio.simpleSimulation();
+        noleggio.simpleSimulation();
+        noleggio.simpleSimulation();
+        noleggio.simpleSimulation();
+
+        noleggio.printResult();
     }
 
     private void testParcheggio() {

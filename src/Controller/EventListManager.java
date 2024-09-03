@@ -174,8 +174,4 @@ public class EventListManager {
 
         return 0;
     }
-
-    public double getImminentEvent() {
-
-    }
 }

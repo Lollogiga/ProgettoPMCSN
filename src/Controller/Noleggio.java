@@ -3,7 +3,7 @@ package Controller;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
-import Util.Distribution;
+import Utils.Distribution;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,8 @@ public class Noleggio implements Center {
     int s;                          /* server index                       */
     long index = 0;                 /* used to count processed jobs       */
     double service;
-    double area = 0.0;      /* time integrated number in the node */
+    double area = 0.0;              /* time integrated number in the node */
+    boolean first_try = true;
 
     private final List<MsqEvent> eventList = new ArrayList<>(NOLEGGIO_SERVER + 1);
     private final List<MsqSum> sumList = new ArrayList<>(NOLEGGIO_SERVER + 1);
@@ -47,7 +48,7 @@ public class Noleggio implements Center {
     @Override
     public void simpleSimulation() {
         int e;
-        MsqEvent event = null;
+        MsqEvent event;
 
         List<MsqEvent> eventList = eventListManager.getServerNoleggio();
         List<MsqEvent> internalEventList = eventListManager.getIntQueueNoleggio();
@@ -64,9 +65,7 @@ public class Noleggio implements Center {
         if (e == 0 && !internalEventList.isEmpty()) {
             this.number++;
 
-            eventList.getFirst().setT(distr.getArrival(0)); /* Get new arrival from passenger arrival */
-
-            event = eventList.getFirst();
+            eventList.get(e).setT(distr.getArrival(0)); /* Get new arrival from passenger arrival */
 
             if (eventList.getFirst().getT() > STOP_FIN) {
                 eventList.getFirst().setX(0);
@@ -75,7 +74,7 @@ public class Noleggio implements Center {
 
             if (number <= NOLEGGIO_SERVER) {
                 service = distr.getService(0);
-                s = MsqEvent.findOne(eventList, NOLEGGIO_SERVER);
+                s = 1;  /* There is only one server */
 
                 /* Set server as active */
                 eventList.get(s).setT(msqT.getCurrent() + service);
@@ -100,14 +99,12 @@ public class Noleggio implements Center {
                 }
             }
 
-            s = e;
-
             /* Virtual move of job from Noleggio to Strada */
-            event = eventList.get(s);
-            event.setX(1);
+            event = eventList.get(e);
 
             List<MsqEvent> serverStrada = eventListManager.getServerStrada();
-            serverStrada.set(0, event);
+            serverStrada.getFirst().setT(event.getT());
+            serverStrada.getFirst().setX(event.getX());
             eventListManager.setServerStrada(serverStrada);
 
             if (number >= NOLEGGIO_SERVER) {        /* there is some jobs in queue, place another job in this server */
@@ -118,16 +115,16 @@ public class Noleggio implements Center {
                 sumList.get(s).incrementServed();
             } else                                    /* no job in queue, simply remove it from server */
                 eventList.get(s).setX(0);
+
+            /* Update centralized event list */
+            List<MsqEvent> systemList = eventListManager.getSystemEventsList();
+            systemList.get(3).setX(1);
+            systemList.get(3).setT(event.getT());
         }
 
         eventListManager.setServerNoleggio(eventList);
         eventListManager.setIntQueueNoleggio(internalEventList);
-
-        /* Update centralized event list */
-        List<MsqEvent> systemList = eventListManager.getSystemEventsList();
-        systemList.get(3).setX(1);
-        assert event != null;
-        systemList.get(3).setT(event.getT());
+        eventListManager.getSystemEventsList().getFirst().setT(MsqEvent.getImminentEvent(eventList));
     }
 
     @Override

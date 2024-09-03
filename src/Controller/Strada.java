@@ -3,7 +3,7 @@ package Controller;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
-import Util.Distribution;
+import Utils.Distribution;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ public class Strada implements Center {
         /* no external arrivals, no internal arrivals and no jobs in the server */
         if (eventList.getFirst().getX() == 0 && eventList.size() == 1) return;
 
-        e = MsqEvent.getNextEvent(eventList, eventList.size());
+        e = MsqEvent.getNextEvent(eventList, eventList.size() - 1);
         msqT.setNext(eventList.get(e).getT());
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
@@ -74,42 +74,43 @@ public class Strada implements Center {
             this.index++;
             this.number--;
 
-            /* Routing */
-            double pLoss = distr.random();
-            if (pLoss < P_LOSS)
-                eventListManager.decrementCars();
-
-
-            /* The job stays in this system */
-            s = e;
-
             /* Update centralized event list */
             List<MsqEvent> systemList = eventListManager.getSystemEventsList();
-            eventList.get(s).setX(1);
 
-            double pRicarica = distr.random();
-            if (pRicarica < P_RICARICA) {
-                // Event sent to Ricarica
-                List<MsqEvent> intQueueRicarica = eventListManager.getIntQueueRicarica();
-                intQueueRicarica.add(eventList.get(s));
-                eventListManager.setIntQueueRicarica(intQueueRicarica);
-
-                systemList.get(0).setX(1);
-                systemList.get(0).setT();
+            /* Routing */
+            s = e;
+            double pLoss = distr.random();
+            if (pLoss < P_LOSS) {
+                eventListManager.decrementCars();
+                // Penalty cost:
+                eventList.get(s).setX(0);
+                eventListManager.getSystemEventsList().get(3).setT(MsqEvent.getImminentEvent(eventList));
             } else {
-                // Event sent to Parcheggio
-                List<MsqEvent> intQueueParcheggio = eventListManager.getIntQueueParcheggio();
-                intQueueParcheggio.add(eventList.get(s));
-                eventListManager.setIntQueueParcheggio(intQueueParcheggio);
+                /* Job stays in this system */
+                double pRicarica = distr.random();
+                if (pRicarica < P_RICARICA) {
+                    // Event sent to Ricarica
+                    List<MsqEvent> intQueueRicarica = eventListManager.getIntQueueRicarica();
+                    intQueueRicarica.add(eventList.get(s));
+                    eventListManager.setIntQueueRicarica(intQueueRicarica);
 
-                systemList.get(0).setX(1);
-                systemList.get(0).setT();
+                    systemList.get(1).setX(1);
+                    systemList.get(1).setT(eventList.get(s).getT());
+                } else {
+                    // Event sent to Parcheggio
+                    List<MsqEvent> intQueueParcheggio = eventListManager.getIntQueueParcheggio();
+                    intQueueParcheggio.add(eventList.get(s));
+                    eventListManager.setIntQueueParcheggio(intQueueParcheggio);
+
+                    systemList.get(2).setX(1);
+                    systemList.get(2).setT(eventList.get(s).getT());
+                }
+                eventList.get(s).setX(0);   /* Set server as idle */
             }
-
-            eventList.get(s).setX(0);   /* Set server as idle */
-
-            eventListManager.setServerStrada(eventList);
         }
+
+        eventListManager.setServerStrada(eventList);
+        eventListManager.getSystemEventsList().get(3).setT(MsqEvent.getImminentEvent(eventList));
     }
 
     @Override

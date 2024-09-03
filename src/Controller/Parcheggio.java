@@ -3,7 +3,7 @@ package Controller;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
-import Util.Distribution;
+import Utils.Distribution;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,10 +111,16 @@ public class Parcheggio implements Center {
                 sumList.get(s).incrementServed();
             } else                                    /* no job in queue, simply remove it from server */
                 eventList.get(s).setX(0);
+
+            /* Update centralized event list */
+            List<MsqEvent> systemList = eventListManager.getSystemEventsList();
+            eventList.getFirst().setX(1);
+            systemList.getFirst().setT(event.getT());
         }
 
         eventListManager.setServerParcheggio(eventList);
         eventListManager.setIntQueueParcheggio(internalEventList);
+        eventListManager.getSystemEventsList().get(2).setT(MsqEvent.getImminentEvent(eventList));
     }
 
     @Override

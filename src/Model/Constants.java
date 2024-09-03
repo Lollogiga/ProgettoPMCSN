@@ -1,6 +1,6 @@
 package Model;
 
-import Util.Distribution;
+import Utils.Distribution;
 
 public class Constants {
     /*  Number of servers in each center  */
@@ -19,10 +19,10 @@ public class Constants {
     public static final double P_LOSS = 0.2;
 
     /* Arrival rate (passenger/sec) */
-    public static final double LAMBDA = 0.0067; /* It is like 10 arrivals every 25 minutes */
+    public static final double LAMBDA = 10;
 
     /* Exogenous rate */
-    public static final double LAMBDA_EXOGENOUS = 0.0067; // TODO set right number
+    public static final double LAMBDA_EXOGENOUS = 10; // TODO set right number
 
     /* Service rate of rental station (vehicle/sec) */
     public static final double RENTAL_SERVICE = LAMBDA;

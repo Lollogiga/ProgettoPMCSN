@@ -4,7 +4,7 @@ import Libs.Rngs;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
-import Util.Distribution;
+import Utils.Distribution;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -122,7 +122,7 @@ public class Sistema {
         System.out.println("\n");
     }
 
-    /* Fetch index of most imminent event */
+    /* Fetch index of most imminent event among all servers */
     private int getNextEvent(List<MsqEvent> eventList) {
         double threshold = Double.MAX_VALUE;
         int e = -1;
