@@ -45,7 +45,7 @@ public class Strada implements Center {
         /* no external arrivals, no internal arrivals and no jobs in the server */
         if (eventList.getFirst().getX() == 0 && eventList.size() == 1) return;
 
-        e = MsqEvent.getNextEvent(eventList, eventList.size() - 1);
+        if ((e = MsqEvent.getNextEvent(eventList, eventList.size() - 1)) >= eventList.size()) return;
         msqT.setNext(eventList.get(e).getT());
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
@@ -58,7 +58,7 @@ public class Strada implements Center {
             service = distr.getService(3);
             s = MsqEvent.findOne(eventList, eventList.size());
 
-            if (s == -1) {
+            if (s == -1 || s >= eventList.size()) {
                 /* Setup new server */
                 eventList.add(new MsqEvent(msqT.getCurrent() +  service, 1));
                 sumList.add(new MsqSum(service, 1));
