@@ -30,6 +30,8 @@ public class MsqEvent {
         while (i < event.size() && event.get(i).x == 0)       /* find the index of the first 'active' */
             i++;                        /* element in the event list            */
 
+        if (i >= event.size()) return -1;
+
         e = i;
         while (i < servers) {         /* now, check the others to find which  */
             i++;                        /* event type is most imminent          */

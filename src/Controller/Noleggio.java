@@ -104,12 +104,12 @@ public class Noleggio implements Center {
             eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */
 
             List<MsqEvent> eventListParcheggio = eventListManager.getServerParcheggio();
-            double nextEventParcheggio = MsqEvent.getImminentEvent(eventListParcheggio);
+            int nextEventParcheggio = MsqEvent.getNextEvent(eventListParcheggio, NOLEGGIO_SERVER);
 
             List<MsqEvent> eventListRicarica = eventListManager.getServerRicarica();
-            double nextEventRicarica = MsqEvent.getImminentEvent(eventListRicarica);
+            int nextEventRicarica = MsqEvent.getNextEvent(eventListRicarica, RICARICA_SERVER);
 
-            double nextT = Math.min(nextEventParcheggio, nextEventRicarica);
+            double nextT = Math.min(eventListParcheggio.get(nextEventParcheggio).getT(), eventListRicarica.get(nextEventRicarica).getT());
 
             eventListManager.getSystemEventsList().getFirst().setT(Math.min(nextT + 1, eventList.getFirst().getT()));
 
@@ -161,7 +161,15 @@ public class Noleggio implements Center {
 
         eventListManager.setServerNoleggio(eventList);
         eventListManager.setIntQueueNoleggio(internalEventList);
-        eventListManager.getSystemEventsList().getFirst().setT(MsqEvent.getImminentEvent(eventList));
+//        eventListManager.getSystemEventsList().getFirst().setT(MsqEvent.getImminentEvent(eventList));
+
+        int nextEvent = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER);
+        if (nextEvent == -1) {
+            eventListManager.getSystemEventsList().getFirst().setX(0);
+            return;
+        }
+
+        eventListManager.getSystemEventsList().getFirst().setT(eventList.get(nextEvent).getT());
     }
 
     @Override

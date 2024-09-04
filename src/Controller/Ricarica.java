@@ -136,7 +136,15 @@ public class Ricarica implements Center {
 
         eventListManager.setServerRicarica(eventList);
         eventListManager.setIntQueueRicarica(internalEventList);
-        eventListManager.getSystemEventsList().get(1).setT(MsqEvent.getImminentEvent(eventList));
+//        eventListManager.getSystemEventsList().get(1).setT(MsqEvent.getImminentEvent(eventList));
+
+        int nextEvent = MsqEvent.getNextEvent(eventList, RICARICA_SERVER);
+        if (nextEvent == -1) {
+            eventListManager.getSystemEventsList().get(1).setX(0);
+            return;
+        }
+
+        eventListManager.getSystemEventsList().get(1).setT(eventList.get(nextEvent).getT());
     }
 
     @Override

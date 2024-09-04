@@ -84,9 +84,21 @@ public class Strada implements Center {
             double pLoss = distr.random();
             if (pLoss < P_LOSS) {
                 eventListManager.decrementCars();
-                // Penalty cost:
+
+                // TODO Penalty cost:
+
+                // Sets the status of the server from which the job started equal to 0
                 eventList.get(s).setX(0);
-                eventListManager.getSystemEventsList().get(3).setT(MsqEvent.getImminentEvent(eventList));
+
+//                eventListManager.getSystemEventsList().get(3).setT(MsqEvent.getImminentEvent(eventList));
+
+                int nextEvent = MsqEvent.getNextEvent(eventList, eventList.size() - 1);
+                if (nextEvent == -1) {
+                    eventListManager.getSystemEventsList().get(3).setX(0);
+                    return;
+                }
+
+                eventListManager.getSystemEventsList().get(3).setT(eventList.get(nextEvent).getT());
             } else {
                 /* Job stays in this system */
                 double pRicarica = distr.random();
@@ -112,7 +124,15 @@ public class Strada implements Center {
         }
 
         eventListManager.setServerStrada(eventList);
-        eventListManager.getSystemEventsList().get(3).setT(MsqEvent.getImminentEvent(eventList));
+//        eventListManager.getSystemEventsList().get(3).setT(MsqEvent.getImminentEvent(eventList));
+
+        int nextEvent = MsqEvent.getNextEvent(eventList, eventList.size() - 1);
+        if (nextEvent == -1) {
+            eventListManager.getSystemEventsList().get(3).setX(0);
+            return;
+        }
+
+        eventListManager.getSystemEventsList().get(3).setT(eventList.get(nextEvent).getT());
     }
 
     @Override

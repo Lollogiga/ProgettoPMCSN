@@ -98,7 +98,10 @@ public class Sistema {
         List<MsqEvent> eventList = eventListManager.getSystemEventsList();
 
         while (msqT.getCurrent() < STOP_FIN) {
-            e = getNextEvent(eventList);
+            if((e = getNextEvent(eventList)) == -1) break;
+
+//            if (msqT.getCurrent() > 172763) break;
+//                System.out.println(msqT.getCurrent() + " - " + e);
 
             msqT.setNext(eventList.get(e).getT());
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;

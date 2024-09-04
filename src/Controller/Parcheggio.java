@@ -107,7 +107,10 @@ public class Parcheggio implements Center {
                 this.index--;
 
                 List<MsqEvent> eventListNoleggio = eventListManager.getServerNoleggio();
-                int nextEventNoleggio = MsqEvent.getNextEvent(eventListNoleggio, NOLEGGIO_SERVER);
+                int nextEventNoleggio;
+
+                if ((nextEventNoleggio = MsqEvent.getNextEvent(eventListNoleggio, NOLEGGIO_SERVER)) == -1) return;
+
 
                 eventListManager.getSystemEventsList().get(2).setT(
                         eventListNoleggio.get(nextEventNoleggio).getT()
@@ -136,7 +139,15 @@ public class Parcheggio implements Center {
 
         eventListManager.setServerParcheggio(eventList);
         eventListManager.setIntQueueParcheggio(internalEventList);
-        eventListManager.getSystemEventsList().get(2).setT(MsqEvent.getImminentEvent(eventList));
+//        eventListManager.getSystemEventsList().get(2).setT(MsqEvent.getImminentEvent(eventList));
+
+        int nextEvent = MsqEvent.getNextEvent(eventList, PARCHEGGIO_SERVER);
+        if (nextEvent == -1) {
+            eventListManager.getSystemEventsList().get(2).setX(0);
+            return;
+        }
+
+        eventListManager.getSystemEventsList().get(2).setT(eventList.get(nextEvent).getT());
     }
 
     @Override
