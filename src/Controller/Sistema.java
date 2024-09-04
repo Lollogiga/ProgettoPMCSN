@@ -87,8 +87,14 @@ public class Sistema {
         int e;
         List<MsqEvent> eventList = eventListManager.getSystemEventsList();
 
-        while (getNextEvent(eventList) != -1) {
+        int i = 0;
+
+//        while (getNextEvent(eventList) != -1) {
+        while (i < 55000) {
             e = getNextEvent(eventList);
+
+            if (e == 2) i++;
+
             msqT.setNext(eventList.get(e).getT());
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
             msqT.setCurrent(msqT.getNext());
@@ -99,7 +105,11 @@ public class Sistema {
             } else throw new Exception("Invalid event");
         }
 
-        printResult();
+        for (i = 0; i < 4; i++) {
+            controllerList.get(i).printResult();
+        }
+
+//        printResult();
     }
 
     private void printResult() {

@@ -63,7 +63,7 @@ public class Parcheggio implements Center {
             this.number++;
 
             if (e == 0) {   /* Check if event is an external arrival */
-                eventList.getFirst().setT(distr.getArrival(1)); /* Get new arrival from exogenous arrival */
+                eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(1)); /* Get new arrival from exogenous arrival */
                 eventListManager.incrementCars();   /* New car in system */
 
                 if (eventList.getFirst().getT() > STOP_FIN) {
@@ -99,8 +99,11 @@ public class Parcheggio implements Center {
             eventListManager.setIntQueueNoleggio(intQueueNoleggio);
 
             // Update number of available cars in the center depending on where the car comes from
-            if (eventListManager.incrementCarsInParcheggio() != 0)
-                throw new RuntimeException("ReduceCarsInParcheggio error");
+            if (eventListManager.incrementCarsInParcheggio() != 0) {
+                return; // Ho raggiunto il numero massimo di macchine nel parcheggio, devono restare in coda
+                // TODO: gestire la penalità
+//                throw new RuntimeException("ReduceCarsInParcheggio error");
+            }
 
             s = e;
             if (number >= PARCHEGGIO_SERVER) {        /* there is some jobs in queue, place another job in this server */

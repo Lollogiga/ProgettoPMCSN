@@ -18,6 +18,14 @@ public class Distribution {
     long MULTIPLIER   = 48271;      /* DON'T CHANGE THIS VALUE                  */
     long DEFAULT      = 123456789L; /* initial seed, use 0 < DEFAULT < MODULUS  */
 
+    private Distribution() {
+        seed = new long[STREAMS];
+        seed[0] = DEFAULT;
+        for (int i = 1; i < STREAMS; i++) {
+            seed[i] = (seed[i - 1] * MULTIPLIER) % MODULUS;
+        }
+    }
+
     public static Distribution getInstance() {
         if (instance == null) {
             instance = new Distribution();
@@ -82,10 +90,22 @@ public class Distribution {
     /** Random returns a pseudo-random real number uniformly distributed between 0.0 and 1.0.
      */
     public double random() {
-        seed = new long[STREAMS];
+        long Q = MODULUS / MULTIPLIER;
+        long R = MODULUS % MULTIPLIER;
+        long t;
 
-        seed[0] = DEFAULT;
+        t = MULTIPLIER * (seed[stream] % Q) - R * (seed[stream] / Q);
+        if (t > 0)
+            seed[stream] = t;
+        else
+            seed[stream] = t + MODULUS;
+        return ((double) seed[stream] / MODULUS);
+    }
 
+    /** Random returns a pseudo-random real number uniformly distributed between 0.0 and 1.0.
+     */
+    // TODO random non funziona, ossia, come stream nell'altra è sempre 0. Visto che ne abbiamo 256, dobbiamo usarne anche altre!!!
+    public double random(int stream) {
         long Q = MODULUS / MULTIPLIER;
         long R = MODULUS % MULTIPLIER;
         long t;

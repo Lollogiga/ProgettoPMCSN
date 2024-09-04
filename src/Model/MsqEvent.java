@@ -44,14 +44,12 @@ public class MsqEvent {
     public static int findOne(List<MsqEvent> event, int servers) {
         int s;
         int i = 1;
-        boolean found = false;
 
-        while (i < event.size() && event.get(i).x == 1) {       /* find the index of the first available */
+        /* find the index of the first available */
+        while (i < event.size() && event.get(i).x == 1)
             i++;                        /* (idle) server                         */
-            found = true;
-        }
 
-        if (!found) return -1;
+        if (i >= event.size()) return -1;
 
         s = i;
         while (i < servers) {         /* now, check the others to find which   */

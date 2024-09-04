@@ -63,7 +63,7 @@ public class Ricarica implements Center {
             this.number++;
 
             if (e == 0) {   /* Check if event is an external arrival */
-                eventList.getFirst().setT(distr.getArrival(2)); /* Get new arrival from exogenous arrival */
+                eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(2)); /* Get new arrival from exogenous arrival */
                 eventListManager.incrementCars();
 
                 if (eventList.getFirst().getT() > STOP_FIN) {

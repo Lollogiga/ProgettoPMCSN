@@ -16,8 +16,14 @@ public class Test {
 
         new Sistema();
 
+        new Test().testParcheggio();
         new Test().testStrada();
+        new Test().testNoleggio();
+        new Test().testExternalParcheggio();
+        new Test().testMsqEventGetNextEvent();
     }
+
+
 
     private void testStrada() {
         EventListManager eventListManager = EventListManager.getInstance();
@@ -27,6 +33,15 @@ public class Test {
         List<MsqEvent> eventList = eventListManager.getServerStrada();
         eventList.set(0, new MsqEvent(2.324, 1));
 
+        strada.simpleSimulation();
+        eventList = eventListManager.getServerStrada();
+        eventList.set(0, new MsqEvent(2.524, 1));
+        strada.simpleSimulation();
+        eventList = eventListManager.getServerStrada();
+        eventList.set(0, new MsqEvent(2.724, 1));
+        strada.simpleSimulation();
+        eventList = eventListManager.getServerStrada();
+        eventList.set(0, new MsqEvent(2.924, 1));
         strada.simpleSimulation();
         strada.simpleSimulation();
         strada.simpleSimulation();
@@ -67,21 +82,17 @@ public class Test {
 
         park.simpleSimulation();
         park.simpleSimulation();
-
-        park.printResult();
     }
 
     private void testExternalParcheggio(){
         EventListManager eventListManager = EventListManager.getInstance();
         Parcheggio park = new Parcheggio();
-        List<MsqEvent> intQueueParcheggio = eventListManager.getIntQueueParcheggio();
+        List<MsqEvent> intQueueParcheggio = eventListManager.getServerParcheggio();
 
-        intQueueParcheggio.getLast().setX(1);
-        intQueueParcheggio.getLast().setT(2);
+        intQueueParcheggio.getFirst().setX(1);
+        intQueueParcheggio.getFirst().setT(2);
 
         park.simpleSimulation();
-
-        park.printResult();
     }
 
     private void testMsqEventGetNextEvent() {
@@ -98,7 +109,5 @@ public class Test {
         eventList.getLast().setT(3);
 
         int rList = MsqEvent.getNextEvent(eventList, 6);
-
-        System.out.println("rList: " + rList);
     }
 }

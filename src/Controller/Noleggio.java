@@ -65,7 +65,7 @@ public class Noleggio implements Center {
         if (e == 0 && !internalEventList.isEmpty()) {
             this.number++;
 
-            eventList.get(e).setT(distr.getArrival(0)); /* Get new arrival from passenger arrival */
+            eventList.get(e).setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */
 
             if (eventList.getFirst().getT() > STOP_FIN) {
                 eventList.getFirst().setX(0);
@@ -100,7 +100,7 @@ public class Noleggio implements Center {
             }
 
             /* Virtual move of job from Noleggio to Strada */
-            event = eventList.get(e);
+            event = new MsqEvent(eventList.get(e).getT(), eventList.get(e).getX());
 
             List<MsqEvent> serverStrada = eventListManager.getServerStrada();
             serverStrada.getFirst().setT(event.getT());
