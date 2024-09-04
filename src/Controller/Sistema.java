@@ -13,10 +13,6 @@ import java.util.List;
 import static Model.Constants.*;
 
 public class Sistema {
-    // TODO all'inizio della simulazione impostare la lista intQueueNoleggio
-    // TODO inizializzare il numero di macchine nel sistema
-    // TODO all'inizio della simulazione impostare in eventListManager carsInParcheggio e carsInRicarica
-
     private final EventListManager eventListManager;
 
     long number = 0;                     /* number of jobs in the node         */
@@ -83,27 +79,29 @@ public class Sistema {
         simpleSimulation();
     }
 
+    /* Finite horizon simulation */
     private void simpleSimulation() throws Exception {
         int e;
         List<MsqEvent> eventList = eventListManager.getSystemEventsList();
 
         int i = 0;
 
-//        while (getNextEvent(eventList) != -1) {
+//          while (getNextEvent(eventList) != -1) {
         while (i < 55000) {
-            e = getNextEvent(eventList);
+              e = getNextEvent(eventList);
 
-            if (e == 2) i++;
+              i++;
 
-            msqT.setNext(eventList.get(e).getT());
-            this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
-            msqT.setCurrent(msqT.getNext());
+              msqT.setNext(eventList.get(e).getT());
+              this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
+              msqT.setCurrent(msqT.getNext());
 
-            if (e < 4) {
-                controllerList.get(e).simpleSimulation();
-                eventList = eventListManager.getSystemEventsList();
-            } else throw new Exception("Invalid event");
+              if (e < 4) {
+                  controllerList.get(e).simpleSimulation();
+                  eventList = eventListManager.getSystemEventsList();
+              } else throw new Exception("Invalid event");
         }
+
 
         for (i = 0; i < 4; i++) {
             controllerList.get(i).printResult();

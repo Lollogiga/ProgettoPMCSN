@@ -38,10 +38,6 @@ public class Distribution {
         return (-m * Math.log(1.0 - rngs.random()));
     }
 
-    public static double cdfBernoulli(double p, long x) {
-        return ((x == 0) ? 1.0 - p : 1.0);
-    }
-
     /** Generate the next arrival time
      * <ul>
      *  <li>param 0: user arrival</li>
@@ -76,13 +72,13 @@ public class Distribution {
 
         return switch (serviceType) {
             case 0 -> /* Rental station */
-                    exponential(1.0 / RENTAL_SERVICE);
+                    exponential(RENTAL_SERVICE);
             case 1 -> /* Parking station */
-                    exponential(1.0 / PARKING_SERVICE);
+                    exponential(PARKING_SERVICE);
             case 2 -> /* Charging station */
-                    exponential(1.0 / CHARGING_SERVICE);
+                    exponential(CHARGING_SERVICE);
             case 3 -> /* Route station */
-                    exponential(1.0 / ROUTE_SERVICE);
+                    exponential(ROUTE_SERVICE);
             default -> throw new IllegalArgumentException("Invalid service type");
         };
     }

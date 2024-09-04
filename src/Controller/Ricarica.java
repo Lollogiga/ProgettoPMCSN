@@ -39,6 +39,7 @@ public class Ricarica implements Center {
         eventListManager.setServerRicarica(serverList);
     }
 
+    /* Finite horizon simulation */
     @Override
     public void simpleSimulation() {
         MsqEvent event;
@@ -101,8 +102,10 @@ public class Ricarica implements Center {
             eventListManager.setIntQueueNoleggio(intQueueNoleggio);
 
             // Update number of available cars in the center depending on where the car comes from
-            if (eventListManager.incrementCarsInRicarica() != 0)
-                throw new RuntimeException("IncementCarsInRicarica error");
+            if (eventListManager.incrementCarsInRicarica() != 0) {
+                this.number++;
+                return; // Ho raggiunto il numero massimo di macchine in ricarica, devono restare in coda
+            }
 
             s = e;
             if (number >= RICARICA_SERVER) {        /* there is some jobs in queue, place another job in this server */
@@ -123,6 +126,11 @@ public class Ricarica implements Center {
         eventListManager.setServerRicarica(eventList);
         eventListManager.setIntQueueRicarica(internalEventList);
         eventListManager.getSystemEventsList().get(1).setT(MsqEvent.getImminentEvent(eventList));
+    }
+
+    @Override
+    public void infiniteSimulation() {
+
     }
 
     @Override

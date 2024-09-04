@@ -1,7 +1,5 @@
 package Model;
 
-import Utils.Distribution;
-
 public class Constants {
     /*  Number of servers in each center  */
     public static final int NOLEGGIO_SERVER = 1;
@@ -15,26 +13,35 @@ public class Constants {
     public static final double STOP_FIN = 86400; /* Finite simulation -> check every 1 day */
 
     /* Probabilities */
-    public static final double P_RICARICA = Distribution.cdfBernoulli(0.9, 0);  // dove x = 0 (probabilità che la carica sia sotto al 10%) e p = 0.9 probabilità che una macchina abbia carica sopra al 10%
+    public static final double P_RICARICA = 0.1;
     public static final double P_LOSS = 0.2;
 
-    /* Arrival rate (passenger/sec) */
-    public static final double LAMBDA = 10;
+    /* Arrival rate in rental station (users/sec) */
+    public static final double LAMBDA = 10 / 60.0 / 60.0;
+
+    /* Service rate in rental station (jobs/sec) */
+    public static final double MU_RENTAL = LAMBDA;
+
+    /* Service rate (jobs/sec) */
+    public static final double MU_PARKING = 2250 / 60.0 / 60.0;
+
+    /* Charging rate (jobs/sec), one battery is fully charged in 40 minutes */
+    public static final double MU_CHARGING = 1.5 / 60.0 / 60.0;
 
     /* Exogenous rate */
-    public static final double LAMBDA_EXOGENOUS = 10; // TODO set right number
+    public static final double LAMBDA_EXOGENOUS = 4 / 60.0 / 60.0;
 
-    /* Service rate of rental station (vehicle/sec) */
-    public static final double RENTAL_SERVICE = LAMBDA;
+    /* rental station (time to process renting service) */
+    public static final double RENTAL_SERVICE = 1.0 / MU_RENTAL;
 
-    /* Service rate of parking station */
-    public static final double PARKING_SERVICE = 0.625;
+    /* parking station (time to park a car) */
+    public static final double PARKING_SERVICE = 1.0 / MU_PARKING;   // mu = 0.625
 
-    /* Service rate of charging station */
-    public static final double CHARGING_SERVICE = 3240;
+    /* charging station (time to recharge car in charging station) */
+    public static final double CHARGING_SERVICE = 1 / MU_CHARGING; // Charging time is 30 minutes on average.
 
     /* Service rate of route */
-    public static final double ROUTE_SERVICE = 1;// TODO set right number
+    public static final double ROUTE_SERVICE = 30 * 60;    // Rental time is 30 min
 
     /* Nodes in system */
     public static final int NODES = 4;
@@ -51,8 +58,12 @@ public class Constants {
     public static final int PARKING_COST = 8; /* Yen/hour for each parking */
     public static final int LOSS_COST = 300; /* Yen for each loss */
 
-    /* Profit constants */ /*Todo Variable or constant profit */
-    public static final int RENTAL_TIME_PROFIT = 118; /* (100 + 0.3*60) Yen/hour when a car is on the road */
+    /* Profit constants */ /* Todo Variable or constant profit */
+    public static final int RENTAL_TIME_PROFIT = 118; /* (100 + 0.3 * 60) Yen/hour when a car is on the road */
     public static final double RENTAL_KM_PROFIT = 0.99; /* Yen/km when a car is on the road */
     public static final int RENTAL_PROFIT = 80; /* Yen/hour */
+
+    /* Batch simulation */
+    public static final int K = 64;
+    //public static final int B = ;
 }

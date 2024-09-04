@@ -45,6 +45,7 @@ public class Noleggio implements Center {
         this.eventListManager.setServerNoleggio(eventList);
     }
 
+    /* Finite horizon simulation */
     @Override
     public void simpleSimulation() {
         int e;
@@ -91,11 +92,15 @@ public class Noleggio implements Center {
             /* Update number of available cars in the center depending on where the car comes from */
             if (internalEventList.getFirst().isFromParking()) {
                 if (eventListManager.reduceCarsInParcheggio() != 0) {
-                    throw new RuntimeException("ReduceCarsInParcheggio error");
+                    this.number++;
+                    return;
+//                    throw new RuntimeException("ReduceCarsInParcheggio error");
                 }
             } else {
                 if (eventListManager.reduceCarsInRicarica() != 0) {
-                    throw new RuntimeException("ReduceCarsInRicarica error");
+                    this.number++;
+                    return;
+//                    throw new RuntimeException("ReduceCarsInRicarica error");
                 }
             }
 
@@ -125,6 +130,11 @@ public class Noleggio implements Center {
         eventListManager.setServerNoleggio(eventList);
         eventListManager.setIntQueueNoleggio(internalEventList);
         eventListManager.getSystemEventsList().getFirst().setT(MsqEvent.getImminentEvent(eventList));
+    }
+
+    @Override
+    public void infiniteSimulation() {
+
     }
 
     @Override

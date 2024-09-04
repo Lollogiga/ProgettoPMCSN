@@ -38,6 +38,7 @@ public class Strada implements Center {
         eventListManager.setServerStrada(serverList);
     }
 
+    /* Finite horizon simulation */
     @Override
     public void simpleSimulation() {
         List<MsqEvent> eventList = eventListManager.getServerStrada();
@@ -111,6 +112,11 @@ public class Strada implements Center {
 
         eventListManager.setServerStrada(eventList);
         eventListManager.getSystemEventsList().get(3).setT(MsqEvent.getImminentEvent(eventList));
+    }
+
+    @Override
+    public void infiniteSimulation() {
+
     }
 
     @Override

@@ -39,6 +39,7 @@ public class Parcheggio implements Center {
         eventListManager.setServerParcheggio(serverList);
     }
 
+    /* Finite horizon simulation */
     @Override
     public void simpleSimulation() {
         int e;
@@ -100,9 +101,9 @@ public class Parcheggio implements Center {
 
             // Update number of available cars in the center depending on where the car comes from
             if (eventListManager.incrementCarsInParcheggio() != 0) {
+                this.number++;
                 return; // Ho raggiunto il numero massimo di macchine nel parcheggio, devono restare in coda
                 // TODO: gestire la penalità
-//                throw new RuntimeException("ReduceCarsInParcheggio error");
             }
 
             s = e;
@@ -127,10 +128,15 @@ public class Parcheggio implements Center {
     }
 
     @Override
+    public void infiniteSimulation() {
+
+    }
+
+    @Override
     public void printResult() {
         System.out.println("Parcheggio\n\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
-//        System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
+//      System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
         System.out.println("  avg wait ........... = " + area / index);
         System.out.println("  avg # in node ...... = " + area / msqT.getCurrent());
 
