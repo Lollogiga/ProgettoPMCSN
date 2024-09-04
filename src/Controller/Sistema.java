@@ -41,32 +41,50 @@ public class Sistema {
         controllerList.addAll(Arrays.asList(noleggio, ricarica, parcheggio, strada));
 
         /* 0 - noleggio, 1 - ricarica, 2 - parcheggio, 3 - strada */
+        for(int i = 0; i < 4; i++) {
+            systemList.add(i, new MsqEvent(0, 0));
+            sumList.add(i, new MsqSum(0, 0));
+        }
 
-        // Initialize noleggio
+        // Initialize noleggio in system list
         List<MsqEvent> noleggioList = eventListManager.getServerNoleggio();
         int nextEventNoleggio = MsqEvent.getNextEvent(noleggioList, NOLEGGIO_SERVER);
-        systemList.addFirst(new MsqEvent(noleggioList.get(nextEventNoleggio).getT(), 1));
-        sumList.addFirst(new MsqSum());
+        systemList.set(0, new MsqEvent(noleggioList.get(nextEventNoleggio).getT(), 1));
 
+        // Initialize ricarica in system list
+        List<MsqEvent> chargingList = eventListManager.getServerRicarica();
+        int nextEventRicarica = MsqEvent.getNextEvent(chargingList, RICARICA_SERVER);
+        systemList.set(1, new MsqEvent(chargingList.get(nextEventRicarica).getT(), 1));
+
+        // Initialize parcheggio in system list
+        List<MsqEvent> parcheggioList = eventListManager.getServerParcheggio();
+        int nextEventParcheggio = MsqEvent.getNextEvent(parcheggioList, PARCHEGGIO_SERVER);
+        systemList.set(2, new MsqEvent(parcheggioList.get(nextEventParcheggio).getT(), 1));
+
+        // Initialize cars in noleggio
         List<MsqEvent> carInRentalStation = eventListManager.getIntQueueNoleggio();
         for (int i = 0; i < INIT_PARK_CARS; i++) {
             carInRentalStation.add(i, new MsqEvent(0, 1, true));
         }
         eventListManager.setIntQueueNoleggio(carInRentalStation);
 
-        // Initialize ricarica
-        systemList.add(1, new MsqEvent(0, 0));
-        sumList.add(1, new MsqSum());
-
-        // Initialize parcheggio
-        systemList.add(2, new MsqEvent(0, 0));
-        sumList.add(2, new MsqSum());
-
-        // Initialize strada
-        systemList.add(3, new MsqEvent(0, 0));
-        sumList.add(3, new MsqSum());
-
         eventListManager.setSystemEventsList(systemList);
+
+//        // Initialize ricarica
+//        systemList.add(1, new MsqEvent(0, 0));
+//        sumList.add(1, new MsqSum());
+//
+//        // Initialize parcheggio
+//        systemList.add(2, new MsqEvent(0, 0));
+//        sumList.add(2, new MsqSum());
+//
+//        // Initialize strada
+//        systemList.add(3, new MsqEvent(0, 0));
+//        sumList.add(3, new MsqSum());
+//
+//        // Initialize noleggio
+//        systemList.addFirst(new MsqEvent(noleggioList.get(nextEventNoleggio).getT(), 1));
+//        sumList.addFirst(new MsqSum());
     }
 
     public void simulation() throws Exception {
@@ -79,11 +97,8 @@ public class Sistema {
         int e;
         List<MsqEvent> eventList = eventListManager.getSystemEventsList();
 
-        while (msqT.getCurrent() < (86400.1)) {
+        while (msqT.getCurrent() < STOP_FIN) {
             e = getNextEvent(eventList);
-
-//            if (msqT.getCurrent() > 6633.792237) break;
-//                System.out.println(msqT.getCurrent() + " - " + e);
 
             msqT.setNext(eventList.get(e).getT());
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;

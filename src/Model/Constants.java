@@ -4,10 +4,10 @@ public class Constants {
     /*  Number of servers in each center  */
     public static final int NOLEGGIO_SERVER = 1;
     public static final int STRADA_SERVER = Integer.MAX_VALUE; // Infinite server
-    //    public static final int PARCHEGGIO_SERVER = 100;
-    public static final int PARCHEGGIO_SERVER = 20;
+    public static final int PARCHEGGIO_SERVER = 200;
+//    public static final int PARCHEGGIO_SERVER = 200;
 
-     public static final int RICARICA_SERVER = 360;
+     public static final int RICARICA_SERVER = 60;
 //     public static final int RICARICA_SERVER = 0;
 
 
@@ -27,8 +27,8 @@ public class Constants {
     public static final double MU_RENTAL = LAMBDA;
 
     /* Service rate (jobs/sec), 37,5 parked cars in one hour */
-//    public static final double MU_PARKING = 37.5 / 60.0 / 60.0;
-    public static final double MU_PARKING = 1 / 60.0 / 60.0;
+    public static final double MU_PARKING = 37.5 / 60.0 / 60.0;
+//    public static final double MU_PARKING = 1 / 60.0 / 60.0;
 
     /* Charging rate (jobs/sec), one battery is fully charged in 45 minutes */
     public static final double MU_CHARGING = 1.33 / 60.0 / 60.0;
@@ -39,8 +39,8 @@ public class Constants {
 //    public static final double MU_STRADA = 8 / 60.0 / 60.0;
 
     /* Exogenous rate */
-//    public static final double LAMBDA_EXOGENOUS = 4 / 60.0 / 60.0;
-    public static final double LAMBDA_EXOGENOUS = 3600 / 60.0 / 60.0;
+    public static final double LAMBDA_EXOGENOUS = 4 / 60.0 / 60.0;
+//    public static final double LAMBDA_EXOGENOUS = 3600 / 60.0 / 60.0;
 
     /* rental station (time to process renting service) */
     public static final double RENTAL_SERVICE = 1.0 / MU_RENTAL;
@@ -61,7 +61,7 @@ public class Constants {
     //public static final long SEED = 123456789L;   // TODO set right number
     public static final long SEED = 234567890L;
 
-    public static final int INIT_PARK_CARS = 10; //Todo set right number (Should be 200, CHECK CARS AND PARCHEGGIO_SERVER)
+    public static final int INIT_PARK_CARS = 100; //Todo set right number (Should be 200, CHECK CARS AND PARCHEGGIO_SERVER)
 //    public static final int INIT_PARK_CARS = 8000; //Todo set right number (Should be 200, CHECK CARS AND PARCHEGGIO_SERVER)
 
     /* Cost constants */

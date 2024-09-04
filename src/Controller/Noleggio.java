@@ -40,10 +40,10 @@ public class Noleggio implements Center {
         double arrival = distr.getArrival(0);
 
         // Add this new event and setting time to arrival time
-        this.eventList.set(0, new MsqEvent(arrival, 1));
+        eventList.set(0, new MsqEvent(arrival, 1));
 
         // Setting event list in eventListManager
-        this.eventListManager.setServerNoleggio(eventList);
+        eventListManager.setServerNoleggio(eventList);
     }
 
     /* Finite horizon simulation */
@@ -102,7 +102,6 @@ public class Noleggio implements Center {
             this.number++;
 
             eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */
-            System.out.println(msqT.getCurrent() + distr.getArrival(0));
 
             List<MsqEvent> eventListParcheggio = eventListManager.getServerParcheggio();
             double nextEventParcheggio = MsqEvent.getImminentEvent(eventListParcheggio);
@@ -112,9 +111,7 @@ public class Noleggio implements Center {
 
             double nextT = Math.min(nextEventParcheggio, nextEventRicarica);
 
-            System.out.println("Min: " + Math.min(nextT + 0.1, eventList.getFirst().getT()));
-
-            eventListManager.getSystemEventsList().getFirst().setT(Math.min(nextT + 0.1, eventList.getFirst().getT()));
+            eventListManager.getSystemEventsList().getFirst().setT(Math.min(nextT + 1, eventList.getFirst().getT()));
 
             return;
         } else {    /* Process a departure */

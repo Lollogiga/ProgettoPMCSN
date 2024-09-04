@@ -37,6 +37,12 @@ public class Ricarica implements Center {
             sumList.add(s, new MsqSum());
         }
 
+        // First arrival event (car to charge)
+        double arrival = distr.getArrival(2);
+
+        // Add this new event and setting time to arrival time
+        serverList.set(0, new MsqEvent(arrival, 1));
+
         eventListManager.setServerRicarica(serverList);
     }
 
@@ -126,11 +132,6 @@ public class Ricarica implements Center {
                 sumList.get(s).incrementServed();
             } else                                    /* no job in queue, simply remove it from server */
                 eventList.get(s).setX(0);
-
-            /* Update centralized event list */
-            List<MsqEvent> systemList = eventListManager.getSystemEventsList();
-            eventList.getFirst().setX(1);
-            systemList.getFirst().setT(event.getT());
         }
 
         eventListManager.setServerRicarica(eventList);
