@@ -25,8 +25,11 @@ public class Constants {
     /* Service rate (jobs/sec) */
     public static final double MU_PARKING = 2250 / 60.0 / 60.0;
 
-    /* Charging rate (jobs/sec), one battery is fully charged in 40 minutes */
-    public static final double MU_CHARGING = 1.5 / 60.0 / 60.0;
+    /* Charging rate (jobs/sec), one battery is fully charged in 45 minutes */
+    public static final double MU_CHARGING = 1.33 / 60.0 / 60.0;
+
+    /* Service rate (job/sec), is considered to rent car and drive it for 30 min */
+    public static final double MU_STRADA = 2 / 60.0 / 60.0;
 
     /* Exogenous rate */
     public static final double LAMBDA_EXOGENOUS = 4 / 60.0 / 60.0;
@@ -41,7 +44,7 @@ public class Constants {
     public static final double CHARGING_SERVICE = 1 / MU_CHARGING; // Charging time is 30 minutes on average.
 
     /* Service rate of route */
-    public static final double ROUTE_SERVICE = 30 * 60;    // Rental time is 30 min
+    public static final double ROUTE_SERVICE = 1 / MU_STRADA;    // Rental time is 30 min
 
     /* Nodes in system */
     public static final int NODES = 4;

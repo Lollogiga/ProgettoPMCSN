@@ -14,21 +14,17 @@ import static Model.Constants.*;
 
 public class Sistema {
     private final EventListManager eventListManager;
-
+    private final List<MsqEvent> systemList = new ArrayList<>(NODES);
+    private final List<MsqSum> sumList = new ArrayList<>(NODES + 1);
+    private final Distribution distr;
     long number = 0;                     /* number of jobs in the node         */
     int e;                               /* next event index                   */
     int s;                               /* server index                       */
     long index = 0;                      /* used to count processed jobs       */
     double area = 0.0;           /* time integrated number in the node */
     double service;
-
-    private MsqT msqT = new MsqT();
-
-    private final List<MsqEvent> systemList = new ArrayList<>(NODES);
-    private final List<MsqSum> sumList = new ArrayList<>(NODES + 1);
-    private final Distribution distr;
-
-    private List<Center> controllerList = new ArrayList<>();
+    private final MsqT msqT = new MsqT();
+    private final List<Center> controllerList = new ArrayList<>();
 
     public Sistema() {
         eventListManager = EventListManager.getInstance();
@@ -84,30 +80,27 @@ public class Sistema {
         int e;
         List<MsqEvent> eventList = eventListManager.getSystemEventsList();
 
-        int i = 0;
+//        while (getNextEvent(eventList) != -1) {
+        while (msqT.getCurrent() < (86400.1 * 2)) {
+            e = getNextEvent(eventList);
 
-//          while (getNextEvent(eventList) != -1) {
-        while (i < 55000) {
-              e = getNextEvent(eventList);
+            // BUG
+            if (msqT.getCurrent() > 87821)
+                System.out.println(msqT.getCurrent() + " " + e);
 
-              i++;
+            msqT.setNext(eventList.get(e).getT());
+            this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
+            msqT.setCurrent(msqT.getNext());
 
-              msqT.setNext(eventList.get(e).getT());
-              this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
-              msqT.setCurrent(msqT.getNext());
-
-              if (e < 4) {
-                  controllerList.get(e).simpleSimulation();
-                  eventList = eventListManager.getSystemEventsList();
-              } else throw new Exception("Invalid event");
+            if (e < 4) {
+                controllerList.get(e).simpleSimulation();
+                eventList = eventListManager.getSystemEventsList();
+            } else throw new Exception("Invalid event");
         }
 
-
-        for (i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             controllerList.get(i).printResult();
         }
-
-//        printResult();
     }
 
     private void printResult() {
@@ -117,15 +110,15 @@ public class Sistema {
         System.out.println("  avg wait ........... = " + area / index);
         System.out.println("  avg # in node ...... = " + area / msqT.getCurrent());
 
-        for(int i = 1; i <= NODES; i++) {
+        for (int i = 1; i <= NODES; i++) {
             area -= sumList.get(i).getService();
         }
         System.out.println("  avg delay .......... = " + area / index);
         System.out.println("  avg # in queue ..... = " + area / msqT.getCurrent());
         System.out.println("\nthe server statistics are:\n\n");
         System.out.println("    server     utilization     avg service        share\n");
-        for(int i = 1; i <= NODES; i++) {
-            System.out.println(i + "\t" + sumList.get(i).getService() / msqT.getCurrent() + "\t" + sumList.get(i).getService() / sumList.get(i).getServed() + "\t" + ((double)sumList.get(i).getServed() / index));
+        for (int i = 1; i <= NODES; i++) {
+            System.out.println(i + "\t" + sumList.get(i).getService() / msqT.getCurrent() + "\t" + sumList.get(i).getService() / sumList.get(i).getServed() + "\t" + ((double) sumList.get(i).getServed() / index));
         }
         System.out.println("\n");
     }
@@ -136,8 +129,8 @@ public class Sistema {
         int e = -1;
         int i = 0;
 
-        for (MsqEvent event: eventList) {
-            if(event.getT() < threshold && event.getX() == 1){
+        for (MsqEvent event : eventList) {
+            if (event.getT() < threshold && event.getX() == 1) {
                 threshold = event.getT();
                 e = i;
             }

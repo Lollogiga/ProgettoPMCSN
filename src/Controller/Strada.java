@@ -127,11 +127,11 @@ public class Strada implements Center {
         System.out.println("  avg wait ........... = " + area / index);
         System.out.println("  avg # in node ...... = " + area / msqT.getCurrent());
 
-        for(int i = 1; i < eventListManager.getServerStrada().size(); i++) {
-            area -= sumList.get(i).getService();
-        }
-        System.out.println("  avg delay .......... = " + area / index);
-        System.out.println("  avg # in queue ..... = " + area / msqT.getCurrent());
+//        for(int i = 1; i < eventListManager.getServerStrada().size(); i++) {
+//            area -= sumList.get(i).getService();
+//        }
+//        System.out.println("  avg delay .......... = " + area / index);
+//        System.out.println("  avg # in queue ..... = " + area / msqT.getCurrent());
         System.out.println("\nthe server statistics are:\n\n");
         System.out.println("    server     utilization     avg service        share\n");
         for(int i = 1; i < eventListManager.getServerStrada().size(); i++) {

@@ -118,7 +118,7 @@ public class Parcheggio implements Center {
 
             /* Update centralized event list */
             List<MsqEvent> systemList = eventListManager.getSystemEventsList();
-            eventList.getFirst().setX(1);
+            systemList.getFirst().setX(1);
             systemList.getFirst().setT(event.getT());
         }
 
@@ -136,7 +136,7 @@ public class Parcheggio implements Center {
     public void printResult() {
         System.out.println("Parcheggio\n\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
-//      System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
+        System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
         System.out.println("  avg wait ........... = " + area / index);
         System.out.println("  avg # in node ...... = " + area / msqT.getCurrent());
 
