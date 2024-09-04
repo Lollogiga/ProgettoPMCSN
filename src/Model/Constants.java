@@ -50,11 +50,10 @@ public class Constants {
     public static final int NODES = 4;
 
     /* Seed to use for the simulation */
-    public static final long SEED = 123456789L;   // TODO set right number
+    //public static final long SEED = 123456789L;   // TODO set right number
+    public static final long SEED = 234567890L;
 
-    public static final int CARS = 200; //Todo set right number (Should be 200, CHECK CARS AND PARCHEGGIO_SERVER)
-
-    public static final int INIT_SYS_CARS = 100;
+    public static final int INIT_SYS_CARS = 100; //Todo set right number (Should be 200, CHECK CARS AND PARCHEGGIO_SERVER)
 
     /* Cost constants */
     public static final int CAR_COST = 5; /* Yen/hour for each car */
