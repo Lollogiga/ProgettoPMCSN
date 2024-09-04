@@ -41,7 +41,7 @@ public class EventListManager {
 
         this.systemEventsList = new ArrayList<>(NODES);
 
-        this.carsInParcheggio = INIT_SYS_CARS;
+        this.carsInParcheggio = INIT_PARK_CARS;
         this.carsInRicarica = 0;
         this.cars = 0;
     }

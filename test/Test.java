@@ -4,7 +4,7 @@ import Model.MsqEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import static Model.Constants.INIT_SYS_CARS;
+import static Model.Constants.INIT_PARK_CARS;
 
 public class Test {
 
@@ -54,7 +54,7 @@ public class Test {
         new Strada();
 
         List<MsqEvent> carInRentalStation = eventListManager.getIntQueueNoleggio();
-        for (int i = 0; i < INIT_SYS_CARS; i++) {
+        for (int i = 0; i < INIT_PARK_CARS; i++) {
             carInRentalStation.add(i, new MsqEvent(0, 1, true));
         }
         eventListManager.setIntQueueNoleggio(carInRentalStation);

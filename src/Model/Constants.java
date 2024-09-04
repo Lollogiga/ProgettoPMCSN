@@ -4,8 +4,12 @@ public class Constants {
     /*  Number of servers in each center  */
     public static final int NOLEGGIO_SERVER = 1;
     public static final int STRADA_SERVER = Integer.MAX_VALUE; // Infinite server
-    public static final int PARCHEGGIO_SERVER = 200;
-    public static final int RICARICA_SERVER = 60;
+    //    public static final int PARCHEGGIO_SERVER = 100;
+    public static final int PARCHEGGIO_SERVER = 20;
+
+     public static final int RICARICA_SERVER = 360;
+//     public static final int RICARICA_SERVER = 0;
+
 
     /*  Value of Start and Stop time */
     public static final double START = 0.0;
@@ -22,17 +26,21 @@ public class Constants {
     /* Service rate in rental station (jobs/sec) */
     public static final double MU_RENTAL = LAMBDA;
 
-    /* Service rate (jobs/sec) */
-    public static final double MU_PARKING = 2250 / 60.0 / 60.0;
+    /* Service rate (jobs/sec), 37,5 parked cars in one hour */
+//    public static final double MU_PARKING = 37.5 / 60.0 / 60.0;
+    public static final double MU_PARKING = 1 / 60.0 / 60.0;
 
     /* Charging rate (jobs/sec), one battery is fully charged in 45 minutes */
     public static final double MU_CHARGING = 1.33 / 60.0 / 60.0;
+//    public static final double MU_CHARGING = 4 / 60.0 / 60.0;
 
     /* Service rate (job/sec), is considered to rent car and drive it for 30 min */
     public static final double MU_STRADA = 2 / 60.0 / 60.0;
+//    public static final double MU_STRADA = 8 / 60.0 / 60.0;
 
     /* Exogenous rate */
-    public static final double LAMBDA_EXOGENOUS = 4 / 60.0 / 60.0;
+//    public static final double LAMBDA_EXOGENOUS = 4 / 60.0 / 60.0;
+    public static final double LAMBDA_EXOGENOUS = 3600 / 60.0 / 60.0;
 
     /* rental station (time to process renting service) */
     public static final double RENTAL_SERVICE = 1.0 / MU_RENTAL;
@@ -41,7 +49,7 @@ public class Constants {
     public static final double PARKING_SERVICE = 1.0 / MU_PARKING;   // mu = 0.625
 
     /* charging station (time to recharge car in charging station) */
-    public static final double CHARGING_SERVICE = 1 / MU_CHARGING; // Charging time is 30 minutes on average.
+    public static final double CHARGING_SERVICE = 1 / MU_CHARGING; // Charging time is 45 minutes on average.
 
     /* Service rate of route */
     public static final double ROUTE_SERVICE = 1 / MU_STRADA;    // Rental time is 30 min
@@ -53,7 +61,8 @@ public class Constants {
     //public static final long SEED = 123456789L;   // TODO set right number
     public static final long SEED = 234567890L;
 
-    public static final int INIT_SYS_CARS = 100; //Todo set right number (Should be 200, CHECK CARS AND PARCHEGGIO_SERVER)
+    public static final int INIT_PARK_CARS = 10; //Todo set right number (Should be 200, CHECK CARS AND PARCHEGGIO_SERVER)
+//    public static final int INIT_PARK_CARS = 8000; //Todo set right number (Should be 200, CHECK CARS AND PARCHEGGIO_SERVER)
 
     /* Cost constants */
     public static final int CAR_COST = 5; /* Yen/hour for each car */

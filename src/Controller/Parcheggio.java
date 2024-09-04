@@ -5,6 +5,7 @@ import Model.MsqSum;
 import Model.MsqT;
 import Utils.Distribution;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,8 +69,9 @@ public class Parcheggio implements Center {
                 eventListManager.incrementCars();   /* New car in system */
 
                 if (eventList.getFirst().getT() > STOP_FIN) {
+                    /* Set event as "not active" cause simulation end */
                     eventList.getFirst().setX(0);
-                    eventListManager.setServerParcheggio(eventList); // TODO superfluo? Fatto alla fine
+                    eventListManager.setServerParcheggio(eventList);
                 }
             } else {    /* Event is an internal arrival */
                 event = internalEventList.getFirst();
@@ -93,18 +95,27 @@ public class Parcheggio implements Center {
             this.index++;
             this.number--;
 
+            // Update number of available cars in the center depending on where the car comes from
+            if (eventListManager.incrementCarsInParcheggio() != 0) {
+                this.number++;
+                this.index--;
+
+                List<MsqEvent> eventListNoleggio = eventListManager.getServerNoleggio();
+                int nextEventNoleggio = MsqEvent.getNextEvent(eventListNoleggio, NOLEGGIO_SERVER);
+
+                eventListManager.getSystemEventsList().get(2).setT(
+                        eventListNoleggio.get(nextEventNoleggio).getT()
+                );
+
+                return; // Ho raggiunto il numero massimo di macchine nel parcheggio, devono restare in coda
+                // TODO: gestire la penalità
+            }
+
             /* Routing job to rental station */
             event = new MsqEvent(msqT.getCurrent(), 1, true);
             List<MsqEvent> intQueueNoleggio = eventListManager.getIntQueueNoleggio();
             intQueueNoleggio.add(event);
             eventListManager.setIntQueueNoleggio(intQueueNoleggio);
-
-            // Update number of available cars in the center depending on where the car comes from
-            if (eventListManager.incrementCarsInParcheggio() != 0) {
-                this.number++;
-                return; // Ho raggiunto il numero massimo di macchine nel parcheggio, devono restare in coda
-                // TODO: gestire la penalità
-            }
 
             s = e;
             if (number >= PARCHEGGIO_SERVER) {        /* there is some jobs in queue, place another job in this server */
@@ -134,6 +145,8 @@ public class Parcheggio implements Center {
 
     @Override
     public void printResult() {
+        DecimalFormat f = new DecimalFormat("#0.00000000");
+
         System.out.println("Parcheggio\n\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
@@ -146,9 +159,9 @@ public class Parcheggio implements Center {
         System.out.println("  avg delay .......... = " + area / index);
         System.out.println("  avg # in queue ..... = " + area / msqT.getCurrent());
         System.out.println("\nthe server statistics are:\n\n");
-        System.out.println("    server     utilization     avg service        share\n");
+        System.out.println("\tserver\tutilization\t avg service\t share\n");
         for(int i = 1; i <= PARCHEGGIO_SERVER; i++) {
-            System.out.println("       " + i + "\t" + sumList.get(i).getService() / msqT.getCurrent() + "\t" + sumList.get(i).getService() / sumList.get(i).getServed() + "\t" + ((double)sumList.get(i).getServed() / index));
+            System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t " + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t " + f.format(((double)sumList.get(i).getServed() / index)));
         }
         System.out.println("\n");
     }

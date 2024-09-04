@@ -49,7 +49,7 @@ public class Sistema {
         sumList.addFirst(new MsqSum());
 
         List<MsqEvent> carInRentalStation = eventListManager.getIntQueueNoleggio();
-        for (int i = 0; i < INIT_SYS_CARS; i++) {
+        for (int i = 0; i < INIT_PARK_CARS; i++) {
             carInRentalStation.add(i, new MsqEvent(0, 1, true));
         }
         eventListManager.setIntQueueNoleggio(carInRentalStation);
@@ -57,7 +57,6 @@ public class Sistema {
         // Initialize ricarica
         systemList.add(1, new MsqEvent(0, 0));
         sumList.add(1, new MsqSum());
-
 
         // Initialize parcheggio
         systemList.add(2, new MsqEvent(0, 0));
@@ -80,13 +79,11 @@ public class Sistema {
         int e;
         List<MsqEvent> eventList = eventListManager.getSystemEventsList();
 
-//        while (getNextEvent(eventList) != -1) {
-        while (msqT.getCurrent() < (86400.1 * 2)) {
+        while (msqT.getCurrent() < (86400.1)) {
             e = getNextEvent(eventList);
 
-            // BUG
-            if (msqT.getCurrent() > 87821)
-                System.out.println(msqT.getCurrent() + " " + e);
+//            if (msqT.getCurrent() > 6633.792237) break;
+//                System.out.println(msqT.getCurrent() + " - " + e);
 
             msqT.setNext(eventList.get(e).getT());
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;

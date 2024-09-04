@@ -5,6 +5,7 @@ import Model.MsqSum;
 import Model.MsqT;
 import Utils.Distribution;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,6 +122,8 @@ public class Strada implements Center {
 
     @Override
     public void printResult() {
+        DecimalFormat f = new DecimalFormat("#0.00000000");
+
         System.out.println("Strada\n\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
@@ -133,9 +136,9 @@ public class Strada implements Center {
 //        System.out.println("  avg delay .......... = " + area / index);
 //        System.out.println("  avg # in queue ..... = " + area / msqT.getCurrent());
         System.out.println("\nthe server statistics are:\n\n");
-        System.out.println("    server     utilization     avg service        share\n");
+        System.out.println("\tserver\tutilization\t avg service\t share\n");
         for(int i = 1; i < eventListManager.getServerStrada().size(); i++) {
-            System.out.println(i + "\t" + sumList.get(i).getService() / msqT.getCurrent() + "\t" + sumList.get(i).getService() / sumList.get(i).getServed() + "\t" + ((double)sumList.get(i).getServed() / index));
+            System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t " + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t " + f.format(((double)sumList.get(i).getServed() / index)));
         }
         System.out.println("\n");
     }
