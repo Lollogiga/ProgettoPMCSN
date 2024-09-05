@@ -11,9 +11,8 @@ public class Constants {
     /*  Value of Start and Stop time */
     public static final double START = 0.0;
     public static final double STOP_INF = Double.MAX_VALUE; /* Infinite simulation */
-//    public static final double STOP_FIN = 86400; /* Finite simulation -> check every 1 day */
-    public static final double STOP_FIN = 86400 * 365; /* Finite simulation -> check every 1 day */
-//    public static final double STOP_FIN = Double.MAX_VALUE; /* Finite simulation -> check every 1 day */
+    public static final double STOP_FIN = 86400; /* Finite simulation -> check every 1 day */
+//    public static final double STOP_FIN = 86400 * 365; /* Finite simulation -> check every 1 day */
 
     /* Probabilities */
     public static final double P_RICARICA = 0.1;
@@ -59,7 +58,7 @@ public class Constants {
     //public static final long SEED = 123456789L;   // TODO set right number
     public static final long SEED = 234567890L;
 
-    public static final int INIT_PARK_CARS = 100; //Todo set right number (Should be 200, CHECK CARS AND PARCHEGGIO_SERVER)
+    public static final int INIT_PARK_CARS = PARCHEGGIO_SERVER / 2; //Todo set right number (Should be 200, CHECK CARS AND PARCHEGGIO_SERVER)
 
     /* Cost constants */
     public static final int CAR_COST = 5; /* Yen/hour for each car */

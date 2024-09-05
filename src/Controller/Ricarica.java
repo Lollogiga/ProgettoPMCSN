@@ -72,6 +72,16 @@ public class Ricarica implements Center {
 
             if (e == 0) {   /* Check if event is an external arrival */
                 eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(2)); /* Get new arrival from exogenous arrival */
+
+                if (eventListManager.getCarsInRicarica() + number > RICARICA_SERVER * 2) {
+                    this.number--;
+
+                    eventListManager.getSystemEventsList().get(1).setT(eventList.getFirst().getT());
+
+                    // TODO gestire penalità
+                    return;
+                }
+
                 eventListManager.incrementCars();
 
                 if (eventList.getFirst().getT() > STOP_FIN) {

@@ -72,6 +72,15 @@ public class Parcheggio implements Center {
 
             if (e == 0) {   /* Check if event is an external arrival */
                 eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(1)); /* Get new arrival from exogenous arrival */
+
+                if (eventListManager.getCarsInParcheggio() + number > PARCHEGGIO_SERVER * 2) {
+                    this.number--;
+
+                    eventListManager.getSystemEventsList().get(2).setT(eventList.getFirst().getT());
+
+                    return;
+                }
+
                 eventListManager.incrementCars();   /* New car in system */
 
                 if (eventList.getFirst().getT() > STOP_FIN) {
@@ -110,7 +119,6 @@ public class Parcheggio implements Center {
                 int nextEventNoleggio;
 
                 if ((nextEventNoleggio = MsqEvent.getNextEvent(eventListNoleggio, NOLEGGIO_SERVER)) == -1) return;
-
 
                 eventListManager.getSystemEventsList().get(2).setT(
                         eventListNoleggio.get(nextEventNoleggio).getT()

@@ -60,8 +60,36 @@ public class Noleggio implements Center {
 
         if((e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER)) >= eventList.size()) return;
         msqT.setNext(eventList.get(e).getT());
-        area += (msqT.getNext() - msqT.getCurrent()) * number;
+        if (e == 0)
+            area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
+
+//        if (e == 0 && !internalEventList.isEmpty()) { /* External arrival (λ) and a car is ready to be rented */
+//            this.number++;
+//
+//            eventList.get(e).setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */
+//
+//            if (eventList.getFirst().getT() > STOP_FIN) {
+//                eventList.getFirst().setX(0);
+//                eventListManager.setServerNoleggio(eventList);
+//            }
+//
+//            /* Update number of available cars in the center depending on where the car comes from */
+//            if (internalEventList.getFirst().isFromParking()) {
+//                if (eventListManager.reduceCarsInParcheggio() != 0) return;
+//            } else {
+//                if (eventListManager.reduceCarsInRicarica() != 0) return;
+//            }
+//
+//            /* Routing to Strada */
+//            List<MsqEvent> serverStrada = eventListManager.getServerStrada();
+//            serverStrada.getFirst().setT(eventList.getFirst().getT());
+//            serverStrada.getFirst().setX(eventList.getFirst().getX());
+//            eventListManager.setServerStrada(serverStrada);
+//
+//            this.number--;
+//        }
+
 
         if (e == 0 && !internalEventList.isEmpty()) { /* External arrival (λ) and a car is ready to be rented */
             this.number++;
@@ -74,20 +102,14 @@ public class Noleggio implements Center {
             }
 
             if (number <= NOLEGGIO_SERVER) {
-                service = distr.getService(0);
+                service = 0;
                 s = 1;  /* There is only one server */
 
                 /* Update number of available cars in the center depending on where the car comes from */
                 if (internalEventList.getFirst().isFromParking()) {
-                    if (eventListManager.reduceCarsInParcheggio() != 0) {
-                        this.number++;
-                        return;
-                    }
+                    if (eventListManager.reduceCarsInParcheggio() != 0) return;
                 } else {
-                    if (eventListManager.reduceCarsInRicarica() != 0) {
-                        this.number++;
-                        return;
-                    }
+                    if (eventListManager.reduceCarsInRicarica() != 0) return;
                 }
 
                 /* Set server as active */
