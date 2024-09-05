@@ -12,7 +12,7 @@ import java.util.List;
 
 import static Model.Constants.*;
 
-public class Sistema {
+public class Sistema implements Center {
     private final EventListManager eventListManager;
     private final List<MsqEvent> systemList = new ArrayList<>(NODES);
     private final List<MsqSum> sumList = new ArrayList<>(NODES + 1);
@@ -76,8 +76,9 @@ public class Sistema {
         simpleSimulation();
     }
 
+    @Override
     /* Finite horizon simulation */
-    private void simpleSimulation() throws Exception {
+    public void simpleSimulation() throws Exception {
         int e;
         List<MsqEvent> eventList = eventListManager.getSystemEventsList();
 
@@ -99,7 +100,13 @@ public class Sistema {
         }
     }
 
-    private void printResult() {
+    @Override
+    public void infiniteSimulation() {
+
+    }
+
+    @Override
+    public void printResult() {
         System.out.println("Sistema\n\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);

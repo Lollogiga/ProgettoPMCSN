@@ -5,6 +5,7 @@ import Model.MsqSum;
 import Model.MsqT;
 import Utils.BatchMeans;
 import Utils.Distribution;
+import Utils.SimulationResults;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ public class Parcheggio implements Center {
 
     private final List<MsqEvent> serverList = new ArrayList<>(PARCHEGGIO_SERVER + 2);
     private final List<MsqSum> sumList = new ArrayList<>(PARCHEGGIO_SERVER + 2);
+
+    private final SimulationResults batchParcheggio = new SimulationResults();
     private final Distribution distr;
 
     public Parcheggio() {
@@ -162,6 +165,7 @@ public class Parcheggio implements Center {
         eventListManager.getSystemEventsList().get(2).setT(eventList.get(nextEvent).getT());
     }
 
+    /* Infinite horizon simulation */
     @Override
     public void infiniteSimulation() {
         int e;
@@ -285,26 +289,61 @@ public class Parcheggio implements Center {
 
     @Override
     public void calculateBatchStatistics() {
+        double avgPopulationInNode = area / batchDuration;
+        double responseTime = area / index;
 
+        batchParcheggio.insertAvgPopulationInNode(avgPopulationInNode, nBatch);
+        batchParcheggio.insertResponseTime(responseTime, nBatch);
+
+        System.out.println("Parcheggio batch statistics\n\n");
+        System.out.println("E[N_s]: " + avgPopulationInNode);
+        System.out.println("E[T_s]: " + responseTime);
+
+        double sum = 0;
+        for(int i = 1; i <= PARCHEGGIO_SERVER; i++) {
+            sum += sumList.get(i).getService();
+            sumList.get(i).setService(0);
+            sumList.get(i).setServed(0);
+        }
+
+        double waitingTimeInQueue = (area - sum) / index;
+        double avgPopulationInQueue = (area - sum) / batchDuration;
+        double utilization = sum / (batchDuration * PARCHEGGIO_SERVER);
+
+        System.out.println("E[T_q]: " + waitingTimeInQueue);
+        System.out.println("E[N_q]: " + avgPopulationInQueue);
+        System.out.println("Utilization: " + utilization);
+
+        batchParcheggio.insertWaitingTimeInQueue(waitingTimeInQueue, nBatch);
+        batchParcheggio.insertAvgPopulationInQueue(avgPopulationInQueue, nBatch);
+        batchParcheggio.insertUtilization(utilization, nBatch);
+
+        /* Reset parameters */
+        area = 0;
+        index = 0;
     }
 
     @Override
     public void printResult() {
         DecimalFormat f = new DecimalFormat("#0.00000000");
 
+        double responseTime = area / index;
+        double avgPopulationInNode = area / msqT.getCurrent();
+
         System.out.println("Parcheggio\n\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
-        System.out.println("  avg wait ........... = " + area / index);
-        System.out.println("  avg # in node ...... = " + area / msqT.getCurrent());
+        System.out.println("  avg wait ........... = " + responseTime);
+        System.out.println("  avg # in node ...... = " + avgPopulationInNode);
 
         for(int i = 1; i <= PARCHEGGIO_SERVER; i++) {
             area -= sumList.get(i).getService();
         }
-        System.out.println("  avg delay .......... = " + area / index);
-        System.out.println("  avg # in queue ..... = " + area / msqT.getCurrent());
-        System.out.println("\nthe server statistics are:\n\n");
-        System.out.println("\tserver\tutilization\t avg service\t share\n");
+
+        double waitingTime = area / index;
+        double avgPopulationInQueue = area / msqT.getCurrent();
+        System.out.println("  avg delay .......... = " + waitingTime);
+        System.out.println("  avg # in queue ..... = " + avgPopulationInQueue);
         for(int i = 1; i <= PARCHEGGIO_SERVER; i++) {
             System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t " + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t " + f.format(((double)sumList.get(i).getServed() / index)));
         }
