@@ -26,7 +26,6 @@ public class EventListManager {
 
     private int carsInParcheggio;
     private int carsInRicarica;
-
     private int cars;
 
     private EventListManager() {
@@ -43,7 +42,7 @@ public class EventListManager {
 
         this.carsInParcheggio = INIT_PARK_CARS;
         this.carsInRicarica = 0;
-        this.cars = 0;
+        this.cars = INIT_PARK_CARS; // Cars in our station
     }
 
     public static synchronized EventListManager getInstance() {

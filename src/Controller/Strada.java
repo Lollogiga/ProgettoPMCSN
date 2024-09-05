@@ -3,6 +3,7 @@ package Controller;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
+import Utils.BatchMeans;
 import Utils.Distribution;
 
 import java.text.DecimalFormat;
@@ -21,6 +22,10 @@ public class Strada implements Center {
     long index = 0;                 /* used to count processed jobs       */
     double service;
     double area = 0.0;              /* time integrated number in the node */
+
+    int nBatch = 0;
+    int jobInBatch = 0;
+    double batchDuration = 0L;
 
     private final MsqT msqT = new MsqT();
 
@@ -42,6 +47,110 @@ public class Strada implements Center {
     /* Finite horizon simulation */
     @Override
     public void simpleSimulation() {
+        List<MsqEvent> eventList = eventListManager.getServerStrada();
+
+        /* no external arrivals, no internal arrivals and no jobs in the server */
+        if (eventList.getFirst().getX() == 0 && eventList.size() == 1) return;
+
+        if ((e = MsqEvent.getNextEvent(eventList, eventList.size() - 1)) >= eventList.size()) return;
+        msqT.setNext(eventList.get(e).getT());
+        area += (msqT.getNext() - msqT.getCurrent()) * number;
+        msqT.setCurrent(msqT.getNext());
+
+        if (e == 0) {
+            this.number++;
+
+            BatchMeans.incrementJobInBatch();
+            jobInBatch++;
+
+            eventList.get(e).setX(0);
+
+            service = distr.getService(3);
+            s = MsqEvent.findOne(eventList, eventList.size() - 1);
+
+            if (s == -1 || s >= eventList.size()) {
+                /* Setup new server */
+                eventList.add(new MsqEvent(msqT.getCurrent() +  service, 1));
+                sumList.add(new MsqSum(service, 1));
+            } else {
+                /* Set existing server as active */
+                eventList.get(s).setT(msqT.getCurrent() +  service);
+                eventList.get(s).setX(1);
+
+                sumList.get(s).incrementService(service);
+                sumList.get(s).incrementServed();
+            }
+        } else {    /* Process a departure */
+            this.index++;
+            this.number--;
+
+            /* Update centralized event list */
+            List<MsqEvent> systemList = eventListManager.getSystemEventsList();
+
+            if (jobInBatch % B == 0 && jobInBatch <= B * K) {
+                batchDuration = msqT.getCurrent() - msqT.getBatchTimer();
+
+                calculateBatchStatistics();
+                nBatch++;
+                msqT.setBatchTimer(msqT.getCurrent());
+            }
+
+            /* Routing */
+            s = e;
+            double pLoss = distr.random();
+            if (pLoss < P_LOSS) {
+                eventListManager.decrementCars();
+
+                // TODO Penalty cost:
+
+                // Sets the status of the server from which the job started equal to 0
+                eventList.get(s).setX(0);
+
+                int nextEvent = MsqEvent.getNextEvent(eventList, eventList.size() - 1);
+                if (nextEvent == -1) {
+                    eventListManager.getSystemEventsList().get(3).setX(0);
+                    return;
+                }
+
+                eventListManager.getSystemEventsList().get(3).setT(eventList.get(nextEvent).getT());
+            } else {
+                /* Job stays in this system */
+                double pRicarica = distr.random();
+                if (pRicarica < P_RICARICA) {
+                    // Event sent to Ricarica
+                    List<MsqEvent> intQueueRicarica = eventListManager.getIntQueueRicarica();
+                    intQueueRicarica.add(eventList.get(s));
+                    eventListManager.setIntQueueRicarica(intQueueRicarica);
+
+                    systemList.get(1).setX(1);
+                    systemList.get(1).setT(eventList.get(s).getT());
+                } else {
+                    // Event sent to Parcheggio
+                    List<MsqEvent> intQueueParcheggio = eventListManager.getIntQueueParcheggio();
+                    intQueueParcheggio.add(eventList.get(s));
+                    eventListManager.setIntQueueParcheggio(intQueueParcheggio);
+
+                    systemList.get(2).setX(1);
+                    systemList.get(2).setT(eventList.get(s).getT());
+                }
+                eventList.get(s).setX(0);   /* Set server as idle */
+            }
+        }
+
+        eventListManager.setServerStrada(eventList);
+//        eventListManager.getSystemEventsList().get(3).setT(MsqEvent.getImminentEvent(eventList));
+
+        int nextEvent = MsqEvent.getNextEvent(eventList, eventList.size() - 1);
+        if (nextEvent == -1) {
+            eventListManager.getSystemEventsList().get(3).setX(0);
+            return;
+        }
+
+        eventListManager.getSystemEventsList().get(3).setT(eventList.get(nextEvent).getT());
+    }
+
+    @Override
+    public void infiniteSimulation() {
         List<MsqEvent> eventList = eventListManager.getServerStrada();
 
         /* no external arrivals, no internal arrivals and no jobs in the server */
@@ -90,8 +199,6 @@ public class Strada implements Center {
                 // Sets the status of the server from which the job started equal to 0
                 eventList.get(s).setX(0);
 
-//                eventListManager.getSystemEventsList().get(3).setT(MsqEvent.getImminentEvent(eventList));
-
                 int nextEvent = MsqEvent.getNextEvent(eventList, eventList.size() - 1);
                 if (nextEvent == -1) {
                     eventListManager.getSystemEventsList().get(3).setX(0);
@@ -136,7 +243,7 @@ public class Strada implements Center {
     }
 
     @Override
-    public void infiniteSimulation() {
+    public void calculateBatchStatistics() {
 
     }
 

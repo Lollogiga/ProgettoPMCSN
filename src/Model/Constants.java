@@ -4,15 +4,17 @@ public class Constants {
     /*  Number of servers in each center  */
     public static final int NOLEGGIO_SERVER = 1;
     public static final int STRADA_SERVER = Integer.MAX_VALUE; // Infinite server
-    public static final int PARCHEGGIO_SERVER = 200;
+    public static final int PARCHEGGIO_SERVER = 60;
 
-     public static final int RICARICA_SERVER = 60;
+    public static final int SERVER_MAX_QUEUE = 5;
+    public static final int RICARICA_MAX_QUEUE = 2;
+
+     public static final int RICARICA_SERVER = 18;
 
     /*  Value of Start and Stop time */
     public static final double START = 0.0;
     public static final double STOP_INF = Double.MAX_VALUE; /* Infinite simulation */
     public static final double STOP_FIN = 86400; /* Finite simulation -> check every 1 day */
-//    public static final double STOP_FIN = 86400 * 365; /* Finite simulation -> check every 1 day */
 
     /* Probabilities */
     public static final double P_RICARICA = 0.1;
@@ -26,18 +28,15 @@ public class Constants {
 
     /* Service rate (jobs/sec), 37,5 parked cars in one hour */
     public static final double MU_PARKING = 37.5 / 60.0 / 60.0;
-//    public static final double MU_PARKING = 1 / 60.0 / 60.0;
 
     /* Charging rate (jobs/sec), one battery is fully charged in 45 minutes */
     public static final double MU_CHARGING = 1.33 / 60.0 / 60.0;
-//    public static final double MU_CHARGING = 4 / 60.0 / 60.0;
 
     /* Service rate (job/sec), is considered to rent car and drive it for 30 min */
     public static final double MU_STRADA = 2 / 60.0 / 60.0;
-//    public static final double MU_STRADA = 8 / 60.0 / 60.0;
 
     /* Exogenous rate */
-    public static final double LAMBDA_EXOGENOUS = 12 / 60.0 / 60.0;
+    public static final double LAMBDA_EXOGENOUS = 4 / 60.0 / 60.0;
 
     /* rental station (time to process renting service) */
     public static final double RENTAL_SERVICE = 1.0 / MU_RENTAL;
@@ -58,19 +57,21 @@ public class Constants {
     //public static final long SEED = 123456789L;   // TODO set right number
     public static final long SEED = 234567890L;
 
-    public static final int INIT_PARK_CARS = PARCHEGGIO_SERVER / 2; //Todo set right number (Should be 200, CHECK CARS AND PARCHEGGIO_SERVER)
+    public static final int INIT_PARK_CARS = PARCHEGGIO_SERVER / 2;
 
     /* Cost constants */
     public static final int CAR_COST = 5; /* Yen/hour for each car */
     public static final int PARKING_COST = 8; /* Yen/hour for each parking */
     public static final int LOSS_COST = 300; /* Yen for each loss */
 
-    /* Profit constants */ /* Todo Variable or constant profit */
+    /* Profit constants */ /* TODO Variable or constant profit */
     public static final int RENTAL_TIME_PROFIT = 118; /* (100 + 0.3 * 60) Yen/hour when a car is on the road */
     public static final double RENTAL_KM_PROFIT = 0.99; /* Yen/km when a car is on the road */
     public static final int RENTAL_PROFIT = 80; /* Yen/hour */
 
     /* Batch simulation */
-    public static final int K = 64;
-    //public static final int B = ;
+    /* Number of jobs processed: 124189 */
+    public static final int K = 128;
+    public static final int B = 970;
+    public static final double LEVEL_OF_CONFIDENCE = 0.05; // tipically alpha = 0.05
 }

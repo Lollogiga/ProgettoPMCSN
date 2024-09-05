@@ -8,4 +8,6 @@ public interface Center {
     void infiniteSimulation();
 
     void printResult();
+
+    void calculateBatchStatistics();
 }

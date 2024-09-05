@@ -69,22 +69,6 @@ public class Sistema {
         eventListManager.setIntQueueNoleggio(carInRentalStation);
 
         eventListManager.setSystemEventsList(systemList);
-
-//        // Initialize ricarica
-//        systemList.add(1, new MsqEvent(0, 0));
-//        sumList.add(1, new MsqSum());
-//
-//        // Initialize parcheggio
-//        systemList.add(2, new MsqEvent(0, 0));
-//        sumList.add(2, new MsqSum());
-//
-//        // Initialize strada
-//        systemList.add(3, new MsqEvent(0, 0));
-//        sumList.add(3, new MsqSum());
-//
-//        // Initialize noleggio
-//        systemList.addFirst(new MsqEvent(noleggioList.get(nextEventNoleggio).getT(), 1));
-//        sumList.addFirst(new MsqSum());
     }
 
     public void simulation() throws Exception {
@@ -99,10 +83,6 @@ public class Sistema {
 
         while (msqT.getCurrent() < STOP_FIN) {
             if((e = getNextEvent(eventList)) == -1) break;
-
-//            if (msqT.getCurrent() > 70655.06742311) //break;
-            if (msqT.getCurrent() > 59781) //break;
-                System.out.println(msqT.getCurrent() + " - " + e);
 
             msqT.setNext(eventList.get(e).getT());
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
