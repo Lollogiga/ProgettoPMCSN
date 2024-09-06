@@ -329,6 +329,11 @@ public class Parcheggio implements Center {
     }
 
     @Override
+    public int getNumJob() {
+        return this.nBatch;
+    }
+
+    @Override
     public void printResult() {
         DecimalFormat f = new DecimalFormat("#0.00000000");
 
