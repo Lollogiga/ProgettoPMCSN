@@ -27,11 +27,10 @@ import java.io.*;
 import java.util.Scanner;
 
 public class Acs {
-
   static int K    = 50;               /* K is the maximum lag          */
   static int SIZE = K + 1;
 
-  public void operate(String fileName) throws IOException {
+  public static void main(String[] args) {
 
     int i = 0;                   /* data point index              */
     int j;                       /* lag index                     */
@@ -46,6 +45,7 @@ public class Acs {
     for (j = 0; j < SIZE; j++)
       cosum[j] = 0.0;
 
+    String fileName = "";
     File fileCalc = new File(fileName);
 
     try {                         /* the first K + 1 data values    */

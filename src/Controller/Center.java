@@ -7,7 +7,9 @@ public interface Center {
     /* Infinite horizon simulation */
     void infiniteSimulation();
 
-    void printResult();
-
     void calculateBatchStatistics();
+
+    int getNumJob();
+
+    void printResult();
 }

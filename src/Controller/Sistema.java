@@ -125,8 +125,32 @@ public class Sistema {
     }
 
     /* Infinite horizon simulation */
-    public void infiniteSimulation() {
+    public void infiniteSimulation() throws Exception {
+        int e;
+        MsqT time=new MsqT();
+        time.setCurrent(START);
+        time.setNext(START);
+        List<MsqEvent> eventList = eventListManager.getSystemEventsList();
 
+        while (msqT.getCurrent() < STOP_FIN) {
+            if((e = getNextEvent(eventList)) == -1) break;
+
+            msqT.setNext(eventList.get(e).getT());
+            this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
+            msqT.setCurrent(msqT.getNext());
+
+            if (e < 4) {
+                controllerList.get(e).infiniteSimulation();
+                eventList = eventListManager.getSystemEventsList();
+            } else throw new Exception("Invalid event");
+        }
+
+        for (int i = 0; i < 4; i++) {
+            controllerList.get(i).printResult();
+        }
+
+        /* Calculate profit */
+        printProfit(eventList.get(MsqEvent.getNextEvent(eventList, NODES - 1)).getT());
     }
 
     private void printProfit(double lastEventTime) {
