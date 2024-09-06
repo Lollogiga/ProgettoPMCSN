@@ -284,7 +284,6 @@ public class Strada implements Center {
         DecimalFormat f = new DecimalFormat("#0.00000000");
 
         double responseTime = area / index;
-        rentalProfit.setProfit((responseTime / 3600) * index * RENTAL_PROFIT); //TODO vedere (Dovrebbe essere pari al numero di utenti entrati, per il loro tempop medio di servizio)
         double avgPopulationInNode = area / msqT.getCurrent();
 
         System.out.println("Strada\n\n");
@@ -298,6 +297,12 @@ public class Strada implements Center {
         for(int i = 1; i < eventListManager.getServerStrada().size(); i++) {
             System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t " + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t " + f.format(((double)sumList.get(i).getServed() / index)));
         }
+
+        /* Calculate rental profit */
+        double baseProfit = (responseTime / 3600) * index * RENTAL_PROFIT;
+        double kmProfit = (MEAN_SPEED * (responseTime / 3600)) * RENTAL_KM_PROFIT * index;
+        rentalProfit.setProfit((baseProfit + kmProfit));
+
         System.out.println("\n");
     }
 

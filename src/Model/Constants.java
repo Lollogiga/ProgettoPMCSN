@@ -65,12 +65,12 @@ public class Constants {
 
     /* Profit constants */ /* TODO Variable or constant profit */
     public static final int RENTAL_TIME_PROFIT = 118; /* (100 + 0.3 * 60) Yen/hour when a car is on the road */
-    public static final double RENTAL_KM_PROFIT = 0.99; /* Yen/km when a car is on the road */
-    //public static final int RENTAL_PROFIT = 80; /* Yen/hour */
-    public static final int RENTAL_PROFIT = 200; /* Yen/hour */
+    public static final double RENTAL_KM_PROFIT = 0.99; /* Yen/km when a car is on the road: Note we assume to know the mean speed */
+    public static final int MEAN_SPEED = 50; /* km/h */
+    public static final int RENTAL_PROFIT = 118; /* Yen/hour */
+    public static final int RECHARGE_COST = 20; /* Yen for each recharge */
 
     /* Batch simulation */
-    /* Number of jobs processed: 124189 */
     public static final int K = 64;
     public static final int B = 1024;
     public static final double LEVEL_OF_CONFIDENCE = 0.05; // Tipically alpha = 0.05

@@ -14,25 +14,33 @@ import java.util.List;
 import static Model.Constants.*;
 
 public class Sistema {
-    private final EventListManager eventListManager;
-    private final List<MsqEvent> systemList = new ArrayList<>(NODES);
-    private final List<MsqSum> sumList = new ArrayList<>(NODES + 1);
-    private final Distribution distr;
     long number = 0;                     /* number of jobs in the node         */
     int e;                               /* next event index                   */
     int s;                               /* server index                       */
     long index = 0;                      /* used to count processed jobs       */
     double area = 0.0;           /* time integrated number in the node */
+
     double service;
-    private final MsqT msqT = new MsqT();
-    private final List<Center> controllerList = new ArrayList<>();
+
     private Rngs rngs = new Rngs();
+    private final MsqT msqT = new MsqT();
+
+    private final EventListManager eventListManager;
+    private final Distribution distr;
+    private RentalProfit rentalProfit;
+
+    private final List<MsqEvent> systemList = new ArrayList<>(NODES);
+    private final List<MsqSum> sumList = new ArrayList<>(NODES + 1);
+
+    private final List<Center> controllerList = new ArrayList<>();
 
     public Sistema(long seed) {
         eventListManager = EventListManager.getInstance();
         distr = Distribution.getInstance();
+        rentalProfit = RentalProfit.getInstance();
 
         eventListManager.resetState();
+        rentalProfit.resetPenalty();
 
         rngs.plantSeeds(seed);
 
@@ -107,19 +115,13 @@ public class Sistema {
             } else throw new Exception("Invalid event");
         }
 
+
         for (int i = 0; i < 4; i++) {
             controllerList.get(i).printResult();
         }
-        printProfit();
-    }
 
-    private void printProfit() {
-        RentalProfit rentalProfit = RentalProfit.getInstance();
-
-        System.out.println("Analisi dei profitti:\n\n");
-        System.out.println("  Profit .. = " + rentalProfit.getProfit());
-        System.out.println("  Cost .... = " + rentalProfit.getCost());
-
+        /* Calculate profit */
+        printProfit(eventList.get(MsqEvent.getNextEvent(eventList, NODES - 1)).getT());
     }
 
     /* Infinite horizon simulation */
@@ -127,7 +129,13 @@ public class Sistema {
 
     }
 
-    public void printResult() {
+    private void printProfit(double lastEventTime) {
+        System.out.println("Analisi dei profitti:\n\n");
+        System.out.println("  Profit .. = " + rentalProfit.getProfit());
+        System.out.println("  Cost .... = " + rentalProfit.getCost(lastEventTime));
+    }
+
+    private void printResult() {
         System.out.println("Sistema\n\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
@@ -145,11 +153,6 @@ public class Sistema {
             System.out.println(i + "\t" + sumList.get(i).getService() / msqT.getCurrent() + "\t" + sumList.get(i).getService() / sumList.get(i).getServed() + "\t" + ((double) sumList.get(i).getServed() / index));
         }
         System.out.println("\n");
-    }
-
-    @Override
-    public void calculateBatchStatistics() {
-
     }
 
     /* Fetch index of most imminent event among all servers */

@@ -352,7 +352,8 @@ public class Ricarica implements Center {
             System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t " + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t " + f.format(((double)sumList.get(i).getServed() / index)));
         }
 
-
+        /* Calculate recharged cost */
+        rentalProfit.setRechargeCost((index * RECHARGE_COST));
 
         System.out.println("\n");
     }

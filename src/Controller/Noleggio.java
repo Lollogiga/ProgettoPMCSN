@@ -110,7 +110,13 @@ public class Noleggio implements Center {
             List<MsqEvent> eventListRicarica = eventListManager.getServerRicarica();
             int nextEventRicarica = MsqEvent.getNextEvent(eventListRicarica, RICARICA_SERVER);
 
-            double nextT = Math.min(eventListParcheggio.get(nextEventParcheggio).getT(), eventListRicarica.get(nextEventRicarica).getT());
+            double nextT = Double.MAX_VALUE;
+            if (nextEventParcheggio != -1 && nextEventRicarica != -1)
+                nextT = Math.min(eventListParcheggio.get(nextEventParcheggio).getT(), eventListRicarica.get(nextEventRicarica).getT());
+            else if (nextEventParcheggio != -1)
+                nextT = eventListParcheggio.get(nextEventParcheggio).getT();
+            else if (nextEventRicarica != -1)
+                nextT = eventListRicarica.get(nextEventRicarica).getT();
 
             eventListManager.getSystemEventsList().getFirst().setT(Math.min(nextT + 1, eventList.getFirst().getT()));
 

@@ -63,15 +63,6 @@ public class MsqEvent {
         return (s);
     }
 
-    public static double getImminentEvent(List<MsqEvent> eventList) {
-        double threshold = Double.MAX_VALUE;
-        for (MsqEvent e : eventList) {
-            if (e.x == 1 && e.t < threshold)
-                threshold = e.t;
-        }
-        return threshold;
-    }
-
     public double getT() {
         return t;
     }
