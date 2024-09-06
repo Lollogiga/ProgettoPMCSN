@@ -5,6 +5,7 @@ import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
 import Utils.Distribution;
+import Utils.RentalProfit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,6 +99,16 @@ public class Sistema implements Center {
         for (int i = 0; i < 4; i++) {
             controllerList.get(i).printResult();
         }
+        printProfit();
+    }
+
+    private void printProfit() {
+        RentalProfit rentalProfit = RentalProfit.getInstance();
+
+        System.out.println("Analisi dei profitti:\n\n");
+        System.out.println("  Profit .. = " + rentalProfit.getProfit());
+        System.out.println("  Cost .... = " + rentalProfit.getCost());
+
     }
 
     @Override
@@ -126,6 +137,11 @@ public class Sistema implements Center {
         System.out.println("\n");
     }
 
+    @Override
+    public void calculateBatchStatistics() {
+
+    }
+
     /* Fetch index of most imminent event among all servers */
     private int getNextEvent(List<MsqEvent> eventList) {
         double threshold = Double.MAX_VALUE;
@@ -141,4 +157,5 @@ public class Sistema implements Center {
         }
         return e;
     }
+
 }

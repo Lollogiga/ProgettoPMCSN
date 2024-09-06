@@ -5,6 +5,7 @@ import Model.MsqSum;
 import Model.MsqT;
 import Utils.BatchMeans;
 import Utils.Distribution;
+import Utils.RentalProfit;
 import Utils.SimulationResults;
 
 import java.text.DecimalFormat;
@@ -15,6 +16,7 @@ import static Model.Constants.*;
 
 public class Parcheggio implements Center {
     private final EventListManager eventListManager;
+    private final RentalProfit rentalProfit;
 
     long number = 0;                     /* number of jobs in the node         */
     int e;                               /* next event index                   */
@@ -37,6 +39,8 @@ public class Parcheggio implements Center {
 
     public Parcheggio() {
         eventListManager = EventListManager.getInstance();
+        rentalProfit = RentalProfit.getInstance();
+
         distr = Distribution.getInstance();
 
         /* Initial servers setup */
@@ -83,6 +87,7 @@ public class Parcheggio implements Center {
                 if (eventListManager.getCarsInParcheggio() + this.number >= PARCHEGGIO_SERVER + SERVER_MAX_QUEUE) {      /* New arrival but Parcheggio's queue is full */
                     this.number--;      /* Loss event */
 
+                    rentalProfit.incrementPenalty();
                     eventListManager.getSystemEventsList().get(2).setT(eventList.getFirst().getT());
 
                     return;
@@ -133,7 +138,7 @@ public class Parcheggio implements Center {
                 );
 
                 return; // Ho raggiunto il numero massimo di macchine nel parcheggio, devono restare in coda
-                // TODO: gestire la penalità
+                // TODO: gestire la penalità (Siamo sicuri?)
             }
 
             /* Routing job to rental station */
