@@ -7,11 +7,11 @@ import static Model.Constants.K;
 
 public class SimulationResults {
     /* Lists of batch's values */
-    private List<Double> avgPopulationInNode = new ArrayList<>();
-    private List<Double> responseTime = new ArrayList<>();
-    private List<Double> avgPopulationInQueue = new ArrayList<>();
-    private List<Double> waitingTimeInQueue = new ArrayList<>();
-    private List<Double> utilization = new ArrayList<>();
+    private List<Double> avgPopulationInNode;
+    private List<Double> responseTime;
+    private List<Double> avgPopulationInQueue;
+    private List<Double> waitingTimeInQueue;
+    private List<Double> utilization;
 
     /* Mean estimation */
     private double meanPopulationInQueue;
@@ -136,14 +136,13 @@ public class SimulationResults {
         this.utilization.set(batchIndex, utilization);
     }
 
-    public double getVariance(double[] batchMean, int type){
-
-        if(batchMean.length == 0){
+    public double getVariance(List<Double> batchMean, int type){
+        if(batchMean.isEmpty()){
             System.out.println("Batch mean is empty");
             return -1;
         }
 
-        //Calculate mean:
+        //Calculate mean
         double mean = 0.0;
         for (double elemento : batchMean) {
             mean += elemento;
@@ -152,35 +151,39 @@ public class SimulationResults {
 
         // Calculate the sum of the squares of the differences from the mean
         double temp = 0.0;
-        for (double element: batchMean ){
+        for (Double element: batchMean){
             double difference = element - mean;
             temp += difference * difference;
         }
 
         //Calculate variance
-
         double devStd = Math.sqrt(temp / K);
 
-        if(type == 0){
-            setMeanPopulationInQueue(mean);
-            setDevPopulationInNode(devStd);
+        switch (type) {
+            case 0:
+                setMeanPopulationInQueue(mean);
+                setDevPopulationInNode(devStd);
+                break;
+            case 1:
+                setMeanPopulationInNode(mean);
+                setDevPopulationInNode(devStd);
+                break;
+            case 2:
+                setMeanResponseTime(mean);
+                setDevResponseTime(devStd);
+                break;
+            case 3:
+                setMeanUtilization(mean);
+                setDevUtilization(devStd);
+                break;
+            case 4:
+                setMeanWaitingTimeInQueue(mean);
+                setDevWaitingTimeInQueue(devStd);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid type");
         }
-        else if(type == 1){
-            setMeanPopulationInNode(mean);
-            setDevPopulationInNode(devStd);
-        }
-        else if(type == 2){
-            setMeanResponseTime(mean);
-            setDevResponseTime(devStd);
-        }
-        else if(type == 3){
-            setMeanUtilization(mean);
-            setDevUtilization(devStd);
-        }
-        else if(type == 4){
-            setMeanWaitingTimeInQueue(mean);
-            setDevWaitingTimeInQueue(devStd);
-        }
+
         return devStd;
     }
 }

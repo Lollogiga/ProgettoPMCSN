@@ -54,8 +54,7 @@ public class Constants {
     public static final int NODES = 4;
 
     /* Seed to use for the simulation */
-    //public static final long SEED = 123456789L;   // TODO set right number
-    public static final long SEED = 234567890L;
+    public static final long SEED = 123456789L;
 
     public static final int INIT_PARK_CARS = PARCHEGGIO_SERVER / 2;
 
@@ -71,7 +70,9 @@ public class Constants {
 
     /* Batch simulation */
     /* Number of jobs processed: 124189 */
-    public static final int K = 128;
-    public static final int B = 970;
-    public static final double LEVEL_OF_CONFIDENCE = 0.05; // tipically alpha = 0.05
+    public static final int K = 64;
+    public static final int B = 1024;
+    public static final double LEVEL_OF_CONFIDENCE = 0.05; // Tipically alpha = 0.05
+
+    public static final int REPLICATION = 64;
 }

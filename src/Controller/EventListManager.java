@@ -173,4 +173,17 @@ public class EventListManager {
 
         return 0;
     }
+
+    public void resetAll() {
+        this.serverStrada.clear();
+        this.serverNoleggio.clear();
+        this.serverRicarica.clear();
+        this.serverParcheggio.clear();
+
+        this.intQueueParcheggio.clear();
+        this.intQueueNoleggio.clear();
+        this.intQueueRicarica.clear();
+
+        this.systemEventsList.clear();
+    }
 }

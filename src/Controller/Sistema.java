@@ -12,7 +12,7 @@ import java.util.List;
 
 import static Model.Constants.*;
 
-public class Sistema implements Center {
+public class Sistema {
     private final EventListManager eventListManager;
     private final List<MsqEvent> systemList = new ArrayList<>(NODES);
     private final List<MsqSum> sumList = new ArrayList<>(NODES + 1);
@@ -25,13 +25,16 @@ public class Sistema implements Center {
     double service;
     private final MsqT msqT = new MsqT();
     private final List<Center> controllerList = new ArrayList<>();
+    private Rngs rngs = new Rngs();
+    List<Long> seedList;
 
     public Sistema() {
         eventListManager = EventListManager.getInstance();
         distr = Distribution.getInstance();
 
-        Rngs rngs = new Rngs();
-        rngs.plantSeeds(SEED);
+        /* Seed lists */
+        seedList = new ArrayList<>(REPLICATION);
+        seedList.addFirst(SEED);
 
         Parcheggio parcheggio = new Parcheggio();
         Noleggio noleggio = new Noleggio();
@@ -71,12 +74,33 @@ public class Sistema implements Center {
         eventListManager.setSystemEventsList(systemList);
     }
 
-    public void simulation() throws Exception {
+    public void simulation(int simulationType) throws Exception {
         System.out.println("Avvio simulazione");
-        simpleSimulation();
+
+        switch (simulationType) {
+            case 0:
+                for (int i = 0; i < REPLICATION; i++) {
+                    rngs.plantSeeds(seedList.get(i));
+
+                    simpleSimulation();
+
+                    /* Update next seed */
+                    if (i + 1 < seedList.size()) {
+                        rngs.selectStream(255);
+                        seedList.add(i + 1, rngs.getSeed());
+                    }
+
+                    eventListManager.resetAll();
+                }
+                break;
+            case 1:
+                infiniteSimulation();
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid simulation choice");
+        }
     }
 
-    @Override
     /* Finite horizon simulation */
     public void simpleSimulation() throws Exception {
         int e;
@@ -100,12 +124,10 @@ public class Sistema implements Center {
         }
     }
 
-    @Override
     public void infiniteSimulation() {
 
     }
 
-    @Override
     public void printResult() {
         System.out.println("Sistema\n\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
