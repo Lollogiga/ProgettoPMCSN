@@ -26,15 +26,14 @@ public class Sistema {
     private final MsqT msqT = new MsqT();
     private final List<Center> controllerList = new ArrayList<>();
     private Rngs rngs = new Rngs();
-    List<Long> seedList;
 
-    public Sistema() {
+    public Sistema(long seed) {
         eventListManager = EventListManager.getInstance();
         distr = Distribution.getInstance();
 
-        /* Seed lists */
-        seedList = new ArrayList<>(REPLICATION);
-        seedList.addFirst(SEED);
+        eventListManager.resetState();
+
+        rngs.plantSeeds(seed);
 
         Parcheggio parcheggio = new Parcheggio();
         Noleggio noleggio = new Noleggio();
@@ -79,19 +78,7 @@ public class Sistema {
 
         switch (simulationType) {
             case 0:
-                for (int i = 0; i < REPLICATION; i++) {
-                    rngs.plantSeeds(seedList.get(i));
-
-                    simpleSimulation();
-
-                    /* Update next seed */
-                    if (i + 1 < seedList.size()) {
-                        rngs.selectStream(255);
-                        seedList.add(i + 1, rngs.getSeed());
-                    }
-
-                    eventListManager.resetAll();
-                }
+                simpleSimulation();
                 break;
             case 1:
                 infiniteSimulation();
@@ -124,6 +111,7 @@ public class Sistema {
         }
     }
 
+    /* Infinite horizon simulation */
     public void infiniteSimulation() {
 
     }

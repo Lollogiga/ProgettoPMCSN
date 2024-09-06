@@ -174,7 +174,7 @@ public class EventListManager {
         return 0;
     }
 
-    public void resetAll() {
+    public void resetState() {
         this.serverStrada.clear();
         this.serverNoleggio.clear();
         this.serverRicarica.clear();
@@ -185,5 +185,9 @@ public class EventListManager {
         this.intQueueRicarica.clear();
 
         this.systemEventsList.clear();
+
+        this.carsInParcheggio = INIT_PARK_CARS;
+        this.carsInRicarica = 0;
+        this.cars = INIT_PARK_CARS;
     }
 }

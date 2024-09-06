@@ -142,7 +142,7 @@ public class SimulationResults {
             return -1;
         }
 
-        //Calculate mean
+        //Calculate mean (μ)
         double mean = 0.0;
         for (double elemento : batchMean) {
             mean += elemento;
@@ -156,7 +156,7 @@ public class SimulationResults {
             temp += difference * difference;
         }
 
-        //Calculate variance
+        //Calculate standard deviation (σ)
         double devStd = Math.sqrt(temp / K);
 
         switch (type) {

@@ -14,7 +14,7 @@ public class Test {
         new Parcheggio();
         new Ricarica();
 
-        new Sistema();
+        //new Sistema();
 
         new Test().testParcheggio();
         new Test().testStrada();

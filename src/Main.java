@@ -1,11 +1,15 @@
 import Controller.Sistema;
 import Libs.Rngs;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import static Model.Constants.*;
 
 public class Main {
+    private static List<Long> seedList;
+
     public static void main(String[] args) throws Exception {
         Rngs rngs = new Rngs();
         rngs.plantSeeds(SEED);
@@ -19,13 +23,33 @@ public class Main {
     }
 
     public static void run(int simulationType) throws Exception {
-        Sistema sys = new Sistema();
+        Rngs rngs = new Rngs();
 
         switch (simulationType) {
             case 0: /* Finite horizon */
-                sys.simulation(simulationType);
+                /* Initialize Seed lists */
+                seedList = new ArrayList<>(REPLICATION);
+                for (int i = 0; i < REPLICATION; i++) {
+                    seedList.add(0L);
+                }
+                /* Set first seed*/
+                seedList.addFirst(SEED);
+
+                /* Simulate REPLICATION = 64 run*/
+                for (int i = 0; i < REPLICATION; i++) {
+                    /* Start simulation with seed[i] */
+                    Sistema sys = new Sistema(seedList.get(i));
+                    sys.simulation(simulationType);
+
+                    /* Generate new seed */
+                    if (i + 1 < REPLICATION) {
+                        rngs.selectStream(255);
+                        seedList.add(i + 1, rngs.getSeed());
+                    }
+                }
                 break;
             case 1: /* Infinite horizon */
+                Sistema sys = new Sistema(SEED);
                 sys.simulation(simulationType);
                 break;
             default:
