@@ -5,6 +5,7 @@ import Model.MsqSum;
 import Model.MsqT;
 import Utils.BatchMeans;
 import Utils.Distribution;
+import Utils.RentalProfit;
 import Utils.SimulationResults;
 
 import java.text.DecimalFormat;
@@ -26,6 +27,7 @@ public class Ricarica implements Center {
     double batchDuration = 0L;
 
     private final EventListManager eventListManager;
+    private final RentalProfit rentalProfit;
 
     private final MsqT msqT = new MsqT();
 
@@ -37,6 +39,7 @@ public class Ricarica implements Center {
 
     public Ricarica() {
         eventListManager = EventListManager.getInstance();
+        rentalProfit = RentalProfit.getInstance();
         distr = Distribution.getInstance();
 
         /* Initial servers setup */
@@ -83,6 +86,7 @@ public class Ricarica implements Center {
 
                 if (eventListManager.getCarsInRicarica() + this.number > RICARICA_SERVER + RICARICA_MAX_QUEUE) { /* New arrival but Ricarica's queue is full */
                     this.number--; /* Loss event */
+                    rentalProfit.incrementPenalty();
 
                     eventListManager.getSystemEventsList().get(1).setT(eventList.getFirst().getT());
 

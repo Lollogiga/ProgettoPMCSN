@@ -5,6 +5,7 @@ import Model.MsqSum;
 import Model.MsqT;
 import Utils.BatchMeans;
 import Utils.Distribution;
+import Utils.RentalProfit;
 import Utils.SimulationResults;
 
 import java.text.DecimalFormat;
@@ -16,6 +17,7 @@ import static Model.Constants.*;
 /* Modeled as an Infinite Server */
 public class Strada implements Center {
     private final EventListManager eventListManager;
+    private final RentalProfit rentalProfit;
 
     long number = 0;                /* number in the node                 */
     int e;                          /* next event index                   */
@@ -39,6 +41,7 @@ public class Strada implements Center {
     public Strada() {
         eventListManager = EventListManager.getInstance();
         distr = Distribution.getInstance();
+        rentalProfit = RentalProfit.getInstance();
 
         /* Setup first server */
         serverList.addFirst(new MsqEvent(0, 0));
@@ -93,7 +96,8 @@ public class Strada implements Center {
             if (pLoss < P_LOSS) {
                 eventListManager.decrementCars();
 
-                // TODO Penalty cost:
+                //In this case, I must pay a penalty:
+                rentalProfit.incrementPenalty();
 
                 // Sets the status of the server from which the job started equal to 0
                 eventList.get(s).setX(0);
@@ -198,7 +202,8 @@ public class Strada implements Center {
             if (pLoss < P_LOSS) {
                 eventListManager.decrementCars();
 
-                // TODO Penalty cost:
+                //In this case, I must pay a penalty:
+                //TODO pay penalty
 
                 // Sets the status of the server from which the job started equal to 0
                 eventList.get(s).setX(0);
@@ -279,6 +284,7 @@ public class Strada implements Center {
         DecimalFormat f = new DecimalFormat("#0.00000000");
 
         double responseTime = area / index;
+        rentalProfit.setProfit((responseTime / 3600) * index * RENTAL_PROFIT); //TODO vedere (Dovrebbe essere pari al numero di utenti entrati, per il loro tempop medio di servizio)
         double avgPopulationInNode = area / msqT.getCurrent();
 
         System.out.println("Strada\n\n");
@@ -294,4 +300,5 @@ public class Strada implements Center {
         }
         System.out.println("\n");
     }
+
 }

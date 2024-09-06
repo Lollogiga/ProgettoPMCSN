@@ -9,7 +9,7 @@ public class Constants {
     public static final int SERVER_MAX_QUEUE = 5;
     public static final int RICARICA_MAX_QUEUE = 2;
 
-     public static final int RICARICA_SERVER = 18;
+     public static final int RICARICA_SERVER = 15;
 
     /*  Value of Start and Stop time */
     public static final double START = 0.0;
@@ -21,7 +21,7 @@ public class Constants {
     public static final double P_LOSS = 0.2;
 
     /* Arrival rate in rental station (users/sec) */
-    public static final double LAMBDA = 10 / 60.0 / 60.0;
+    public static final double LAMBDA = 12 / 60.0 / 60.0;
 
     /* Service rate in rental station (jobs/sec) */
     public static final double MU_RENTAL = LAMBDA;
@@ -61,12 +61,13 @@ public class Constants {
     /* Cost constants */
     public static final int CAR_COST = 5; /* Yen/hour for each car */
     public static final int PARKING_COST = 8; /* Yen/hour for each parking */
-    public static final int LOSS_COST = 300; /* Yen for each loss */
+    public static final int LOSS_COST = 30; /* Yen for each loss */
 
     /* Profit constants */ /* TODO Variable or constant profit */
     public static final int RENTAL_TIME_PROFIT = 118; /* (100 + 0.3 * 60) Yen/hour when a car is on the road */
     public static final double RENTAL_KM_PROFIT = 0.99; /* Yen/km when a car is on the road */
-    public static final int RENTAL_PROFIT = 80; /* Yen/hour */
+    //public static final int RENTAL_PROFIT = 80; /* Yen/hour */
+    public static final int RENTAL_PROFIT = 200; /* Yen/hour */
 
     /* Batch simulation */
     /* Number of jobs processed: 124189 */
