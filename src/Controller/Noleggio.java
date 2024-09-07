@@ -5,6 +5,7 @@ import Model.MsqSum;
 import Model.MsqT;
 import Utils.BatchMeans;
 import Utils.Distribution;
+import Utils.FileCSVGenerator;
 import Utils.SimulationResults;
 
 import java.text.DecimalFormat;
@@ -372,7 +373,7 @@ public class Noleggio implements Center {
     }
 
     @Override
-    public void printResult() {
+    public void printResult(int runNumber, long seed) {
         DecimalFormat f = new DecimalFormat("#0.00000000");
 
         double responseTime = area / index;
@@ -388,15 +389,19 @@ public class Noleggio implements Center {
             area -= sumList.get(i).getService();
         }
 
-        double waitingTimeInQueue = area / index;
+        double waitingTime = area / index;
         double avgPopulationInQueue = area / msqT.getCurrent();
 
-        System.out.println("  avg delay .......... = " + waitingTimeInQueue);
+        System.out.println("  avg delay .......... = " + waitingTime);
         System.out.println("  avg # in queue ..... = " + avgPopulationInQueue);
         System.out.println("\tserver\tutilization\t avg service\t share\n");
         for(int i = 1; i == NOLEGGIO_SERVER; i++) {
             System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t" + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t" + f.format(((double)sumList.get(i).getServed() / index)));
         }
         System.out.println("\n");
+
+        FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
+        if (runNumber > 0 && seed > 0)
+            fileCSVGenerator.saveRepResults(NOLEGGIO, runNumber, seed, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
     }
 }

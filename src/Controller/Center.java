@@ -11,5 +11,5 @@ public interface Center {
 
     int getNumJob();
 
-    void printResult();
+    void printResult(int runNumber, long seed);
 }

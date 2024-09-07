@@ -16,8 +16,8 @@ public class Constants {
     /*  Value of Start and Stop time */
     public static final double START = 0.0;
     public static final double STOP_INF = Double.MAX_VALUE; /* Infinite simulation */
-//    public static final double STOP_FIN = 86400; /* Finite simulation -> check every 1 day */
-    public static final double STOP_FIN = 86400 * 365; /* Finite simulation -> check every 1 day */
+    public static final double STOP_FIN = 86400; /* Finite simulation -> check every 1 day */
+//    public static final double STOP_FIN = 86400 * 365; /* Finite simulation -> check every 1 day */
 
     /* Probabilities */
     public static final double P_RICARICA = 0.1;
@@ -80,4 +80,10 @@ public class Constants {
     public static final double LEVEL_OF_CONFIDENCE = 0.05; // Tipically alpha = 0.05
 
     public static final int REPLICATION = 64;
+
+    /* Center constants for file generation */
+    public static final String PARCHEGGIO = "Parcheggio";
+    public static final String STRADA = "Strada";
+    public static final String NOLEGGIO = "Noleggio";
+    public static final String RICARICA = "Ricarica";
 }

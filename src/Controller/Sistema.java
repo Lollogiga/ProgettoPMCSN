@@ -82,12 +82,12 @@ public class Sistema {
         eventListManager.setSystemEventsList(systemList);
     }
 
-    public void simulation(int simulationType) throws Exception {
+    public void simulation(int simulationType, long seed, int runNumber) throws Exception {
         System.out.println("Starting simulation");
 
         switch (simulationType) {
             case 0:
-                simpleSimulation();
+                simpleSimulation(seed, runNumber);
                 break;
             case 1:
                 infiniteSimulation();
@@ -98,15 +98,12 @@ public class Sistema {
     }
 
     /* Finite horizon simulation */
-    public void simpleSimulation() throws Exception {
+    public void simpleSimulation(long seed, int runNumber) throws Exception {
         int e;
         List<MsqEvent> eventList = eventListManager.getSystemEventsList();
 
         while (msqT.getCurrent() < STOP_FIN) {
             if ((e = getNextEvent(eventList)) == -1) break;
-
-//            if (msqT.getCurrent() > 86400 * 100)
-//                System.out.println(msqT.getCurrent() + " - " + e);
 
             msqT.setNext(eventList.get(e).getT());
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
@@ -118,7 +115,7 @@ public class Sistema {
             } else throw new Exception("Invalid event");
         }
 
-        for (int i = 0; i < 4; i++) centerList.get(i).printResult();
+        for (int i = 0; i < 4; i++) centerList.get(i).printResult(runNumber, seed);
 
         /* Calculate profit */
         printProfit(msqT.getCurrent());
@@ -146,7 +143,7 @@ public class Sistema {
             } else throw new Exception("Invalid event");
         }
 
-        for (int i = 0; i < 4; i++) centerList.get(i).printResult();
+        for (int i = 0; i < 4; i++) centerList.get(i).printResult(-1, -1L);
 
         /* Calculate profit */
         printProfit(msqT.getCurrent());
@@ -158,7 +155,7 @@ public class Sistema {
         System.out.println("  Cost .... = " + rentalProfit.getCost(lastEventTime));
     }
 
-    private void printResult() {
+    private void printResult(int runNumber) {
         System.out.println("Sistema\n\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);

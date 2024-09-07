@@ -3,10 +3,7 @@ package Controller;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
-import Utils.BatchMeans;
-import Utils.Distribution;
-import Utils.RentalProfit;
-import Utils.SimulationResults;
+import Utils.*;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -336,7 +333,7 @@ public class Ricarica implements Center {
     }
 
     @Override
-    public void printResult() {
+    public void printResult(int runNumber, long seed) {
         DecimalFormat f = new DecimalFormat("#0.00000000");
 
         double responseTime = area / index;
@@ -366,5 +363,9 @@ public class Ricarica implements Center {
         rentalProfit.setRechargeCost((index * RECHARGE_COST));
 
         System.out.println("\n");
+
+        FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
+        if (runNumber > 0 && seed > 0)
+            fileCSVGenerator.saveRepResults(RICARICA, runNumber, seed, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
     }
 }

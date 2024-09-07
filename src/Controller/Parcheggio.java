@@ -3,10 +3,7 @@ package Controller;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
-import Utils.BatchMeans;
-import Utils.Distribution;
-import Utils.RentalProfit;
-import Utils.SimulationResults;
+import Utils.*;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -341,7 +338,7 @@ public class Parcheggio implements Center {
     }
 
     @Override
-    public void printResult() {
+    public void printResult(int runNumber, long seed) {
         DecimalFormat f = new DecimalFormat("#0.00000000");
 
         double responseTime = area / index;
@@ -362,9 +359,13 @@ public class Parcheggio implements Center {
         System.out.println("  avg delay .......... = " + waitingTime);
         System.out.println("  avg # in queue ..... = " + avgPopulationInQueue);
         for(int i = 1; i <= PARCHEGGIO_SERVER; i++) {
-            System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t " + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t " + f.format(((double)sumList.get(i).getServed() / index)));
+            System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t " + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t " + f.format(((double) sumList.get(i).getServed() / index)));
         }
         System.out.println("\n");
+
+        FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
+        if (runNumber > 0 && seed > 0)
+            fileCSVGenerator.saveRepResults(PARCHEGGIO, runNumber, seed, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
     }
 }
 

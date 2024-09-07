@@ -1,5 +1,6 @@
 import Controller.Sistema;
 import Libs.Rngs;
+import Utils.FileCSVGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Scanner;
 import static Model.Constants.*;
 
 public class Main {
-    private static List<Long> seedList;
+    private static FileCSVGenerator fileCSVGenerator;
 
     public static void main(String[] args) throws Exception {
         Rngs rngs = new Rngs();
@@ -24,11 +25,14 @@ public class Main {
 
     public static void run(int simulationType) throws Exception {
         Rngs rngs = new Rngs();
+        fileCSVGenerator = FileCSVGenerator.getInstance();
+
+        clearFiles();
 
         switch (simulationType) {
             case 0: /* Finite horizon */
                 /* Initialize Seed lists */
-                seedList = new ArrayList<>(REPLICATION);
+                List<Long> seedList = new ArrayList<>(REPLICATION);
                 for (int i = 0; i < REPLICATION; i++) {
                     seedList.add(0L);
                 }
@@ -37,9 +41,12 @@ public class Main {
 
                 /* Simulate REPLICATION = 64 run */
                 for (int i = 0; i < REPLICATION; i++) {
+                    /* Create seed folders */
+                    fileCSVGenerator.createSeedFolders(seedList.get(i));
+
                     /* Start simulation with seed[i] */
                     Sistema sys = new Sistema(seedList.get(i));
-                    sys.simulation(simulationType);
+                    sys.simulation(simulationType, seedList.get(i), i + 1);
 
                     /* Generate new seed */
                     if (i + 1 < REPLICATION) {
@@ -52,7 +59,7 @@ public class Main {
                 break;
             case 1: /* Infinite horizon */
                 Sistema sys = new Sistema(SEED);
-                sys.simulation(simulationType);
+                sys.simulation(simulationType, -1, -1); // -1 is to ignore input
                 break;
             default:
                 throw new Exception("Invalid simulation type");
@@ -73,5 +80,9 @@ public class Main {
         }
 
         return choice;
+    }
+
+    private static void clearFiles() {
+        fileCSVGenerator.deleteSeedDirectory();
     }
 }
