@@ -63,6 +63,19 @@ public class MsqEvent {
         return (s);
     }
 
+    public static int findActiveServers(List<MsqEvent> event, int servers) {
+        int count = 0;
+
+        int s = 1;
+        while (s < servers) {
+            if (event.get(s).getX() == 1) count++;
+
+            s++;
+        }
+
+        return count;
+    }
+
     public double getT() {
         return t;
     }

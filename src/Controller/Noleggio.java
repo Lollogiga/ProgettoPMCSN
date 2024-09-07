@@ -16,7 +16,7 @@ import static Model.Constants.*;
 public class Noleggio implements Center {
     private final EventListManager eventListManager;
 
-    long number = 0;                /* number in the node                 */
+    long nUsers = 0;                /* number in the node                 */
     int e;                          /* next event index                   */
     int s;                          /* server index                       */
     long index = 0;                 /* used to count processed jobs       */
@@ -63,29 +63,29 @@ public class Noleggio implements Center {
         List<MsqEvent> internalEventList = eventListManager.getIntQueueNoleggio();
 
         /* No event to process */
-        if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0) return;
+        if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.nUsers == 0) return;
 
-        if((e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER)) >= eventList.size()) return;
+        if ((e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER)) >= eventList.size()) return;
 
         if (e == 0 && eventList.get(e).getT() > eventListManager.getSystemEventsList().getFirst().getT()) {
-            if (this.number == 0) {
+            if (this.nUsers == 0) {
                 eventListManager.getSystemEventsList().getFirst().setT(eventList.get(e).getT());
 
                 return;
             }
 
             msqT.setNext(eventListManager.getSystemEventsList().getFirst().getT());
-            area += (msqT.getNext() - msqT.getCurrent()) * number;
+            area += (msqT.getNext() - msqT.getCurrent()) * nUsers;
         } else {
             msqT.setNext(eventList.get(e).getT());
-            if (e == 0) area += (msqT.getNext() - msqT.getCurrent()) * number;
+            if (e == 0) area += (msqT.getNext() - msqT.getCurrent()) * nUsers;
         }
         msqT.setCurrent(msqT.getNext());
 
         if (e == 0 && !internalEventList.isEmpty()) { /* External arrival (λ) and a car is ready to be rented */
             // Controllo che il prossimo evento sia un evento di arrivo e che l'evento nel sistema < evento più prossimo trovato -> mi è arrivata una macchina mentre non stavo servendo nessuno ed ho utenti pendenti
             if (eventList.getFirst().getT() <= eventListManager.getSystemEventsList().getFirst().getT()) {
-                this.number++;
+                this.nUsers++;
 
                 eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */
             }
@@ -100,8 +100,14 @@ public class Noleggio implements Center {
                 /* Update number of available cars in the center depending on where the car comes from */
                 if (internalEventList.getFirst().isFromParking()) {
                     if (eventListManager.reduceCarsInParcheggio() != 0) return;
+
+                    if (eventListManager.getCarsInParcheggio() == PARCHEGGIO_SERVER - 1)
+                        eventListManager.getSystemEventsList().get(2).setT(msqT.getCurrent() + 1);
                 } else {
                     if (eventListManager.reduceCarsInRicarica() != 0) return;
+
+                    if (eventListManager.getCarsInRicarica() == RICARICA_SERVER - 1)
+                        eventListManager.getSystemEventsList().get(1).setT(msqT.getCurrent() + 1);
                 }
 
                 /* Set server as active */
@@ -112,28 +118,11 @@ public class Noleggio implements Center {
                 sumList.get(1).incrementServed();
             }
         } else if (e == 0) {                /* External arrival (λ) but there aren't cars to rent */
-            this.number++;
+            this.nUsers++;
 
             eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */
 
-//            List<MsqEvent> eventListParcheggio = eventListManager.getServerParcheggio();
-//            int nextEventParcheggio = MsqEvent.getNextEvent(eventListParcheggio, NOLEGGIO_SERVER);
-//
-//            List<MsqEvent> eventListRicarica = eventListManager.getServerRicarica();
-//            int nextEventRicarica = MsqEvent.getNextEvent(eventListRicarica, RICARICA_SERVER);
-//
-//            double nextT = Double.MAX_VALUE;
-//            if (nextEventParcheggio != -1 && nextEventRicarica != -1)
-//                nextT = Math.min(eventListParcheggio.get(nextEventParcheggio).getT(), eventListRicarica.get(nextEventRicarica).getT());
-//            else if (nextEventParcheggio != -1)
-//                nextT = eventListParcheggio.get(nextEventParcheggio).getT();
-//            else if (nextEventRicarica != -1)
-//                nextT = eventListRicarica.get(nextEventRicarica).getT();
-//
-//            // BUG sbagliato
-//            eventListManager.getSystemEventsList().getFirst().setT(Math.min(nextT + 1, eventList.getFirst().getT()));
-
-            if((e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER)) != 0) {
+            if ((e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER)) != 0) {
                 eventListManager.getSystemEventsList().getFirst().setX(0);
 
                 return;
@@ -144,7 +133,7 @@ public class Noleggio implements Center {
             return;
         } else {    /* Process a departure */
             this.index++;
-            this.number--;
+            this.nUsers--;
 
             /* Virtual move of job from Noleggio to Strada */
             event = new MsqEvent(eventList.get(e).getT(), eventList.get(e).getX());
@@ -156,20 +145,26 @@ public class Noleggio implements Center {
             eventListManager.setServerStrada(serverStrada);
 
             s = e;
-            if (number >= NOLEGGIO_SERVER && !internalEventList.isEmpty()) {        /* there is some jobs in queue, place another job in this server */
+            if (nUsers >= NOLEGGIO_SERVER && !internalEventList.isEmpty()) {        /* there is some jobs in queue, place another job in this server */
                 service = distr.getService(0);
 
                 /* Update number of available cars in the center depending on where the car comes from */
                 if (internalEventList.getFirst().isFromParking()) {
                     if (eventListManager.reduceCarsInParcheggio() != 0) {
-                        this.number++;
+                        this.nUsers++;
                         this.index--;
+
+                        eventList.get(2).setT(msqT.getCurrent());
+
                         return;
                     }
                 } else {
                     if (eventListManager.reduceCarsInRicarica() != 0) {
-                        this.number++;
+                        this.nUsers++;
                         this.index--;
+
+                        eventList.get(1).setT(msqT.getCurrent());
+
                         return;
                     }
                 }
@@ -210,15 +205,15 @@ public class Noleggio implements Center {
         List<MsqEvent> internalEventList = eventListManager.getIntQueueNoleggio();
 
         /* No event to process */
-        if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0) return;
+        if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.nUsers == 0) return;
 
-        if((e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER)) >= eventList.size()) return;
+        if ((e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER)) >= eventList.size()) return;
         msqT.setNext(eventList.get(e).getT());
-        if (e == 0) area += (msqT.getNext() - msqT.getCurrent()) * number;
+        if (e == 0) area += (msqT.getNext() - msqT.getCurrent()) * nUsers;
         msqT.setCurrent(msqT.getNext());
 
         if (e == 0 && !internalEventList.isEmpty()) { /* External arrival (λ) and a car is ready to be rented */
-            this.number++;
+            this.nUsers++;
 
             BatchMeans.incrementJobInBatch();
             jobInBatch++;
@@ -230,7 +225,7 @@ public class Noleggio implements Center {
                 eventListManager.setServerNoleggio(eventList); // TODO superfluo? Fatto alla fine
             }
 
-            if (number <= NOLEGGIO_SERVER) {
+            if (nUsers <= NOLEGGIO_SERVER) {
                 service = 0;
                 s = 1;  /* There is only one server */
 
@@ -250,7 +245,7 @@ public class Noleggio implements Center {
                 sumList.get(s).incrementServed();
             }
         } else if (e == 0) {                /* External arrival (λ) but there aren't cars to rent */
-            this.number++;
+            this.nUsers++;
 
             eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */
 
@@ -267,7 +262,7 @@ public class Noleggio implements Center {
             return;
         } else {    /* Process a departure */
             this.index++;
-            this.number--;
+            this.nUsers--;
 
             /* Virtual move of job from Noleggio to Strada */
             event = new MsqEvent(eventList.get(e).getT(), eventList.get(e).getX());
@@ -286,19 +281,19 @@ public class Noleggio implements Center {
             }
 
             s = e;
-            if (number >= NOLEGGIO_SERVER && !internalEventList.isEmpty()) {        /* there is some jobs in queue, place another job in this server */
+            if (nUsers >= NOLEGGIO_SERVER && !internalEventList.isEmpty()) {        /* there is some jobs in queue, place another job in this server */
                 service = distr.getService(0);
 
                 /* Update number of available cars in the center depending on where the car comes from */
                 if (internalEventList.getFirst().isFromParking()) {
                     if (eventListManager.reduceCarsInParcheggio() != 0) {
-                        this.number++;
+                        this.nUsers++;
                         this.index--;
                         return;
                     }
                 } else {
                     if (eventListManager.reduceCarsInRicarica() != 0) {
-                        this.number++;
+                        this.nUsers++;
                         this.index--;
                         return;
                     }
@@ -343,7 +338,7 @@ public class Noleggio implements Center {
         batchNoleggio.insertResponseTime(responseTime, nBatch);
 
         double sum = 0;
-        for(int i = 1; i == NOLEGGIO_SERVER; i++) {
+        for (int i = 1; i == NOLEGGIO_SERVER; i++) {
             sum += sumList.get(i).getService();
             sumList.get(i).setService(0);
             sumList.get(i).setServed(0);
@@ -384,7 +379,7 @@ public class Noleggio implements Center {
         System.out.println("  avg wait ........... = " + responseTime);
         System.out.println("  avg # in node ...... = " + avgPopulationInNode);
 
-        for(int i = 1; i == NOLEGGIO_SERVER; i++) {
+        for (int i = 1; i == NOLEGGIO_SERVER; i++) {
             area -= sumList.get(i).getService();
         }
 
@@ -394,8 +389,8 @@ public class Noleggio implements Center {
         System.out.println("  avg delay .......... = " + waitingTimeInQueue);
         System.out.println("  avg # in queue ..... = " + avgPopulationInQueue);
         System.out.println("\tserver\tutilization\t avg service\t share\n");
-        for(int i = 1; i == NOLEGGIO_SERVER; i++) {
-            System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t" + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t" + f.format(((double)sumList.get(i).getServed() / index)));
+        for (int i = 1; i == NOLEGGIO_SERVER; i++) {
+            System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t" + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t" + f.format(((double) sumList.get(i).getServed() / index)));
         }
         System.out.println("\n");
     }

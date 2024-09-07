@@ -6,18 +6,18 @@ public class Constants {
     public static final int STRADA_SERVER = Integer.MAX_VALUE; // Infinite server
     public static final int PARCHEGGIO_SERVER = 60;
 
-//    public static final int SERVER_MAX_QUEUE = 5;
-//    public static final int RICARICA_MAX_QUEUE = 2;
-    public static final int SERVER_MAX_QUEUE = Integer.MAX_VALUE;
-    public static final int RICARICA_MAX_QUEUE = Integer.MAX_VALUE;
+    public static final int PARCHEGGIO_MAX_QUEUE = 5;
+    public static final int RICARICA_MAX_QUEUE = 2;
+//    public static final int PARCHEGGIO_MAX_QUEUE = Integer.MAX_VALUE;
+//    public static final int RICARICA_MAX_QUEUE = Integer.MAX_VALUE;
 
      public static final int RICARICA_SERVER = 15;
 
     /*  Value of Start and Stop time */
     public static final double START = 0.0;
     public static final double STOP_INF = Double.MAX_VALUE; /* Infinite simulation */
-//    public static final double STOP_FIN = 86400; /* Finite simulation -> check every 1 day */
-    public static final double STOP_FIN = 86400 * 365; /* Finite simulation -> check every 1 day */
+    public static final double STOP_FIN = 86400; /* Finite simulation -> check every 1 day */
+//    public static final double STOP_FIN = 86400 * 365; /* Finite simulation -> check every 1 day */
 
     /* Probabilities */
     public static final double P_RICARICA = 0.1;

@@ -8,7 +8,7 @@ import static Model.Constants.INIT_PARK_CARS;
 
 public class Test {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         new Noleggio();
         new Strada();
         new Parcheggio();
@@ -71,7 +71,7 @@ public class Test {
         noleggio.printResult();
     }
 
-    private void testParcheggio() {
+    private void testParcheggio() throws Exception {
         EventListManager eventListManager = EventListManager.getInstance();
 
         Parcheggio park = new Parcheggio();
@@ -84,7 +84,7 @@ public class Test {
         park.simpleSimulation();
     }
 
-    private void testExternalParcheggio(){
+    private void testExternalParcheggio() throws Exception {
         EventListManager eventListManager = EventListManager.getInstance();
         Parcheggio park = new Parcheggio();
         List<MsqEvent> intQueueParcheggio = eventListManager.getServerParcheggio();

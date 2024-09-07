@@ -105,8 +105,15 @@ public class Sistema {
         while (msqT.getCurrent() < STOP_FIN) {
             if ((e = getNextEvent(eventList)) == -1) break;
 
-//            if (msqT.getCurrent() > 86400 * 100)
-//                System.out.println(msqT.getCurrent() + " - " + e);
+
+            boolean x = false;
+
+            System.out.println(eventList.get(e).getT() + " - " + e);
+//            if (eventListManager.getServerParcheggio().get(60).getX() == 1)
+            if (msqT.getCurrent() > 17153) break;
+            if (msqT.getCurrent() > 15651) // break;
+                System.out.println("sadf as d");
+//            if (x && eventList.get(e).getT() > 6420) break;
 
             msqT.setNext(eventList.get(e).getT());
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
@@ -118,10 +125,10 @@ public class Sistema {
             } else throw new Exception("Invalid event");
         }
 
-        for (int i = 0; i < 4; i++) centerList.get(i).printResult();
+//        for (int i = 0; i < 4; i++) centerList.get(i).printResult();
 
         /* Calculate profit */
-        printProfit(msqT.getCurrent());
+//        printProfit(msqT.getCurrent());
     }
 
     /* Infinite horizon simulation */
