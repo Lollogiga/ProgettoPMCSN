@@ -35,6 +35,7 @@ public class Noleggio implements Center {
 
     private final SimulationResults batchNoleggio = new SimulationResults();
     private final Distribution distr = Distribution.getInstance();
+    private final FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
 
     public Noleggio() {
         this.eventListManager = EventListManager.getInstance();
@@ -400,7 +401,6 @@ public class Noleggio implements Center {
         }
         System.out.println("\n");
 
-        FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
         if (runNumber > 0 && seed > 0)
             fileCSVGenerator.saveRepResults(NOLEGGIO, runNumber, seed, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
     }

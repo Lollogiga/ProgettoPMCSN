@@ -33,6 +33,7 @@ public class Ricarica implements Center {
 
     private final SimulationResults batchRicarica = new SimulationResults();
     private final Distribution distr;
+    private final FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
 
     public Ricarica() {
         eventListManager = EventListManager.getInstance();
@@ -364,7 +365,6 @@ public class Ricarica implements Center {
 
         System.out.println("\n");
 
-        FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
         if (runNumber > 0 && seed > 0)
             fileCSVGenerator.saveRepResults(RICARICA, runNumber, seed, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
     }

@@ -33,6 +33,7 @@ public class Parcheggio implements Center {
 
     private final SimulationResults batchParcheggio = new SimulationResults();
     private final Distribution distr;
+    private final FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
 
     public Parcheggio() {
         eventListManager = EventListManager.getInstance();
@@ -327,6 +328,8 @@ public class Parcheggio implements Center {
         batchParcheggio.insertAvgPopulationInQueue(avgPopulationInQueue, nBatch);
         batchParcheggio.insertUtilization(utilization, nBatch);
 
+        fileCSVGenerator.saveBatchResults(nBatch, avgPopulationInQueue);
+
         /* Reset parameters */
         area = 0;
         index = 0;
@@ -363,7 +366,6 @@ public class Parcheggio implements Center {
         }
         System.out.println("\n");
 
-        FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
         if (runNumber > 0 && seed > 0)
             fileCSVGenerator.saveRepResults(PARCHEGGIO, runNumber, seed, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
     }

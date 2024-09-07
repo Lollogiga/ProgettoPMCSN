@@ -34,6 +34,7 @@ public class Strada implements Center {
 
     private final SimulationResults batchStrada = new SimulationResults();
     private final Distribution distr;
+    private final FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
 
     public Strada() {
         eventListManager = EventListManager.getInstance();
@@ -307,7 +308,6 @@ public class Strada implements Center {
 
         System.out.println("\n");
 
-        FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
         if (runNumber > 0 && seed > 0)
             fileCSVGenerator.saveRepResults(STRADA, runNumber, seed, responseTime, avgPopulationInNode, -Double.MAX_VALUE, -Double.MAX_VALUE);
 

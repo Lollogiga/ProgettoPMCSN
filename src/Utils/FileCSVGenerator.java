@@ -9,13 +9,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FileCSVGenerator {
-    private static final String RESULT = "results/";
-    private static final String MAIN_PATH = "resources/";
+    private static final String RESULT = "results";
+    private static final String MAIN_PATH = "resources";
+    private static final String FINITE_HORIZON = "finite_horizon";
+    private static final String INFINITE_HORIZON = "infinite_horizon";
+
     private static String directoryPath;
     private static FileCSVGenerator instance;
 
     public FileCSVGenerator(String directoryPath) {
-        FileCSVGenerator.directoryPath = directoryPath + File.separator;
+        FileCSVGenerator.directoryPath = directoryPath;
 
         createDirectories();
     }
@@ -28,11 +31,21 @@ public class FileCSVGenerator {
     }
 
     private void createDirectories() {
-            Path folderPath = Paths.get(directoryPath + FileCSVGenerator.RESULT);
+        Path folderPath = Paths.get(directoryPath, FileCSVGenerator.RESULT);
+        Path finitePath = Paths.get(directoryPath, FileCSVGenerator.RESULT, FileCSVGenerator.FINITE_HORIZON);
+        Path infinitePath = Paths.get(directoryPath, FileCSVGenerator.RESULT, FileCSVGenerator.INFINITE_HORIZON);
 
-            try {
+        try {
                 if (!Files.exists(folderPath)) {
                     Files.createDirectories(folderPath);
+                }
+
+                if (!Files.exists(finitePath)) {
+                    Files.createDirectories(finitePath);
+                }
+
+                if (!Files.exists(infinitePath)) {
+                    Files.createDirectories(infinitePath);
                 }
             } catch (IOException ex) {
                 Logger.getAnonymousLogger().log(Level.INFO, "Results folders creation error");
@@ -41,7 +54,7 @@ public class FileCSVGenerator {
 
     public void createSeedFolders(long seed) {
         String folderName = "Seed_" + seed + File.separator;
-        Path folderPath = Paths.get(directoryPath + FileCSVGenerator.RESULT + folderName);
+        Path folderPath = Paths.get(directoryPath + FileCSVGenerator.RESULT + FileCSVGenerator.FINITE_HORIZON + folderName);
         try {
             if (!Files.exists(folderPath)) {
                 Files.createDirectories(folderPath);
@@ -69,7 +82,7 @@ public class FileCSVGenerator {
                 }
             });
         } catch (IOException ex) {
-            Logger.getAnonymousLogger().log(Level.INFO, "Deleting files error");
+            // ignore: nothing to delete
         }
     }
 
@@ -79,7 +92,7 @@ public class FileCSVGenerator {
     }
 
     public void saveRepResults(String type, int runNumber, long seed, double responseTime, double avgPopulationInNode, double waitingTime, double avgPopulationInQueue) {
-        String fileTitle = Paths.get(directoryPath, FileCSVGenerator.RESULT, searchSeedFileName(seed), "run_" + runNumber).toString();
+        String fileTitle = Paths.get(directoryPath, FileCSVGenerator.RESULT, FileCSVGenerator.FINITE_HORIZON, searchSeedFileName(seed), "run_" + runNumber).toString();
         File file = new File(fileTitle);
 
         try (FileWriter fileWriter = new FileWriter(fileTitle, true)) {
@@ -93,6 +106,21 @@ public class FileCSVGenerator {
                 writeToFile(fileWriter, type + "," + responseTime + "," +
                         avgPopulationInNode + "," + waitingTime + "," + avgPopulationInQueue);
             }
+
+        } catch (IOException e) {
+            Logger.getAnonymousLogger().log(Level.INFO, "An error occurred while generating release info", e);
+        }
+    }
+
+    public void saveBatchResults(int batchIndex, double responseTime) {
+        String fileTitle = Paths.get(directoryPath, FileCSVGenerator.RESULT, FileCSVGenerator.INFINITE_HORIZON, "responseTime").toString();
+        File file = new File(fileTitle);
+
+        try (FileWriter fileWriter = new FileWriter(fileTitle, true)) {
+            if (file.length() == 0)
+                writeToFile(fileWriter, "Batch Number,E[T_s]");
+
+            writeToFile(fileWriter, batchIndex + "," + responseTime);
 
         } catch (IOException e) {
             Logger.getAnonymousLogger().log(Level.INFO, "An error occurred while generating release info", e);
