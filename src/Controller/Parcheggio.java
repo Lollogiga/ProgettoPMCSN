@@ -89,6 +89,8 @@ public class Parcheggio implements Center {
                 if (eventListManager.getCarsInParcheggio() + this.number >= PARCHEGGIO_SERVER + SERVER_MAX_QUEUE) {      /* New arrival but Parcheggio's queue is full */
                     this.number--;      /* Loss event */
 
+                    eventListManager.decrementCars();
+
                     rentalProfit.incrementPenalty();
 
                     eventListManager.getSystemEventsList().get(2).setT(eventList.getFirst().getT());
@@ -206,7 +208,7 @@ public class Parcheggio implements Center {
 
                 if (eventListManager.getCarsInParcheggio() + this.number >= PARCHEGGIO_SERVER + SERVER_MAX_QUEUE) {      /* New arrival but Parcheggio's queue is full */
                     this.number--;      /* Loss event */
-
+                    eventListManager.decrementCars();
                     eventListManager.getSystemEventsList().get(2).setT(eventList.getFirst().getT());
 
                     return;

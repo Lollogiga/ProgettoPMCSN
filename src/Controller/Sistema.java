@@ -105,7 +105,7 @@ public class Sistema {
         while (msqT.getCurrent() < STOP_FIN) {
             if ((e = getNextEvent(eventList)) == -1) break;
 
-//            if (msqT.getCurrent() > 129851) // break;
+//            if (msqT.getCurrent() > 86400 * 100)
 //                System.out.println(msqT.getCurrent() + " - " + e);
 
             msqT.setNext(eventList.get(e).getT());

@@ -88,7 +88,7 @@ public class Ricarica implements Center {
 
                 if (eventListManager.getCarsInRicarica() + this.number > RICARICA_SERVER + RICARICA_MAX_QUEUE) { /* New arrival but Ricarica's queue is full */
                     this.number--; /* Loss event */
-
+                    eventListManager.decrementCars();
                     rentalProfit.incrementPenalty();
 
                     eventListManager.getSystemEventsList().get(1).setT(eventList.getFirst().getT());
@@ -205,7 +205,7 @@ public class Ricarica implements Center {
 
                 if (eventListManager.getCarsInRicarica() + this.number > RICARICA_SERVER + RICARICA_MAX_QUEUE) { /* New arrival but Ricarica's queue is full */
                     this.number--; /* Loss event */
-
+                    eventListManager.decrementCars();
                     eventListManager.getSystemEventsList().get(1).setT(eventList.getFirst().getT());
 
                     return;
