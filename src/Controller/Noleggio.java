@@ -66,24 +66,37 @@ public class Noleggio implements Center {
         if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0) return;
 
         if((e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER)) >= eventList.size()) return;
-        msqT.setNext(eventList.get(e).getT());
-        if (e == 0) area += (msqT.getNext() - msqT.getCurrent()) * number;
+
+        if (e == 0 && eventList.get(e).getT() > eventListManager.getSystemEventsList().getFirst().getT()) {
+            if (this.number == 0) {
+                eventListManager.getSystemEventsList().getFirst().setT(eventList.get(e).getT());
+
+                return;
+            }
+
+            msqT.setNext(eventListManager.getSystemEventsList().getFirst().getT());
+            area += (msqT.getNext() - msqT.getCurrent()) * number;
+        } else {
+            msqT.setNext(eventList.get(e).getT());
+            if (e == 0) area += (msqT.getNext() - msqT.getCurrent()) * number;
+        }
         msqT.setCurrent(msqT.getNext());
 
         if (e == 0 && !internalEventList.isEmpty()) { /* External arrival (λ) and a car is ready to be rented */
-            this.number++;
+            // Controllo che il prossimo evento sia un evento di arrivo e che l'evento nel sistema < evento più prossimo trovato -> mi è arrivata una macchina mentre non stavo servendo nessuno ed ho utenti pendenti
+            if (eventList.getFirst().getT() <= eventListManager.getSystemEventsList().getFirst().getT()) {
+                this.number++;
 
-            eventList.get(e).setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */
+                eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */
+            }
 
             if (eventList.getFirst().getT() > STOP_FIN) {
                 eventList.getFirst().setX(0);
-                eventListManager.setServerNoleggio(eventList); // TODO superfluo? Fatto alla fine
+                eventListManager.setServerNoleggio(eventList);
             }
 
-            if (number <= NOLEGGIO_SERVER) {
-                service = 0;
-                s = 1;  /* There is only one server */
-
+//            if (number <= NOLEGGIO_SERVER) {
+            if (eventList.get(1).getX() == 0) { // TODO: condizione da verificare
                 /* Update number of available cars in the center depending on where the car comes from */
                 if (internalEventList.getFirst().isFromParking()) {
                     if (eventListManager.reduceCarsInParcheggio() != 0) return;
@@ -92,33 +105,41 @@ public class Noleggio implements Center {
                 }
 
                 /* Set server as active */
-                eventList.get(s).setT(msqT.getCurrent() + service);
-                eventList.get(s).setX(1);
+                eventList.get(1).setT(msqT.getCurrent());
+                eventList.get(1).setX(1);
                 internalEventList.removeFirst();
 
-                sumList.get(s).incrementService(service);
-                sumList.get(s).incrementServed();
+                sumList.get(1).incrementServed();
             }
         } else if (e == 0) {                /* External arrival (λ) but there aren't cars to rent */
             this.number++;
 
             eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */
 
-            List<MsqEvent> eventListParcheggio = eventListManager.getServerParcheggio();
-            int nextEventParcheggio = MsqEvent.getNextEvent(eventListParcheggio, NOLEGGIO_SERVER);
+//            List<MsqEvent> eventListParcheggio = eventListManager.getServerParcheggio();
+//            int nextEventParcheggio = MsqEvent.getNextEvent(eventListParcheggio, NOLEGGIO_SERVER);
+//
+//            List<MsqEvent> eventListRicarica = eventListManager.getServerRicarica();
+//            int nextEventRicarica = MsqEvent.getNextEvent(eventListRicarica, RICARICA_SERVER);
+//
+//            double nextT = Double.MAX_VALUE;
+//            if (nextEventParcheggio != -1 && nextEventRicarica != -1)
+//                nextT = Math.min(eventListParcheggio.get(nextEventParcheggio).getT(), eventListRicarica.get(nextEventRicarica).getT());
+//            else if (nextEventParcheggio != -1)
+//                nextT = eventListParcheggio.get(nextEventParcheggio).getT();
+//            else if (nextEventRicarica != -1)
+//                nextT = eventListRicarica.get(nextEventRicarica).getT();
+//
+//            // BUG sbagliato
+//            eventListManager.getSystemEventsList().getFirst().setT(Math.min(nextT + 1, eventList.getFirst().getT()));
 
-            List<MsqEvent> eventListRicarica = eventListManager.getServerRicarica();
-            int nextEventRicarica = MsqEvent.getNextEvent(eventListRicarica, RICARICA_SERVER);
+            if((e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER)) != 0) {
+                eventListManager.getSystemEventsList().getFirst().setX(0);
 
-            double nextT = Double.MAX_VALUE;
-            if (nextEventParcheggio != -1 && nextEventRicarica != -1)
-                nextT = Math.min(eventListParcheggio.get(nextEventParcheggio).getT(), eventListRicarica.get(nextEventRicarica).getT());
-            else if (nextEventParcheggio != -1)
-                nextT = eventListParcheggio.get(nextEventParcheggio).getT();
-            else if (nextEventRicarica != -1)
-                nextT = eventListRicarica.get(nextEventRicarica).getT();
+                return;
+            }
 
-            eventListManager.getSystemEventsList().getFirst().setT(Math.min(nextT + 1, eventList.getFirst().getT()));
+            eventListManager.getSystemEventsList().getFirst().setT(eventList.get(e).getT());
 
             return;
         } else {    /* Process a departure */
@@ -204,7 +225,7 @@ public class Noleggio implements Center {
 
             eventList.get(e).setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */
 
-            if (eventList.getFirst().getT() > STOP_FIN) {
+            if (eventList.getFirst().getT() > STOP_INF) {
                 eventList.getFirst().setX(0);
                 eventListManager.setServerNoleggio(eventList); // TODO superfluo? Fatto alla fine
             }
@@ -347,7 +368,7 @@ public class Noleggio implements Center {
 
     @Override
     public int getNumJob() {
-        return this.nBatch;
+        return this.jobInBatch;
     }
 
     @Override

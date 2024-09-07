@@ -4,6 +4,7 @@ import Libs.Rngs;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
+import Utils.BatchMeans;
 import Utils.Distribution;
 import Utils.RentalProfit;
 
@@ -22,17 +23,17 @@ public class Sistema {
 
     double service;
 
-    private Rngs rngs = new Rngs();
+    private final Rngs rngs = new Rngs();
     private final MsqT msqT = new MsqT();
 
     private final EventListManager eventListManager;
     private final Distribution distr;
-    private RentalProfit rentalProfit;
+    private final RentalProfit rentalProfit;
 
     private final List<MsqEvent> systemList = new ArrayList<>(NODES);
     private final List<MsqSum> sumList = new ArrayList<>(NODES + 1);
 
-    private final List<Center> controllerList = new ArrayList<>();
+    private final List<Center> centerList = new ArrayList<>();
 
     public Sistema(long seed) {
         eventListManager = EventListManager.getInstance();
@@ -49,10 +50,10 @@ public class Sistema {
         Strada strada = new Strada();
         Ricarica ricarica = new Ricarica();
 
-        controllerList.addAll(Arrays.asList(noleggio, ricarica, parcheggio, strada));
+        centerList.addAll(Arrays.asList(noleggio, ricarica, parcheggio, strada));
 
         /* 0 - noleggio, 1 - ricarica, 2 - parcheggio, 3 - strada */
-        for(int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             systemList.add(i, new MsqEvent(0, 0));
             sumList.add(i, new MsqSum(0, 0));
         }
@@ -74,16 +75,15 @@ public class Sistema {
 
         // Initialize cars in noleggio
         List<MsqEvent> carInRentalStation = eventListManager.getIntQueueNoleggio();
-        for (int i = 0; i < INIT_PARK_CARS; i++) {
+        for (int i = 0; i < INIT_PARK_CARS; i++)
             carInRentalStation.add(i, new MsqEvent(0, 1, true));
-        }
         eventListManager.setIntQueueNoleggio(carInRentalStation);
 
         eventListManager.setSystemEventsList(systemList);
     }
 
     public void simulation(int simulationType) throws Exception {
-        System.out.println("Avvio simulazione");
+        System.out.println("Starting simulation");
 
         switch (simulationType) {
             case 0:
@@ -103,54 +103,53 @@ public class Sistema {
         List<MsqEvent> eventList = eventListManager.getSystemEventsList();
 
         while (msqT.getCurrent() < STOP_FIN) {
-            if((e = getNextEvent(eventList)) == -1) break;
+            if ((e = getNextEvent(eventList)) == -1) break;
+
+//            if (msqT.getCurrent() > 129851) // break;
+//                System.out.println(msqT.getCurrent() + " - " + e);
 
             msqT.setNext(eventList.get(e).getT());
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
             msqT.setCurrent(msqT.getNext());
 
             if (e < 4) {
-                controllerList.get(e).simpleSimulation();
+                centerList.get(e).simpleSimulation();
                 eventList = eventListManager.getSystemEventsList();
             } else throw new Exception("Invalid event");
         }
 
-
-        for (int i = 0; i < 4; i++) {
-            controllerList.get(i).printResult();
-        }
+        for (int i = 0; i < 4; i++) centerList.get(i).printResult();
 
         /* Calculate profit */
-        printProfit(eventList.get(MsqEvent.getNextEvent(eventList, NODES - 1)).getT());
+        printProfit(msqT.getCurrent());
     }
 
     /* Infinite horizon simulation */
     public void infiniteSimulation() throws Exception {
         int e;
-        MsqT time=new MsqT();
-        time.setCurrent(START);
-        time.setNext(START);
+
+        msqT.setCurrent(START);
+        msqT.setNext(START);
+
         List<MsqEvent> eventList = eventListManager.getSystemEventsList();
 
-        while (msqT.getCurrent() < STOP_FIN) {
-            if((e = getNextEvent(eventList)) == -1) break;
+        while (pendingEvents()) {
+            if ((e = getNextEvent(eventList)) == -1) break;
 
             msqT.setNext(eventList.get(e).getT());
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
             msqT.setCurrent(msqT.getNext());
 
             if (e < 4) {
-                controllerList.get(e).infiniteSimulation();
+                centerList.get(e).infiniteSimulation();
                 eventList = eventListManager.getSystemEventsList();
             } else throw new Exception("Invalid event");
         }
 
-        for (int i = 0; i < 4; i++) {
-            controllerList.get(i).printResult();
-        }
+        for (int i = 0; i < 4; i++) centerList.get(i).printResult();
 
         /* Calculate profit */
-        printProfit(eventList.get(MsqEvent.getNextEvent(eventList, NODES - 1)).getT());
+        printProfit(msqT.getCurrent());
     }
 
     private void printProfit(double lastEventTime) {
@@ -195,4 +194,8 @@ public class Sistema {
         return e;
     }
 
+    /* Check if there is a centre that has not processed B*K events */
+    private boolean pendingEvents() {
+        return BatchMeans.getJobInBatch() <= B * K;
+    }
 }

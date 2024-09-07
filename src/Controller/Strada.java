@@ -281,7 +281,7 @@ public class Strada implements Center {
 
     @Override
     public int getNumJob() {
-        return this.nBatch;
+        return this.jobInBatch;
     }
 
     @Override

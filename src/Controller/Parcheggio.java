@@ -73,6 +73,8 @@ public class Parcheggio implements Center {
             eventList.getLast().setX(1);
         }
 
+        double msqCurr = msqT.getCurrent();
+
         if ((e = MsqEvent.getNextEvent(eventList, PARCHEGGIO_SERVER + 1)) >= eventList.size()) return;
         msqT.setNext(eventList.get(e).getT());
         area += (msqT.getNext() - msqT.getCurrent()) * number;
@@ -88,13 +90,13 @@ public class Parcheggio implements Center {
                     this.number--;      /* Loss event */
 
                     rentalProfit.incrementPenalty();
+
                     eventListManager.getSystemEventsList().get(2).setT(eventList.getFirst().getT());
 
                     return;
                 }
 
-                if (e == eventList.size() - 1)
-                    eventListManager.incrementCars();   /* New car in system */
+                eventListManager.incrementCars();   /* New car in system */
 
                 if (eventList.getFirst().getT() > STOP_FIN) {
                     /* Set event as "not active" cause simulation end */
@@ -104,8 +106,6 @@ public class Parcheggio implements Center {
             } else {    /* Event is an internal arrival */
                 event = internalEventList.getFirst();
                 internalEventList.removeFirst();
-
-                if (internalEventList.isEmpty()) eventList.getLast().setX(0);
             }
 
             if (eventListManager.getCarsInParcheggio() + number <= PARCHEGGIO_SERVER) {
@@ -119,6 +119,8 @@ public class Parcheggio implements Center {
                 sumList.get(s).incrementService(service);
                 sumList.get(s).incrementServed();
             }
+
+            if (e == eventList.size() - 1 && internalEventList.isEmpty()) eventList.getLast().setX(0);
         } else {        /* Process a departure */
             this.index++;
             this.number--;
@@ -146,6 +148,7 @@ public class Parcheggio implements Center {
             List<MsqEvent> intQueueNoleggio = eventListManager.getIntQueueNoleggio();
             intQueueNoleggio.add(event);
             eventListManager.setIntQueueNoleggio(intQueueNoleggio);
+            eventListManager.getSystemEventsList().getFirst().setT(msqT.getCurrent());
 
             s = e;
             if (number >= PARCHEGGIO_SERVER) {        /* there is some jobs in queue, place another job in this server */
@@ -185,6 +188,8 @@ public class Parcheggio implements Center {
             eventList.getLast().setX(1);
         }
 
+        double msqCurr = msqT.getCurrent();
+
         if ((e = MsqEvent.getNextEvent(eventList, PARCHEGGIO_SERVER + 1)) >= eventList.size()) return;
         msqT.setNext(eventList.get(e).getT());
         area += (msqT.getNext() - msqT.getCurrent()) * number;
@@ -207,10 +212,9 @@ public class Parcheggio implements Center {
                     return;
                 }
 
-                if (e == eventList.size() - 1)
-                    eventListManager.incrementCars();   /* New car in system */
+                eventListManager.incrementCars();   /* New car in system */
 
-                if (eventList.getFirst().getT() > STOP_FIN) {
+                if (eventList.getFirst().getT() > STOP_INF) {
                     /* Set event as "not active" cause simulation end */
                     eventList.getFirst().setX(0);
                     eventListManager.setServerParcheggio(eventList);
@@ -218,8 +222,6 @@ public class Parcheggio implements Center {
             } else {    /* Event is an internal arrival */
                 event = internalEventList.getFirst();
                 internalEventList.removeFirst();
-
-                if (internalEventList.isEmpty()) eventList.getLast().setX(0);
             }
 
             if (eventListManager.getCarsInParcheggio() + number <= PARCHEGGIO_SERVER) {
@@ -233,6 +235,8 @@ public class Parcheggio implements Center {
                 sumList.get(s).incrementService(service);
                 sumList.get(s).incrementServed();
             }
+
+            if (e == eventList.size() - 1 && internalEventList.isEmpty()) eventList.getLast().setX(0);
         } else {        /* Process a departure */
             this.index++;
             this.number--;
@@ -268,6 +272,7 @@ public class Parcheggio implements Center {
             List<MsqEvent> intQueueNoleggio = eventListManager.getIntQueueNoleggio();
             intQueueNoleggio.add(event);
             eventListManager.setIntQueueNoleggio(intQueueNoleggio);
+            eventListManager.getSystemEventsList().getFirst().setT(msqT.getCurrent());
 
             s = e;
             if (number >= PARCHEGGIO_SERVER) {        /* there is some jobs in queue, place another job in this server */
@@ -330,7 +335,7 @@ public class Parcheggio implements Center {
 
     @Override
     public int getNumJob() {
-        return this.nBatch;
+        return this.jobInBatch;
     }
 
     @Override

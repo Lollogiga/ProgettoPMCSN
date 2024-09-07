@@ -33,9 +33,9 @@ public class Main {
                     seedList.add(0L);
                 }
                 /* Set first seed*/
-                seedList.addFirst(SEED);
+                seedList.set(0, SEED);
 
-                /* Simulate REPLICATION = 64 run*/
+                /* Simulate REPLICATION = 64 run */
                 for (int i = 0; i < REPLICATION; i++) {
                     /* Start simulation with seed[i] */
                     Sistema sys = new Sistema(seedList.get(i));
@@ -44,7 +44,9 @@ public class Main {
                     /* Generate new seed */
                     if (i + 1 < REPLICATION) {
                         rngs.selectStream(255);
-                        seedList.add(i + 1, rngs.getSeed());
+                        rngs.random(); // TODO: se non metto questa riga rngs.getSeed() è uguale dalla seconda iterazione fino alla fine. Così cambia.
+
+                        seedList.set(i + 1, rngs.getSeed());
                     }
                 }
                 break;
