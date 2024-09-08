@@ -35,15 +35,13 @@ public class Sistema {
 
     private final List<Center> centerList = new ArrayList<>();
 
-    public Sistema(long seed) {
+    public Sistema() {
         eventListManager = EventListManager.getInstance();
         distr = Distribution.getInstance();
         rentalProfit = RentalProfit.getInstance();
 
         eventListManager.resetState();
         rentalProfit.resetPenalty();
-
-        rngs.plantSeeds(seed);
 
         Parcheggio parcheggio = new Parcheggio();
         Noleggio noleggio = new Noleggio();
@@ -105,6 +103,10 @@ public class Sistema {
         while (msqT.getCurrent() < STOP_FIN) {
             if ((e = getNextEvent(eventList)) == -1) break;
 
+//            if (e == 1 && msqT.getCurrent() > 14664) break;
+//            if (msqT.getCurrent() > 86367) // break;
+//                System.out.println(msqT.getCurrent() + " - " + e + " - " + rngs.getSeed());
+
             msqT.setNext(eventList.get(e).getT());
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
             msqT.setCurrent(msqT.getNext());
@@ -114,6 +116,8 @@ public class Sistema {
                 eventList = eventListManager.getSystemEventsList();
             } else throw new Exception("Invalid event");
         }
+
+        System.out.println("\n\n");
 
         for (int i = 0; i < 4; i++) centerList.get(i).printResult(runNumber, seed);
 

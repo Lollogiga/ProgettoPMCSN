@@ -57,7 +57,6 @@ public class Noleggio implements Center {
 
     @Override
     public void simpleSimulation() {
-        int e;
         MsqEvent event;
 
         List<MsqEvent> eventList = eventListManager.getServerNoleggio();
@@ -66,9 +65,7 @@ public class Noleggio implements Center {
         /* No event to process */
         if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0) return;
 
-//        if((e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER)) != 0) return; // Ralisin: secondo me è inutile
-
-        if ((e = MsqEvent.getNextEvent(eventList, eventList.size() - 1)) >= eventList.size()) return;
+        if ((e = MsqEvent.getNextEvent(eventList, eventList.size() - 1)) == -1) return;
         msqT.setNext(eventList.get(e).getT());
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
@@ -87,10 +84,13 @@ public class Noleggio implements Center {
 
             if (eventList.get(1).getX() == 0) { // TODO: condizione da verificare
                 /* Update number of available cars in the center depending on where the car comes from */
-                if (internalEventList.getFirst().isFromParking())
-                    if (eventListManager.reduceCarsInParcheggio() != 0) return;
-                else
-                    if (eventListManager.reduceCarsInRicarica() != 0) return;
+                if (internalEventList.getFirst().isFromParking()) {
+                    if (eventListManager.reduceCarsInParcheggio() != 0)
+                        return;
+                } else {
+                    if (eventListManager.reduceCarsInRicarica() != 0)
+                        return;
+                }
 
                 /* Set server as active */
                 eventList.get(1).setT(msqT.getCurrent()); /* mu_noleggio = inf -> no tempo di servizio */
@@ -107,24 +107,18 @@ public class Noleggio implements Center {
                 // Imposto la x di lamda* a 1
                 eventList.getLast().setX(1);
             }
-        } else if (e == 0) {        /* External arrival (λ) but there aren't cars to rent */
-            this.number++;
+        } else if (e == 0 || e == eventList.size() - 1) {
+            if (e == 0) {
+                this.number++;
 
-            eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */
-
-            if((e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER)) != 0) {
-                eventListManager.getSystemEventsList().getFirst().setX(0);
-
-                return;
+                eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */
             }
 
-            eventListManager.getSystemEventsList().getFirst().setT(eventList.get(e).getT());
-        } else if (e == eventList.size() - 1) {     /* Event λ* but there aren't cars to rent */
             // Prendo il tempo minimo tra system.parcheggio e system.ricarica
             double time = Math.min(eventListManager.getSystemEventsList().get(1).getT(), eventListManager.getSystemEventsList().get(2).getT());
 
             // Imposto il tempo di lamda* al minimo trovato + un epsilon
-            eventList.getLast().setT(time + 1);
+            eventList.getLast().setT(time + 0.1);
 
             // Imposto la x di lamda* a 1
             eventList.getLast().setX(1);
@@ -163,7 +157,9 @@ public class Noleggio implements Center {
                     }
 
                     // TODO: ho liberato un posto in Parcheggio, dare il controllo a lui per inserire eventuali eventi pendenti
-                    // nextEvent di Parcheggio avrà time = eventList.get(e).getT() + 1
+                    // nextEvent (manbda*) di Parcheggio avrà time = eventList.get(e).getT() + 1
+                    if (!eventListManager.getServerParcheggio().isEmpty())
+                        eventListManager.getServerParcheggio().getFirst().setT(eventList.get(e).getT());
                 } else {
                     if (eventListManager.reduceCarsInRicarica() != 0) {
                         this.index--;
@@ -178,13 +174,15 @@ public class Noleggio implements Center {
 
                     // TODO: ho liberato un posto in Ricarica, dare il controllo a lui per inserire eventuali eventi pendenti
                     // nextEvent di Ricarica avrà time = eventList.get(e).getT() + 1
+                    if (!eventListManager.getServerRicarica().isEmpty())
+                        eventListManager.getServerRicarica().getFirst().setT(eventList.get(e).getT());
                 }
 
                 eventList.get(s).setT(msqT.getCurrent());
                 internalEventList.removeFirst();
 
                 sumList.get(s).incrementServed();
-            } else if (number >= NOLEGGIO_SERVER) {
+            } else if (number == 0) {
                 eventList.get(s).setX(0);
             }
 
@@ -218,7 +216,7 @@ public class Noleggio implements Center {
         /* No event to process */
         if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0) return;
 
-        if((e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER)) >= eventList.size()) return;
+        if((e = MsqEvent.getNextEvent(eventList, NOLEGGIO_SERVER)) == -1) return;
 
         if (e == 0 && eventList.get(e).getT() > eventListManager.getSystemEventsList().getFirst().getT()) {
             if (this.number == 0) {

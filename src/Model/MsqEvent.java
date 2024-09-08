@@ -51,7 +51,7 @@ public class MsqEvent {
         while (i < event.size() && event.get(i).x == 1)
             i++;                        /* (idle) server                         */
 
-        if (i >= event.size()) return -1;
+        if (i >= servers) return -1;
 
         s = i;
         while (i < servers) {         /* now, check the others to find which   */
@@ -61,6 +61,19 @@ public class MsqEvent {
         }
 
         return (s);
+    }
+
+    public static int findActiveServers(List<MsqEvent> event, int servers) {
+        int count = 0;
+
+        int s = 1;
+        while (s < servers) {
+            if (event.get(s).getX() == 1) count++;
+
+            s++;
+        }
+
+        return count;
     }
 
     public double getT() {

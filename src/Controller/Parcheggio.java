@@ -19,7 +19,7 @@ public class Parcheggio implements Center {
     int e;                               /* next event index                   */
     int s;                               /* server index                       */
     long index = 0;                      /* used to count processed jobs       */
-    double area = 0.0;           /* time integrated number in the node */
+    double area = 0.0;                   /* time integrated number in the node */
     double service;
 
     int nBatch = 0;
@@ -28,6 +28,7 @@ public class Parcheggio implements Center {
 
     private final MsqT msqT = new MsqT();
 
+    // λ_ext, s_1, s_2, ..., s_n, λ_int
     private final List<MsqEvent> serverList = new ArrayList<>(PARCHEGGIO_SERVER + 2);
     private final List<MsqSum> sumList = new ArrayList<>(PARCHEGGIO_SERVER + 2);
 
@@ -58,9 +59,6 @@ public class Parcheggio implements Center {
 
     @Override
     public void simpleSimulation() {
-        int e;
-        MsqEvent event;
-
         List<MsqEvent> eventList = eventListManager.getServerParcheggio();
         List<MsqEvent> internalEventList = eventListManager.getIntQueueParcheggio();
 
@@ -76,8 +74,101 @@ public class Parcheggio implements Center {
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
 
-        if (e == 0 || e == eventList.size() - 1) {   /* Check if event is an arrival */
+        if (e == 0 || e == eventList.size() - 1) {   /* Check if event is an arrival (exogenous or endogenous) */
+            this.number++;
+
+            if (e == 0) {       /* Check if event is an external arrival */
+                eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(1));     /* Get new arrival from exogenous arrival */
+
+                if (eventListManager.getCarsInParcheggio() + this.number > PARCHEGGIO_SERVER + SERVER_MAX_QUEUE) {      /* New arrival but Parcheggio's servers and queue are full */
+                    this.number--;      /* Loss event */
+
+                    rentalProfit.incrementPenalty();
+
+                    int nextEvent = MsqEvent.getNextEvent(eventList, PARCHEGGIO_SERVER);
+                    if (nextEvent == -1) {
+                        eventListManager.getSystemEventsList().get(2).setX(0);
+                        return;
+                    }
+
+                    eventListManager.getSystemEventsList().get(2).setT(eventList.get(nextEvent).getT());
+
+                    return;
+                }
+
+                eventListManager.incrementCars();   /* New car in system */
+
+                if (eventList.getFirst().getT() > STOP_FIN) {
+                    eventList.getFirst().setX(0);   /* Set event as "not active" cause simulation end */
+
+                    eventListManager.setServerParcheggio(eventList);
+                }
+            } else if (e == eventList.size() - 1)
+                internalEventList.removeFirst();
+
+            // Place job in a server if there is a free server
+            s = MsqEvent.findOne(eventList, PARCHEGGIO_SERVER);
+            if (s != -1 && eventListManager.getCarsInParcheggio() + MsqEvent.findActiveServers(eventList, PARCHEGGIO_SERVER) < PARCHEGGIO_SERVER) {
+                service = distr.getService(1);
+
+                /* Set server as active */
+                eventList.get(s).setT(msqT.getCurrent() +  service);
+                eventList.get(s).setX(1);
+
+                sumList.get(s).incrementService(service);
+                sumList.get(s).incrementServed();
+            }
+
+            if (e == eventList.size() - 1 && internalEventList.isEmpty() && s != -1) eventList.getLast().setX(0);
+        } else {
+            this.index++;
+            this.number--;
+
+            // Update number of available cars in the center depending on where the car comes from
+            if (eventListManager.incrementCarsInParcheggio() != 0) {
+                this.index--;
+                this.number++;
+
+                List<MsqEvent> eventListNoleggio = eventListManager.getServerNoleggio();
+
+                int nextEventNoleggio = MsqEvent.getNextEvent(eventListNoleggio, NOLEGGIO_SERVER);
+                if (nextEventNoleggio == -1)
+                    eventListManager.getSystemEventsList().get(2).setT(msqT.getCurrent() + 1);
+                else
+                    eventListManager.getSystemEventsList().get(2).setT(
+                        eventListNoleggio.get(nextEventNoleggio).getT()
+                    );
+
+                return; // Ho raggiunto il numero massimo di macchine nel parcheggio, devono restare in coda
+            }
+
+            /* Routing job to rental station */
+            MsqEvent event = new MsqEvent(msqT.getCurrent(), 1, true);
+            List<MsqEvent> intQueueNoleggio = eventListManager.getIntQueueNoleggio();
+            intQueueNoleggio.add(event);
+            eventListManager.setIntQueueNoleggio(intQueueNoleggio);
+
+            s = e;
+            if (eventListManager.getCarsInParcheggio() + number >= PARCHEGGIO_SERVER) {        /* there is some jobs in queue, place another job in this server */
+                service = distr.getService(1);
+                eventList.get(s).setT(msqT.getCurrent() + service);
+
+                sumList.get(s).incrementService(service);
+                sumList.get(s).incrementServed();
+            } else                                    /* no job in queue, simply remove it from server */
+                eventList.get(s).setX(0);
         }
+
+        eventListManager.setServerParcheggio(eventList);
+        eventListManager.setIntQueueParcheggio(internalEventList);
+
+        int nextEvent = MsqEvent.getNextEvent(eventList, PARCHEGGIO_SERVER);
+        if (nextEvent == -1) {
+            eventListManager.getSystemEventsList().get(2).setX(0);
+            return;
+        }
+
+        eventListManager.getSystemEventsList().get(2).setT(eventList.get(nextEvent).getT());
     }
 
     /* Finite horizon simulation */
@@ -111,7 +202,7 @@ public class Parcheggio implements Center {
                 if (eventListManager.getCarsInParcheggio() + this.number >= PARCHEGGIO_SERVER + SERVER_MAX_QUEUE) {      /* New arrival but Parcheggio's queue is full */
                     this.number--;      /* Loss event */
 
-                    eventListManager.decrementCars();
+//                    eventListManager.decrementCars(); // NO! La macchina arrivata non la devo decrementare in cars
 
                     rentalProfit.incrementPenalty();
 

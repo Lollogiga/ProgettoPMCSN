@@ -6,10 +6,10 @@ public class Constants {
     public static final int STRADA_SERVER = Integer.MAX_VALUE; // Infinite server
     public static final int PARCHEGGIO_SERVER = 60;
 
-//    public static final int SERVER_MAX_QUEUE = 5;
-//    public static final int RICARICA_MAX_QUEUE = 2;
-    public static final int SERVER_MAX_QUEUE = Integer.MAX_VALUE;
-    public static final int RICARICA_MAX_QUEUE = Integer.MAX_VALUE;
+    public static final int SERVER_MAX_QUEUE = 5;
+    public static final int RICARICA_MAX_QUEUE = 2;
+//    public static final int SERVER_MAX_QUEUE = Integer.MAX_VALUE;
+//    public static final int RICARICA_MAX_QUEUE = Integer.MAX_VALUE;
 
      public static final int RICARICA_SERVER = 15;
 
@@ -21,7 +21,8 @@ public class Constants {
 
     /* Probabilities */
     public static final double P_RICARICA = 0.1;
-    public static final double P_LOSS = 0.0002;
+    public static final double P_LOSS = 0.2;
+//    public static final double P_LOSS = 0.0002;
 
     /* Arrival rate in rental station (users/sec) */
     public static final double LAMBDA = 12 / 60.0 / 60.0;
@@ -58,6 +59,12 @@ public class Constants {
 
     /* Seed to use for the simulation */
     public static final long SEED = 123456789L;
+//    public static final long SEED = 12108280L; // Seed fallato (43)?
+//    public static final long SEED = 363231896L; // Seed fallato (44)?
+//    public static final long SEED = 1510357708L; // Seed fallato (45)?
+//    public static final long SEED = 1554590865L; // Seed fallato (46)?
+//    public static final long SEED = 1211;
+//    public static final long SEED = 1620033335;
 
     public static final int INIT_PARK_CARS = PARCHEGGIO_SERVER / 2;
 
@@ -79,6 +86,7 @@ public class Constants {
     public static final int B = 1024;
     public static final double LEVEL_OF_CONFIDENCE = 0.05; // Tipically alpha = 0.05
 
+//    public static final int REPLICATION = 64;
     public static final int REPLICATION = 64;
 
     /* Center constants for file generation */

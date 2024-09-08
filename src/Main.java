@@ -44,21 +44,22 @@ public class Main {
                     /* Create seed folders */
                     fileCSVGenerator.createSeedFolders(seedList.get(i));
 
+                    rngs.plantSeeds(seedList.get(i));
+
                     /* Start simulation with seed[i] */
-                    Sistema sys = new Sistema(seedList.get(i));
+                    Sistema sys = new Sistema();
                     sys.simulation(simulationType, seedList.get(i), i + 1);
 
                     /* Generate new seed */
                     if (i + 1 < REPLICATION) {
                         rngs.selectStream(255);
-                        rngs.random(); // TODO: se non metto questa riga rngs.getSeed() è uguale dalla seconda iterazione fino alla fine. Così cambia.
-
                         seedList.set(i + 1, rngs.getSeed());
                     }
                 }
                 break;
             case 1: /* Infinite horizon */
-                Sistema sys = new Sistema(SEED);
+                rngs.plantSeeds(SEED);
+                Sistema sys = new Sistema();
                 sys.simulation(simulationType, -1, -1); // -1 is to ignore input
                 break;
             default:

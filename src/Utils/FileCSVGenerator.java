@@ -9,10 +9,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FileCSVGenerator {
-    private static final String RESULT = "results";
-    private static final String MAIN_PATH = "resources";
-    private static final String FINITE_HORIZON = "finite_horizon";
-    private static final String INFINITE_HORIZON = "infinite_horizon";
+    private static final String RESULT = "results/";
+    private static final String MAIN_PATH = "resources/";
+    private static final String FINITE_HORIZON = "finite_horizon/";
+    private static final String INFINITE_HORIZON = "infinite_horizon/";
 
     private static String directoryPath;
     private static FileCSVGenerator instance;
