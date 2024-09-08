@@ -80,7 +80,7 @@ public class Sistema {
     }
 
     public void simulation(int simulationType, long seed, int runNumber) throws Exception {
-        System.out.println("Starting simulation");
+        System.out.println("Starting simulation - seed: " + seed);
 
         switch (simulationType) {
             case 0:

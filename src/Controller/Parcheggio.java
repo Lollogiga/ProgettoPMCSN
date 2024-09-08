@@ -62,7 +62,7 @@ public class Parcheggio implements Center {
         List<MsqEvent> eventList = eventListManager.getServerParcheggio();
         List<MsqEvent> internalEventList = eventListManager.getIntQueueParcheggio();
 
-        if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0) return; /* no external arrivals, no internal arrivals and no jobs in the server */
+        if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0 && MsqEvent.findActiveServers(eventList, PARCHEGGIO_SERVER) == 0) return; /* no external arrivals, no internal arrivals and no jobs in the server */
 
         if (!internalEventList.isEmpty()) {
             eventList.getLast().setT(internalEventList.getFirst().getT());
@@ -136,7 +136,7 @@ public class Parcheggio implements Center {
                     eventListManager.getSystemEventsList().get(2).setT(msqT.getCurrent() + 1);
                 else
                     eventListManager.getSystemEventsList().get(2).setT(
-                        eventListNoleggio.get(nextEventNoleggio).getT()
+                        eventListNoleggio.get(nextEventNoleggio).getT() + 0.1
                     );
 
                 return; // Ho raggiunto il numero massimo di macchine nel parcheggio, devono restare in coda
@@ -149,7 +149,7 @@ public class Parcheggio implements Center {
             eventListManager.setIntQueueNoleggio(intQueueNoleggio);
 
             s = e;
-            if (eventListManager.getCarsInParcheggio() + number >= PARCHEGGIO_SERVER) {        /* there is some jobs in queue, place another job in this server */
+            if (eventListManager.getCarsInParcheggio() + MsqEvent.findActiveServers(eventList, PARCHEGGIO_SERVER) < PARCHEGGIO_SERVER && MsqEvent.findActiveServers(eventList, PARCHEGGIO_SERVER) != this.number) {        /* there is some jobs in queue, place another job in this server */
                 service = distr.getService(1);
                 eventList.get(s).setT(msqT.getCurrent() + service);
 
