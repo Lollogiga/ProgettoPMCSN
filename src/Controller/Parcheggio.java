@@ -56,9 +56,33 @@ public class Parcheggio implements Center {
         eventListManager.setServerParcheggio(serverList);
     }
 
-    /* Finite horizon simulation */
     @Override
     public void simpleSimulation() {
+        int e;
+        MsqEvent event;
+
+        List<MsqEvent> eventList = eventListManager.getServerParcheggio();
+        List<MsqEvent> internalEventList = eventListManager.getIntQueueParcheggio();
+
+        if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0) return; /* no external arrivals, no internal arrivals and no jobs in the server */
+
+        if (!internalEventList.isEmpty()) {
+            eventList.getLast().setT(internalEventList.getFirst().getT());
+            eventList.getLast().setX(1);
+        }
+
+        if ((e = MsqEvent.getNextEvent(eventList, PARCHEGGIO_SERVER + 1)) >= eventList.size()) return;
+        msqT.setNext(eventList.get(e).getT());
+        area += (msqT.getNext() - msqT.getCurrent()) * number;
+        msqT.setCurrent(msqT.getNext());
+
+        if (e == 0 || e == eventList.size() - 1) {   /* Check if event is an arrival */
+        }
+    }
+
+    /* Finite horizon simulation */
+//    @Override
+    public void simpleSimulation1() {
         int e;
         MsqEvent event;
         List<MsqEvent> eventList = eventListManager.getServerParcheggio();

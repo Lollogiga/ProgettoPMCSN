@@ -157,6 +157,8 @@ public class Noleggio implements Center {
 
                         eventList.getLast().setX(1);
 
+                        // TODO: capire se qui va messo l'aggioranmento di systemList
+
                         return;
                     }
 
@@ -168,6 +170,8 @@ public class Noleggio implements Center {
                         this.number++;
 
                         eventList.getLast().setX(1);
+
+                        // TODO: capire se qui va messo l'aggioranmento di systemList
 
                         return;
                     }

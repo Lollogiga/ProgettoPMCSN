@@ -69,12 +69,10 @@ public class Strada implements Center {
             service = distr.getService(3);
             s = MsqEvent.findOne(eventList, eventList.size() - 1);
 
-            if (s == -1 || s >= eventList.size()) {
-                /* Setup new server */
+            if (s == -1 || s >= eventList.size()) {     /* Setup new server */
                 eventList.add(new MsqEvent(msqT.getCurrent() +  service, 1));
                 sumList.add(new MsqSum(service, 1));
-            } else {
-                /* Set existing server as active */
+            } else {        /* Set existing server as active */
                 eventList.get(s).setT(msqT.getCurrent() +  service);
                 eventList.get(s).setX(1);
 
