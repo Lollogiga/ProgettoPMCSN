@@ -44,10 +44,10 @@ public class Main {
                     /* Create seed folders */
                     fileCSVGenerator.createSeedFolders(seedList.get(i));
 
-                    rngs.plantSeeds(seedList.get(i));
+                    rngs.plantSeeds(seedList.get(i));;
 
                     /* Start simulation with seed[i] */
-                    Sistema sys = new Sistema();
+                    Sistema sys = new Sistema(rngs);
                     sys.simulation(simulationType, seedList.get(i), i + 1);
 
                     /* Generate new seed */
@@ -59,7 +59,7 @@ public class Main {
                 break;
             case 1: /* Infinite horizon */
                 rngs.plantSeeds(SEED);
-                Sistema sys = new Sistema();
+                Sistema sys = new Sistema(rngs);
                 sys.simulation(simulationType, -1, -1); // -1 is to ignore input
                 break;
             default:

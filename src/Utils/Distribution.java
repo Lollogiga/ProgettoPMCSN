@@ -5,31 +5,25 @@ import Libs.Rngs;
 import static Model.Constants.*;
 
 public class Distribution {
-    Rngs rngs = new Rngs();
     private static Distribution instance = null;
     private double passengerArrival = 0.0;
     private double exogenous_park = 0.0;
     private double exogenous_charge = 0.0;
 
-    long[] seed;                     /* current state of each stream   */
-    int  stream        = 0;          /* stream index, 0 is the default */
-    int STREAMS       = 256;        /* # of streams, DON'T CHANGE THIS VALUE    */
-    long MODULUS      = 2147483647; /* DON'T CHANGE THIS VALUE                  */
-    long MULTIPLIER   = 48271;      /* DON'T CHANGE THIS VALUE                  */
-    long DEFAULT      = 123456789L; /* initial seed, use 0 < DEFAULT < MODULUS  */
+    private Rngs rngs;
 
-    private Distribution() {
-        seed = new long[STREAMS];
-        seed[0] = DEFAULT;
-        for (int i = 1; i < STREAMS; i++) {
-            seed[i] = (seed[i - 1] * MULTIPLIER) % MODULUS;
+    private Distribution(Rngs rngsToSet) {
+        this.rngs = rngsToSet;
+    }
+
+    public static Distribution getInstance(Rngs toSet) {
+        if (instance == null) {
+            instance = new Distribution(toSet);
         }
+        return instance;
     }
 
     public static Distribution getInstance() {
-        if (instance == null) {
-            instance = new Distribution();
-        }
         return instance;
     }
 
@@ -83,34 +77,7 @@ public class Distribution {
         };
     }
 
-    /** Random returns a pseudo-random real number uniformly distributed between 0.0 and 1.0.
-     */
-    public double random() {
-        long Q = MODULUS / MULTIPLIER;
-        long R = MODULUS % MULTIPLIER;
-        long t;
-
-        t = MULTIPLIER * (seed[stream] % Q) - R * (seed[stream] / Q);
-        if (t > 0)
-            seed[stream] = t;
-        else
-            seed[stream] = t + MODULUS;
-        return ((double) seed[stream] / MODULUS);
-    }
-
-    /** Random returns a pseudo-random real number uniformly distributed between 0.0 and 1.0.
-     */
-    // TODO random non funziona, ossia, come stream nell'altra è sempre 0. Visto che ne abbiamo 256, dobbiamo usarne anche altre!!!
-    public double random(int stream) {
-        long Q = MODULUS / MULTIPLIER;
-        long R = MODULUS % MULTIPLIER;
-        long t;
-
-        t = MULTIPLIER * (seed[stream] % Q) - R * (seed[stream] / Q);
-        if (t > 0)
-            seed[stream] = t;
-        else
-            seed[stream] = t + MODULUS;
-        return ((double) seed[stream] / MODULUS);
+    public Rngs getRngs() {
+        return rngs;
     }
 }

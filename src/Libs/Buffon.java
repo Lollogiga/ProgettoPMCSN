@@ -1,4 +1,4 @@
-/* -------------------------------------------------------------------------
+package Libs;/* -------------------------------------------------------------------------
  * A Monte Carlo simulation of Buffon's needle experiment.
  *
  * Name              : Buffon.java
@@ -8,6 +8,8 @@
  * Latest Revision   : 6-16-06
  * ------------------------------------------------------------------------- 
  */
+
+import Libs.Rngs;
 
 import java.lang.*;
 import java.text.*;
@@ -30,7 +32,7 @@ class Buffon {
     long   j;
 
     Buffon b = new Buffon();
-    Rng r = new Rng();
+    Rngs r = new Rngs();
 
     r.putSeed(-1);                 /* any negative integer will do      */
     seed = r.getSeed();            /* trap the value of the intial seed */
@@ -54,7 +56,7 @@ class Buffon {
   }
 
   
-   double uniform(double a, double b, Rng r) {
+   double uniform(double a, double b, Rngs r) {
 /* ------------------------------------------------
  * generate a Uniform random variate, use a < b 
  * ------------------------------------------------

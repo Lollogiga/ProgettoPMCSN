@@ -1,5 +1,6 @@
 package Controller;
 
+import Libs.Rngs;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
@@ -34,12 +35,15 @@ public class Strada implements Center {
 
     private final SimulationResults batchStrada = new SimulationResults();
     private final Distribution distr;
+    private final Rngs rngs;
     private final FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
 
     public Strada() {
         eventListManager = EventListManager.getInstance();
         distr = Distribution.getInstance();
         rentalProfit = RentalProfit.getInstance();
+
+        rngs = distr.getRngs();
 
         /* Setup first server */
         serverList.addFirst(new MsqEvent(0, 0));
@@ -88,7 +92,7 @@ public class Strada implements Center {
 
             /* Routing */
             s = e;
-            double pLoss = distr.random();
+            double pLoss = rngs.random();
             if (pLoss < P_LOSS) {
                 eventListManager.decrementCars();
 
@@ -107,7 +111,7 @@ public class Strada implements Center {
                 eventListManager.getSystemEventsList().get(3).setT(eventList.get(nextEvent).getT());
             } else {
                 /* Job stays in this system */
-                double pRicarica = distr.random();
+                double pRicarica = rngs.random();
                 if (pRicarica < P_RICARICA) {
                     // Event sent to Ricarica
                     List<MsqEvent> intQueueRicarica = eventListManager.getIntQueueRicarica();
@@ -194,7 +198,7 @@ public class Strada implements Center {
 
             /* Routing */
             s = e;
-            double pLoss = distr.random();
+            double pLoss = rngs.random();
             if (pLoss < P_LOSS) {
                 eventListManager.decrementCars();
 
@@ -213,7 +217,7 @@ public class Strada implements Center {
                 eventListManager.getSystemEventsList().get(3).setT(eventList.get(nextEvent).getT());
             } else {
                 /* Job stays in this system */
-                double pRicarica = distr.random();
+                double pRicarica = rngs.random();
                 if (pRicarica < P_RICARICA) {
                     // Event sent to Ricarica
                     List<MsqEvent> intQueueRicarica = eventListManager.getIntQueueRicarica();

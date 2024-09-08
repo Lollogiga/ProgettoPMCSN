@@ -23,7 +23,6 @@ public class Sistema {
 
     double service;
 
-    private final Rngs rngs = new Rngs();
     private final MsqT msqT = new MsqT();
 
     private final EventListManager eventListManager;
@@ -35,9 +34,9 @@ public class Sistema {
 
     private final List<Center> centerList = new ArrayList<>();
 
-    public Sistema() {
+    public Sistema(Rngs rngs) {
         eventListManager = EventListManager.getInstance();
-        distr = Distribution.getInstance();
+        distr = Distribution.getInstance(rngs);
         rentalProfit = RentalProfit.getInstance();
 
         eventListManager.resetState();
@@ -102,10 +101,6 @@ public class Sistema {
 
         while (msqT.getCurrent() < STOP_FIN) {
             if ((e = getNextEvent(eventList)) == -1) break;
-
-//            if (e == 1 && msqT.getCurrent() > 14664) break;
-//            if (msqT.getCurrent() > 86367) // break;
-//                System.out.println(msqT.getCurrent() + " - " + e + " - " + rngs.getSeed());
 
             msqT.setNext(eventList.get(e).getT());
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
