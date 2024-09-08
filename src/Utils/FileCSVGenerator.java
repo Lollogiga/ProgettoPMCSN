@@ -92,7 +92,7 @@ public class FileCSVGenerator {
     }
 
     public void saveRepResults(String type, int runNumber, long seed, double responseTime, double avgPopulationInNode, double waitingTime, double avgPopulationInQueue) {
-        String fileTitle = Paths.get(directoryPath, FileCSVGenerator.RESULT, FileCSVGenerator.FINITE_HORIZON, searchSeedFileName(seed), "run_" + runNumber).toString();
+        String fileTitle = Paths.get(directoryPath, FileCSVGenerator.RESULT, FileCSVGenerator.FINITE_HORIZON, searchSeedFileName(seed), "run_" + runNumber + ".csv").toString();
         File file = new File(fileTitle);
 
         try (FileWriter fileWriter = new FileWriter(fileTitle, true)) {
@@ -113,7 +113,16 @@ public class FileCSVGenerator {
     }
 
     public void saveBatchResults(int batchIndex, double responseTime) {
-        String fileTitle = Paths.get(directoryPath, FileCSVGenerator.RESULT, FileCSVGenerator.INFINITE_HORIZON, "responseTime").toString();
+        String fileTitle = Paths.get(directoryPath + FileCSVGenerator.RESULT + FileCSVGenerator.INFINITE_HORIZON + "responseTime.csv").toString();
+
+        try {
+            Files.createDirectories(Paths.get(fileTitle).getParent());
+        } catch (IOException e) {
+            Logger.getAnonymousLogger().log(Level.INFO, e.getMessage());
+
+            return;
+        }
+
         File file = new File(fileTitle);
 
         try (FileWriter fileWriter = new FileWriter(fileTitle, true)) {

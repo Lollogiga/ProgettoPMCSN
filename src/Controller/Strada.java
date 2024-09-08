@@ -144,6 +144,7 @@ public class Strada implements Center {
         eventListManager.getSystemEventsList().get(3).setT(eventList.get(nextEvent).getT());
     }
 
+
     /* Infinite horizon simulation */
     @Override
     public void infiniteSimulation() {
@@ -163,18 +164,15 @@ public class Strada implements Center {
             BatchMeans.incrementJobInBatch();
             jobInBatch++;
 
-
             eventList.get(e).setX(0);
 
             service = distr.getService(3);
             s = MsqEvent.findOne(eventList, eventList.size() - 1);
 
-            if (s == -1 || s >= eventList.size()) {
-                /* Setup new server */
+            if (s == -1 || s >= eventList.size()) {     /* Setup new server */
                 eventList.add(new MsqEvent(msqT.getCurrent() +  service, 1));
                 sumList.add(new MsqSum(service, 1));
-            } else {
-                /* Set existing server as active */
+            } else {        /* Set existing server as active */
                 eventList.get(s).setT(msqT.getCurrent() +  service);
                 eventList.get(s).setX(1);
 
@@ -203,7 +201,7 @@ public class Strada implements Center {
                 eventListManager.decrementCars();
 
                 //In this case, I must pay a penalty:
-                //TODO pay penalty
+                rentalProfit.incrementPenalty();
 
                 // Sets the status of the server from which the job started equal to 0
                 eventList.get(s).setX(0);
@@ -263,7 +261,7 @@ public class Strada implements Center {
         System.out.println("E[T_s]: " + responseTime);
 
         double sum = 0;
-        for(int i = 1; i <= eventListManager.getServerStrada().size(); i++) {
+        for(int i = 1; i < eventListManager.getServerStrada().size(); i++) {
             sum += sumList.get(i).getService();
             sumList.get(i).setService(0);
             sumList.get(i).setServed(0);

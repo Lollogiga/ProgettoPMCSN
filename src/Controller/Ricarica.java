@@ -169,156 +169,45 @@ public class Ricarica implements Center {
         eventListManager.getSystemEventsList().get(1).setT(eventList.get(nextEvent).getT());
     }
 
-    /* Finite horizon simulation */
-//    @Override
-    public void simpleSimulation1() {
-        MsqEvent event;
-
-        List<MsqEvent> eventList = eventListManager.getServerRicarica();
-        List<MsqEvent> internalEventList = eventListManager.getIntQueueRicarica();
-
-        /* no external arrivals, no internal arrivals and no jobs in the server */
-        if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0) return;
-
-        if (!internalEventList.isEmpty()) {
-            eventList.getLast().setT(internalEventList.getFirst().getT());
-            eventList.getLast().setX(1);
-        }
-
-        double msqCurr = msqT.getCurrent();
-
-        int e = MsqEvent.getNextEvent(serverList, RICARICA_SERVER + 1);
-        msqT.setNext(eventList.get(e).getT());
-        area += (msqT.getNext() - msqT.getCurrent()) * number;
-        msqT.setCurrent(msqT.getNext());
-
-        if (e == 0 || e == eventList.size() - 1) {   /* Check if event is an arrival */
-            this.number++;
-
-            if (e == 0) {   /* Check if event is an external arrival */
-                eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(2)); /* Get new arrival from exogenous arrival */
-
-                if (eventListManager.getCarsInRicarica() + this.number > RICARICA_SERVER + RICARICA_MAX_QUEUE) { /* New arrival but Ricarica's queue is full */
-                    this.number--; /* Loss event */
-                    eventListManager.decrementCars();
-                    rentalProfit.incrementPenalty();
-
-                    eventListManager.getSystemEventsList().get(1).setT(eventList.getFirst().getT());
-
-                    return;
-                }
-
-                eventListManager.incrementCars();   /* New car in system */
-
-                if (eventList.getFirst().getT() > STOP_FIN) {
-                    eventList.getFirst().setX(0);
-                    eventListManager.setServerRicarica(eventList);
-                }
-
-                event = eventList.getFirst();
-            } else {    /* Event is an internal arrival */
-                event = internalEventList.getFirst();
-                internalEventList.removeFirst();
-            }
-
-            if (eventListManager.getCarsInRicarica() + number <= RICARICA_SERVER) {
-                service = distr.getService(2);
-                s = MsqEvent.findOne(serverList, RICARICA_SERVER);
-
-                /* Set server as active */
-                eventList.get(s).setT(msqT.getCurrent() +  service);
-                eventList.get(s).setX(1);
-
-                sumList.get(s).incrementService(service);
-                sumList.get(s).incrementServed();
-            }
-
-            if (e == eventList.size() - 1 && internalEventList.isEmpty()) eventList.getLast().setX(0);
-        } else {        /* Process a departure */
-            this.index++;
-            this.number--;
-
-            // Update number of available cars in the center depending on where the car comes from
-            if (eventListManager.incrementCarsInRicarica() != 0) {
-                this.number++;
-                this.index--;
-
-                List<MsqEvent> eventListNoleggio = eventListManager.getServerNoleggio();
-                int nextEventNoleggio = MsqEvent.getNextEvent(eventListNoleggio, NOLEGGIO_SERVER);
-
-                eventListManager.getSystemEventsList().get(1).setT(
-                        eventListNoleggio.get(nextEventNoleggio).getT()
-                );
-
-                return; // Ho raggiunto il numero massimo di macchine in ricarica, devono restare in coda
-            }
-
-            /* Routing job to rental station */
-            event = new MsqEvent(msqT.getCurrent(), eventList.get(e).getX(), false);
-            List<MsqEvent> intQueueNoleggio = eventListManager.getIntQueueNoleggio();
-            intQueueNoleggio.add(event);
-            eventListManager.setIntQueueNoleggio(intQueueNoleggio);
-            eventListManager.getSystemEventsList().getFirst().setT(msqT.getCurrent());
-
-            s = e;
-            if (number >= RICARICA_SERVER) {        /* there is some jobs in queue, place another job in this server */
-                service = distr.getService(2);
-                eventList.get(s).setT(msqT.getCurrent() + service);
-
-                sumList.get(s).incrementService(service);
-                sumList.get(s).incrementServed();
-            } else                                    /* no job in queue, simply remove it from server */
-                eventList.get(s).setX(0);
-        }
-
-        eventListManager.setServerRicarica(eventList);
-        eventListManager.setIntQueueRicarica(internalEventList);
-
-        int nextEvent = MsqEvent.getNextEvent(eventList, RICARICA_SERVER);
-        if (nextEvent == -1) {
-            eventListManager.getSystemEventsList().get(1).setX(0);
-            return;
-        }
-
-        eventListManager.getSystemEventsList().get(1).setT(eventList.get(nextEvent).getT());
-    }
-
     /* Infinite horizon simulation */
     @Override
-    public void infiniteSimulation() {
-        MsqEvent event;
-
+    public void infiniteSimulation () {
         List<MsqEvent> eventList = eventListManager.getServerRicarica();
         List<MsqEvent> internalEventList = eventListManager.getIntQueueRicarica();
 
-        /* no external arrivals, no internal arrivals and no jobs in the server */
-        if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0) return;
+        if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0 && MsqEvent.findActiveServers(eventList, RICARICA_SERVER) == 0) return; /* no external arrivals, no internal arrivals and no jobs in the server */
 
         if (!internalEventList.isEmpty()) {
             eventList.getLast().setT(internalEventList.getFirst().getT());
             eventList.getLast().setX(1);
         }
 
-        double msqCurr = msqT.getCurrent();
-
-        int e = MsqEvent.getNextEvent(serverList, RICARICA_SERVER + 1);
+        if ((e = MsqEvent.getNextEvent(eventList, RICARICA_SERVER + 1)) >= eventList.size()) return;
         msqT.setNext(eventList.get(e).getT());
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
 
-        if (e == 0 || e == eventList.size() - 1) {   /* Check if event is an arrival */
+        if (e == 0 || e == eventList.size() - 1) {   /* Check if event is an arrival (exogenous or endogenous) */
             this.number++;
 
             BatchMeans.incrementJobInBatch();
             jobInBatch++;
 
-            if (e == 0) {   /* Check if event is an external arrival */
-                eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(2)); /* Get new arrival from exogenous arrival */
+            if (e == 0) {       /* Check if event is an external arrival */
+                eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(2));     /* Get new arrival from exogenous arrival */
 
-                if (eventListManager.getCarsInRicarica() + this.number > RICARICA_SERVER + RICARICA_MAX_QUEUE) { /* New arrival but Ricarica's queue is full */
-                    this.number--; /* Loss event */
-                    eventListManager.decrementCars();
-                    eventListManager.getSystemEventsList().get(1).setT(eventList.getFirst().getT());
+                if (eventListManager.getCarsInRicarica() + this.number > RICARICA_SERVER + RICARICA_MAX_QUEUE) {      /* New arrival but Ricarica's servers and queue are full */
+                    this.number--;      /* Loss event */
+
+                    rentalProfit.incrementPenalty();
+
+                    int nextEvent = MsqEvent.getNextEvent(eventList, RICARICA_SERVER);
+                    if (nextEvent == -1) {
+                        eventListManager.getSystemEventsList().get(1).setX(0);
+                        return;
+                    }
+
+                    eventListManager.getSystemEventsList().get(1).setT(eventList.get(nextEvent).getT());
 
                     return;
                 }
@@ -326,19 +215,17 @@ public class Ricarica implements Center {
                 eventListManager.incrementCars();   /* New car in system */
 
                 if (eventList.getFirst().getT() > STOP_INF) {
-                    eventList.getFirst().setX(0);
+                    eventList.getFirst().setX(0);   /* Set event as "not active" cause simulation end */
+
                     eventListManager.setServerRicarica(eventList);
                 }
-
-                event = eventList.getFirst();
-            } else {    /* Event is an internal arrival */
-                event = internalEventList.getFirst();
+            } else if (e == eventList.size() - 1)
                 internalEventList.removeFirst();
-            }
 
-            if (eventListManager.getCarsInRicarica() + number <= RICARICA_SERVER) {
+            // Place job in a server if there is a free server
+            s = MsqEvent.findOne(eventList, RICARICA_SERVER);
+            if (s != -1 && eventListManager.getCarsInRicarica() + MsqEvent.findActiveServers(eventList, RICARICA_SERVER) < RICARICA_SERVER) {
                 service = distr.getService(2);
-                s = MsqEvent.findOne(serverList, RICARICA_SERVER);
 
                 /* Set server as active */
                 eventList.get(s).setT(msqT.getCurrent() +  service);
@@ -348,24 +235,27 @@ public class Ricarica implements Center {
                 sumList.get(s).incrementServed();
             }
 
-            if (e == eventList.size() - 1 && internalEventList.isEmpty()) eventList.getLast().setX(0);
-        } else {        /* Process a departure */
+            if (e == eventList.size() - 1 && internalEventList.isEmpty() && s != -1) eventList.getLast().setX(0);
+        } else {
             this.index++;
             this.number--;
 
             // Update number of available cars in the center depending on where the car comes from
             if (eventListManager.incrementCarsInRicarica() != 0) {
-                this.number++;
                 this.index--;
+                this.number++;
 
                 List<MsqEvent> eventListNoleggio = eventListManager.getServerNoleggio();
+
                 int nextEventNoleggio = MsqEvent.getNextEvent(eventListNoleggio, NOLEGGIO_SERVER);
+                if (nextEventNoleggio == -1)
+                    eventListManager.getSystemEventsList().get(1).setT(msqT.getCurrent() + 1);
+                else
+                    eventListManager.getSystemEventsList().get(1).setT(
+                            eventListNoleggio.get(nextEventNoleggio).getT() + 0.1
+                    );
 
-                eventListManager.getSystemEventsList().get(1).setT(
-                        eventListNoleggio.get(nextEventNoleggio).getT()
-                );
-
-                return; // Ho raggiunto il numero massimo di macchine in ricarica, devono restare in coda
+                return; // Ho raggiunto il numero massimo di macchine in Ricarica, devono restare in coda
             }
 
             if (jobInBatch % B == 0 && jobInBatch <= B * K) {
@@ -377,14 +267,13 @@ public class Ricarica implements Center {
             }
 
             /* Routing job to rental station */
-            event = new MsqEvent(msqT.getCurrent(), eventList.get(e).getX(), false);
+            MsqEvent event = new MsqEvent(msqT.getCurrent(), 1, false);
             List<MsqEvent> intQueueNoleggio = eventListManager.getIntQueueNoleggio();
             intQueueNoleggio.add(event);
             eventListManager.setIntQueueNoleggio(intQueueNoleggio);
-            eventListManager.getSystemEventsList().getFirst().setT(msqT.getCurrent());
 
             s = e;
-            if (number >= RICARICA_SERVER) {        /* there is some jobs in queue, place another job in this server */
+            if (eventListManager.getCarsInRicarica() + MsqEvent.findActiveServers(eventList, RICARICA_SERVER) < RICARICA_SERVER && MsqEvent.findActiveServers(eventList, RICARICA_SERVER) != this.number) {        /* there is some jobs in queue, place another job in this server */
                 service = distr.getService(2);
                 eventList.get(s).setT(msqT.getCurrent() + service);
 
@@ -405,6 +294,7 @@ public class Ricarica implements Center {
 
         eventListManager.getSystemEventsList().get(1).setT(eventList.get(nextEvent).getT());
     }
+
 
     @Override
     public void calculateBatchStatistics() {

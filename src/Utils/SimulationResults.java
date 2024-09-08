@@ -33,6 +33,14 @@ public class SimulationResults {
         this.avgPopulationInQueue = new ArrayList<>(K);
         this.waitingTimeInQueue = new ArrayList<>(K);
         this.utilization = new ArrayList<>(K);
+
+        for (int i = 0; i < K; i++) {
+            this.avgPopulationInNode.add(0.0);
+            this.responseTime.add(0.0);
+            this.avgPopulationInQueue.add(0.0);
+            this.waitingTimeInQueue.add(0.0);
+            this.utilization.add(0.0);
+        }
     }
 
     public double getDevPopulationInNode() {
