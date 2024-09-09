@@ -134,7 +134,6 @@ public class FileCSVGenerator {
                     .sorted(Comparator.reverseOrder())
                     .map(Path::toFile)
                     .forEach(File::delete);
-            System.out.println("Folder deleted successfully.");
         } catch (IOException e) {
             e.printStackTrace();
         }

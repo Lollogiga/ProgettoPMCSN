@@ -105,6 +105,14 @@ public class Sistema {
         while (msqT.getCurrent() < STOP_FIN) {
             if ((e = getNextEvent(eventList)) == -1) break;
 
+//            if ((eventListManager.getCarsInRicarica() + MsqEvent.findActiveServers(eventListManager.getServerRicarica(), RICARICA_SERVER)) == 14) {
+            if (eventListManager.getCarsInRicarica() == 12) {
+                System.out.println(msqT.getCurrent() + " - " + e);
+            }
+
+//            if(msqT.getCurrent() > 35557)
+//                System.out.println(msqT.getCurrent() + " - " + e);
+
             msqT.setNext(eventList.get(e).getT());
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
             msqT.setCurrent(msqT.getNext());

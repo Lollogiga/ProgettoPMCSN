@@ -4,7 +4,7 @@ public class Constants {
     /*  Number of servers in each center  */
     public static final int NOLEGGIO_SERVER = 1;
     public static final int STRADA_SERVER = Integer.MAX_VALUE; // Infinite server
-    public static final int PARCHEGGIO_SERVER = 60;
+    public static final int PARCHEGGIO_SERVER = 6000;
 
     public static final int SERVER_MAX_QUEUE = 50;
     public static final int RICARICA_MAX_QUEUE = 20;
@@ -55,7 +55,8 @@ public class Constants {
     public static final int NODES = 4;
 
     /* Seed to use for the simulation */
-    public static final long SEED = 123456789L;
+//    public static final long SEED = 123456789L;
+    public static final long SEED = 1186174369L;
 
     public static final int INIT_PARK_CARS = PARCHEGGIO_SERVER / 2;
 

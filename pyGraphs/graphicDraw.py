@@ -110,7 +110,7 @@ def delete_all_graphics(input_folder):
                         except Exception as e:
                             print(f"Errore nell'eliminazione del file {file_path}: {e}")
 
-def plot_combined_graph(file_path, img_name):
+def plot_combined_graph(file_path, img_folder, img_name):
     # Carica i dati dal file CSV
     df = pd.read_csv(file_path, header=None, names=['Run', 'Center', 'Time', 'E[T_S]', 'E[N_S]', 'E[T_Q]', 'E[N_Q]'])
 
@@ -131,7 +131,7 @@ def plot_combined_graph(file_path, img_name):
     unique_runs = df['Run'].unique()
     for run in unique_runs:
         df_run = df[df['Run'] == run]
-        plt.plot(df_run['Time'], df_run['E[T_S]'], marker='o', linestyle='-', markersize=4, label=f'Run {run}')
+        plt.plot(df_run['Time'], df_run['E[T_S]'], marker='.', linestyle='-', markersize=4, label=f'Run {run}')
 
     # Configura l'aspetto del grafico
     plt.xlabel('Time (s)')
@@ -139,9 +139,16 @@ def plot_combined_graph(file_path, img_name):
     plt.title('Time vs E[T_S] for Different Runs')
     plt.grid(True)
 
-    plt.savefig(img_name)
+    # Crea la cartella se non esiste
+    if not os.path.exists(img_folder):
+        os.makedirs(img_folder)
+
+    output_path = os.path.join(img_folder, img_name)
+    plt.savefig(output_path)
+    plt.close()
+
 
 # Esempio di utilizzo
-input_folder = "D:/path/to/your/folder"
-plot_metrics(input_folder)
+# input_folder = "D:/path/to/your/folder"
+# plot_metrics(input_folder)
 #delete_all_graphics(input_folder)

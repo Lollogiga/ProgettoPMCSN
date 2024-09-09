@@ -76,8 +76,6 @@ public class Ricarica implements Center {
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
 
-        if(number < 0 )
-            System.out.println("Porco cane");
         if (e == 0 || e == eventList.size() - 1) {   /* Check if event is an arrival (exogenous or endogenous) */
             this.number++;
 
