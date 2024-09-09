@@ -7,6 +7,7 @@ import Model.MsqSum;
 import Model.MsqT;
 import Utils.*;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +35,11 @@ public class Strada implements Center {
     private final List<MsqEvent> serverList = new ArrayList<>(1);
     private final List<MsqSum> sumList = new ArrayList<>(1);
 
+    private final ReplicationStats repStrada = new ReplicationStats();
     private final SimulationResults batchStrada = new SimulationResults();
     private final Distribution distr;
     private final Rngs rngs;
+    private final Rvms rvms = new Rvms();
     private final FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
 
     public Strada() {
@@ -290,6 +293,17 @@ public class Strada implements Center {
     }
 
     @Override
+    public void printIteration(boolean isFinite, int event, int runNumber, double time) {
+        double responseTime = area / index;
+        double avgPopulationInNode = area / msqT.getCurrent();
+
+        double waitingTime = 0;
+        double avgPopulationInQueue = 0;
+
+        FileCSVGenerator.writeFile(isFinite, event, runNumber, time, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
+    }
+
+    @Override
     public void printResult(int runNumber, long seed) {
         DecimalFormat f = new DecimalFormat("#0.00000000");
 
@@ -302,11 +316,15 @@ public class Strada implements Center {
         System.out.println("  avg wait ........... = " + responseTime);
         System.out.println("  avg # in node ...... = " + avgPopulationInNode);
 
+        double meanUtilization = 0;
         System.out.println("\nthe server statistics are:\n\n");
         System.out.println("\tserver\tutilization\t avg service\t share\n");
         for(int i = 1; i < eventListManager.getServerStrada().size(); i++) {
             System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t " + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t " + f.format(((double)sumList.get(i).getServed() / index)));
+            meanUtilization += (sumList.get(i).getService() / msqT.getCurrent());
         }
+
+        meanUtilization = meanUtilization / (eventListManager.getServerStrada().size() - 1);
 
         /* Calculate rental profit */
         double baseProfit = (responseTime / 3600) * (index + rentalProfit.getExternalCars()) * RENTAL_PROFIT;
@@ -316,35 +334,60 @@ public class Strada implements Center {
         System.out.println("\n");
 
         if (runNumber > 0 && seed > 0)
-            fileCSVGenerator.saveRepResults(STRADA, runNumber, seed, responseTime, avgPopulationInNode, -Double.MAX_VALUE, -Double.MAX_VALUE);
+            fileCSVGenerator.saveRepResults(STRADA, runNumber, responseTime, avgPopulationInNode, -Double.MAX_VALUE, -Double.MAX_VALUE);
 
+        repStrada.insertAvgPopulationInNode(avgPopulationInNode, runNumber - 1);
+        repStrada.insertUtilization(meanUtilization, runNumber - 1);
+        repStrada.insertResponseTime(responseTime, runNumber - 1);
+        repStrada.insertWaitingTimeInQueue(0.0, runNumber - 1);
+        repStrada.insertWaitingTimeInQueue(0.0, runNumber - 1);
     }
 
     @Override
-    public void printStats() {
-        Rvms rvms = new Rvms();
+    public void printFinalStatsTransitorio() {
+        double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
+
+        System.out.println("\n\nStrada\n");
+
+        repStrada.setStandardDeviation(repStrada.getWaitingTimeInQueue(), 4);
+        System.out.println("Critical endpoints E[T_Q] =  " + repStrada.getMeanWaitingTimeInQueue() + " +/- " + critical_value * repStrada.getStandardDeviation(4) / (Math.sqrt(K - 1)));
+
+        repStrada.setStandardDeviation(repStrada.getAvgPopulationInQueue(), 0);
+        System.out.println("Critical endpoints E[N_Q] =  " + repStrada.getMeanPopulationInQueue() + " +/- " + critical_value * repStrada.getStandardDeviation(0) / (Math.sqrt(K - 1)));
+
+        repStrada.setStandardDeviation(repStrada.getResponseTime(), 2);
+        System.out.println("Critical endpoints E[T_S] =  " + repStrada.getMeanResponseTime() + " +/- " + critical_value * repStrada.getStandardDeviation(2) / (Math.sqrt(K - 1)));
+
+        repStrada.setStandardDeviation(repStrada.getAvgPopulationInNode(), 1);
+        System.out.println("Critical endpoints E[N_S] =  " + repStrada.getMeanPopulationInNode() + " +/- " + critical_value * repStrada.getStandardDeviation(1) / (Math.sqrt(K - 1)));
+
+        repStrada.setStandardDeviation(repStrada.getUtilization(), 3);
+        System.out.println("Critical endpoints rho =  " + repStrada.getMeanUtilization() + " +/- " + critical_value * repStrada.getStandardDeviation(3) / (Math.sqrt(K - 1)));
+    }
+
+    @Override
+    public void printFinalStatsStazionario() {
         double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
 
         System.out.println("\n\nStrada\n");
 
         batchStrada.setStandardDeviation(batchStrada.getWaitingTimeInQueue(), 4);
-        System.out.println("Critical endpoints E[T_Q] =  " + batchStrada.getMeanWaitingTimeInQueue() + " +/- " + critical_value * batchStrada.getStandardDeviation(4)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints E[T_Q] =  " + batchStrada.getMeanWaitingTimeInQueue() + " +/- " + critical_value * batchStrada.getStandardDeviation(4) / (Math.sqrt(K - 1)));
 
         batchStrada.setStandardDeviation(batchStrada.getAvgPopulationInQueue(), 0);
-        System.out.println("Critical endpoints E[N_Q] =  " + batchStrada.getMeanPopulationInQueue() + " +/- " + critical_value * batchStrada.getStandardDeviation(0)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints E[N_Q] =  " + batchStrada.getMeanPopulationInQueue() + " +/- " + critical_value * batchStrada.getStandardDeviation(0) / (Math.sqrt(K - 1)));
 
         batchStrada.setStandardDeviation(batchStrada.getResponseTime(), 2);
-        System.out.println("Critical endpoints E[T_S] =  " + batchStrada.getMeanResponseTime() + " +/- " + critical_value * batchStrada.getStandardDeviation(2)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints E[T_S] =  " + batchStrada.getMeanResponseTime() + " +/- " + critical_value * batchStrada.getStandardDeviation(2) / (Math.sqrt(K - 1)));
 
         batchStrada.setStandardDeviation(batchStrada.getAvgPopulationInNode(), 1);
-        System.out.println("Critical endpoints E[N_S] =  " + batchStrada.getMeanPopulationInNode() + " +/- " + critical_value * batchStrada.getStandardDeviation(1)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints E[N_S] =  " + batchStrada.getMeanPopulationInNode() + " +/- " + critical_value * batchStrada.getStandardDeviation(1) / (Math.sqrt(K - 1)));
 
         batchStrada.setStandardDeviation(batchStrada.getUtilization(), 3);
-        System.out.println("Critical endpoints rho =  " + batchStrada.getMeanUtilization() + " +/- " + critical_value * batchStrada.getStandardDeviation(3)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints rho =  " + batchStrada.getMeanUtilization() + " +/- " + critical_value * batchStrada.getStandardDeviation(3) / (Math.sqrt(K - 1)));
 
         double baseProfit = (batchStrada.getMeanResponseTime() / 3600) * (index + rentalProfit.getExternalCars()) * RENTAL_PROFIT;
         double kmProfit = (MEAN_SPEED * (batchStrada.getMeanResponseTime() / 3600)) * RENTAL_KM_PROFIT * index;
         rentalProfit.setProfit((baseProfit + kmProfit));
     }
-
 }

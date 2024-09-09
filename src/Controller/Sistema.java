@@ -5,6 +5,7 @@ import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
 import Utils.Distribution;
+import Utils.FileCSVGenerator;
 import Utils.RentalProfit;
 
 import java.util.ArrayList;
@@ -31,9 +32,11 @@ public class Sistema {
     private final List<MsqEvent> systemList = new ArrayList<>(NODES);
     private final List<MsqSum> sumList = new ArrayList<>(NODES + 1);
 
-    private final List<Center> centerList = new ArrayList<>();
+    public static final List<Center> centerList = new ArrayList<>();
 
     public Sistema(Rngs rngs) {
+        centerList.clear();
+
         eventListManager = EventListManager.getInstance();
         distr = Distribution.getInstance(rngs);
         rentalProfit = RentalProfit.getInstance();
@@ -108,13 +111,16 @@ public class Sistema {
 
             if (e < 4) {
                 centerList.get(e).simpleSimulation();
+
+                centerList.get(e).printIteration(true, e, runNumber, msqT.getCurrent());
+
                 eventList = eventListManager.getSystemEventsList();
             } else throw new Exception("Invalid event");
         }
 
         System.out.println("\n\n");
 
-        for (int i = 0; i < 4; i++) centerList.get(i).printResult(runNumber, seed);
+        for (int i = 0; i < NODES; i++) centerList.get(i).printResult(runNumber, seed);
 
         /* Calculate profit */
         printProfit(msqT.getCurrent());
@@ -142,7 +148,7 @@ public class Sistema {
             } else throw new Exception("Invalid event");
         }
 
-        for (int i = 0; i < 4; i++) centerList.get(i).printStats();
+        for (int i = 0; i < NODES; i++) centerList.get(i).printFinalStatsStazionario();
 
         /* Calculate profit */
         printProfit(msqT.getCurrent());

@@ -1,5 +1,7 @@
 package Controller;
 
+import java.io.File;
+
 public interface Center {
     /* Finite horizon simulation */
     void simpleSimulation() throws Exception;
@@ -13,7 +15,11 @@ public interface Center {
 
     int getJobInBatch();
 
+    void printIteration(boolean isFinite, int event, int runNumber, double time);
+
     void printResult(int runNumber, long seed);
 
-    void printStats();
+    void printFinalStatsStazionario();
+
+    void printFinalStatsTransitorio();
 }
