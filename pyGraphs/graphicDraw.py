@@ -51,18 +51,18 @@ def plot_metric_with_given_x(x_values, df, metric, centers, output_path):
     finally:
         plt.close()  # Chiude la figura corrente
 
-def plot_metrics(input_folder):
+def plot_metrics(folder):
     """
     Genera e salva grafici per tutte le metriche nei file CSV della cartella di input.
     """
-    result_folder = os.path.join(input_folder, 'resources', 'results')
+    # folder = os.path.join(input_folder, 'resources', 'results')
 
-    if not os.path.exists(result_folder):
-        print(f"La cartella {result_folder} non esiste.")
+    if not os.path.exists(folder):
+        print(f"La cartella {folder} non esiste.")
         return
 
-    for seed_folder in os.listdir(result_folder):
-        seed_path = os.path.join(result_folder, seed_folder)
+    for seed_folder in os.listdir(folder):
+        seed_path = os.path.join(folder, seed_folder)
 
         if os.path.isdir(seed_path):
             graphic_folder = os.path.join(seed_path, 'dirNameGraphic')
@@ -110,8 +110,38 @@ def delete_all_graphics(input_folder):
                         except Exception as e:
                             print(f"Errore nell'eliminazione del file {file_path}: {e}")
 
+def plot_combined_graph(file_path, img_name):
+    # Carica i dati dal file CSV
+    df = pd.read_csv(file_path, header=None, names=['Run', 'Center', 'Time', 'E[T_S]', 'E[N_S]', 'E[T_Q]', 'E[N_Q]'])
 
-# # Esempio di utilizzo
-# input_folder = "D:/path/to/your/folder"
-# plot_metrics(input_folder)
-# #delete_all_graphics(input_folder)
+    # Converti le colonne in tipo float
+    df['Time'] = pd.to_numeric(df['Time'], errors='coerce')
+    df['E[T_S]'] = pd.to_numeric(df['E[T_S]'], errors='coerce')
+    df['E[N_S]'] = pd.to_numeric(df['E[N_S]'], errors='coerce')
+    df['E[T_Q]'] = pd.to_numeric(df['E[T_Q]'], errors='coerce')
+    df['E[N_Q]'] = pd.to_numeric(df['E[N_Q]'], errors='coerce')
+
+    # Imposta il limite di tempo a 86400 secondi (24 ore)
+    df = df[df['Time'] <= 86400]
+
+    # Crea il grafico unico
+    plt.figure(figsize=(12, 8))
+
+    # Filtra per ogni Run e aggiungi la linea al grafico
+    unique_runs = df['Run'].unique()
+    for run in unique_runs:
+        df_run = df[df['Run'] == run]
+        plt.plot(df_run['Time'], df_run['E[T_S]'], marker='o', linestyle='-', markersize=4, label=f'Run {run}')
+
+    # Configura l'aspetto del grafico
+    plt.xlabel('Time (s)')
+    plt.ylabel('E[T_S]')
+    plt.title('Time vs E[T_S] for Different Runs')
+    plt.grid(True)
+
+    plt.savefig(img_name)
+
+# Esempio di utilizzo
+input_folder = "D:/path/to/your/folder"
+plot_metrics(input_folder)
+#delete_all_graphics(input_folder)
