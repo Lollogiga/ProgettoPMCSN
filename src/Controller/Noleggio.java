@@ -4,11 +4,9 @@ import Libs.Rvms;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
-import Utils.BatchMeans;
-import Utils.Distribution;
-import Utils.FileCSVGenerator;
-import Utils.SimulationResults;
+import Utils.*;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +31,11 @@ public class Noleggio implements Center {
     private final List<MsqSum> sumList = new ArrayList<>(NOLEGGIO_SERVER + 2);
     private final MsqT msqT = new MsqT();
 
+    private final ReplicationStats repNoleggio = new ReplicationStats();
     private final SimulationResults batchNoleggio = new SimulationResults();
     private final Distribution distr = Distribution.getInstance();
     private final FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
+    private final Rvms rvms = new Rvms();
 
     public Noleggio() {
         this.eventListManager = EventListManager.getInstance();
@@ -404,6 +404,22 @@ public class Noleggio implements Center {
     }
 
     @Override
+    public void printIteration(boolean isFinite, int event, int runNumber, double time) {
+        double responseTime = area / index;
+        double avgPopulationInNode = area / msqT.getCurrent();
+
+        double area = this.area;
+        for(int i = 1; i == NOLEGGIO_SERVER; i++) {
+            area -= sumList.get(i).getService();
+        }
+
+        double waitingTime = area / index;
+        double avgPopulationInQueue = area / msqT.getCurrent();
+
+        FileCSVGenerator.writeFile(isFinite, event, runNumber, time, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
+    }
+
+    @Override
     public void printResult(int runNumber, long seed) {
         DecimalFormat f = new DecimalFormat("#0.00000000");
 
@@ -431,30 +447,61 @@ public class Noleggio implements Center {
         }
         System.out.println("\n");
 
+        if (waitingTime <= 0.0) waitingTime = 0L;
+        if (avgPopulationInQueue <= 0.0) avgPopulationInQueue = 0L;
+
         if (runNumber > 0 && seed > 0)
-            fileCSVGenerator.saveRepResults(NOLEGGIO, runNumber, seed, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
+            fileCSVGenerator.saveRepResults(NOLEGGIO, runNumber, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
+
+        repNoleggio.insertAvgPopulationInNode(avgPopulationInNode, runNumber - 1);
+        repNoleggio.insertUtilization(0.0, runNumber - 1);
+        repNoleggio.insertResponseTime(responseTime, runNumber - 1);
+        repNoleggio.insertWaitingTimeInQueue(waitingTime, runNumber - 1);
+        repNoleggio.insertWaitingTimeInQueue(avgPopulationInQueue, runNumber - 1);
     }
 
     @Override
-    public void printStats() {
-       Rvms rvms = new Rvms();
+    public void printFinalStatsTransitorio() {
+        double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
+
+        System.out.println("\n\nNoleggio\n");
+
+        repNoleggio.setStandardDeviation(repNoleggio.getWaitingTimeInQueue(), 4);
+        System.out.println("Critical endpoints E[T_Q] =  " + repNoleggio.getMeanWaitingTimeInQueue() + " +/- " + critical_value * repNoleggio.getStandardDeviation(4) / (Math.sqrt(K - 1)));
+
+        repNoleggio.setStandardDeviation(repNoleggio.getAvgPopulationInQueue(), 0);
+        System.out.println("Critical endpoints E[N_Q] =  " + repNoleggio.getMeanPopulationInQueue() + " +/- " + critical_value * repNoleggio.getStandardDeviation(0) / (Math.sqrt(K - 1)));
+
+        repNoleggio.setStandardDeviation(repNoleggio.getResponseTime(), 2);
+        System.out.println("Critical endpoints E[T_S] =  " + repNoleggio.getMeanResponseTime() + " +/- " + critical_value * repNoleggio.getStandardDeviation(2) / (Math.sqrt(K - 1)));
+
+        repNoleggio.setStandardDeviation(repNoleggio.getAvgPopulationInNode(), 1);
+        System.out.println("Critical endpoints E[N_S] =  " + repNoleggio.getMeanPopulationInNode() + " +/- " + critical_value * repNoleggio.getStandardDeviation(1) / (Math.sqrt(K - 1)));
+
+        repNoleggio.setStandardDeviation(repNoleggio.getUtilization(), 3);
+        System.out.println("Critical endpoints rho =  " + repNoleggio.getMeanUtilization() + " +/- " + critical_value * repNoleggio.getStandardDeviation(3) / (Math.sqrt(K - 1)));
+
+    }
+
+    @Override
+    public void printFinalStatsStazionario() {
         double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
 
         System.out.println("\n\nNoleggio\n");
 
         batchNoleggio.setStandardDeviation(batchNoleggio.getWaitingTimeInQueue(), 4);
-        System.out.println("Critical endpoints E[T_Q] =  " + batchNoleggio.getMeanWaitingTimeInQueue() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(4)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints E[T_Q] =  " + batchNoleggio.getMeanWaitingTimeInQueue() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(4) / (Math.sqrt(K - 1)));
 
         batchNoleggio.setStandardDeviation(batchNoleggio.getAvgPopulationInQueue(), 0);
-        System.out.println("Critical endpoints E[N_Q] =  " + batchNoleggio.getMeanPopulationInQueue() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(0)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints E[N_Q] =  " + batchNoleggio.getMeanPopulationInQueue() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(0) / (Math.sqrt(K - 1)));
 
         batchNoleggio.setStandardDeviation(batchNoleggio.getResponseTime(), 2);
-        System.out.println("Critical endpoints E[T_S] =  " + batchNoleggio.getMeanResponseTime() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(2)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints E[T_S] =  " + batchNoleggio.getMeanResponseTime() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(2) / (Math.sqrt(K - 1)));
 
         batchNoleggio.setStandardDeviation(batchNoleggio.getAvgPopulationInNode(), 1);
-        System.out.println("Critical endpoints E[N_S] =  " + batchNoleggio.getMeanPopulationInNode() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(1)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints E[N_S] =  " + batchNoleggio.getMeanPopulationInNode() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(1) / (Math.sqrt(K - 1)));
 
         batchNoleggio.setStandardDeviation(batchNoleggio.getUtilization(), 3);
-        System.out.println("Critical endpoints rho =  " + batchNoleggio.getMeanUtilization() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(3)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints rho =  " + batchNoleggio.getMeanUtilization() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(3) / (Math.sqrt(K - 1)));
     }
 }

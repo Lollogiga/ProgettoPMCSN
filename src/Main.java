@@ -6,14 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import static Controller.Sistema.centerList;
 import static Utils.Constants.*;
 
 public class Main {
-    private static FileCSVGenerator fileCSVGenerator;
 
     public static void main(String[] args) throws Exception {
         Rngs rngs = new Rngs();
         rngs.plantSeeds(SEED);
+
+        FileCSVGenerator.deleteFolder("resources/results");
 
         System.out.println("---- Choose type of simulation ----");
         System.out.println("0 - Finite horizon simulation ");
@@ -25,9 +27,6 @@ public class Main {
 
     public static void run(int simulationType) throws Exception {
         Rngs rngs = new Rngs();
-        fileCSVGenerator = FileCSVGenerator.getInstance();
-
-        clearFiles();
 
         switch (simulationType) {
             case 0: /* Finite horizon */
@@ -41,9 +40,6 @@ public class Main {
 
                 /* Simulate REPLICATION = 64 run */
                 for (int i = 0; i < REPLICATION; i++) {
-                    /* Create seed folders */
-                    fileCSVGenerator.createSeedFolders(seedList.get(i));
-
                     rngs.plantSeeds(seedList.get(i));;
 
                     /* Start simulation with seed[i] */
@@ -56,6 +52,11 @@ public class Main {
                         seedList.set(i + 1, rngs.getSeed());
                     }
                 }
+
+                /* Final stats in transient state */
+                for (int i = 0; i < NODES; i++)
+                    centerList.get(i).printFinalStatsTransitorio();
+
                 break;
             case 1: /* Infinite horizon */
                 rngs.plantSeeds(SEED);
@@ -81,9 +82,5 @@ public class Main {
         }
 
         return choice;
-    }
-
-    private static void clearFiles() {
-        fileCSVGenerator.deleteSeedDirectory();
     }
 }

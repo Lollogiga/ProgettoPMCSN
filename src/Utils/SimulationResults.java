@@ -174,21 +174,21 @@ public class SimulationResults {
         this.utilization.set(batchIndex, utilization);
     }
 
-    public void setStandardDeviation(List<Double> batchMean, int type) {
-        if (batchMean.isEmpty()) {
-            System.out.println("Batch mean is empty");
+    public void setStandardDeviation(List<Double> statList, int type) {
+        if (statList.isEmpty()) {
+            throw new IllegalArgumentException("List cannot be empty");
         }
 
         //Calculate mean (μ)
         double mean = 0.0;
-        for (double elemento : batchMean) {
+        for (double elemento : statList) {
             mean += elemento;
         }
         mean /= K;
 
         // Calculate the sum of the squares of the differences from the mean
         double temp = 0.0;
-        for (Double element : batchMean) {
+        for (Double element : statList) {
             double difference = element - mean;
             temp += difference * difference;
         }

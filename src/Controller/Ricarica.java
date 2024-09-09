@@ -6,6 +6,7 @@ import Model.MsqSum;
 import Model.MsqT;
 import Utils.*;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +33,10 @@ public class Ricarica implements Center {
     private final List<MsqEvent> serverList = new ArrayList<>(RICARICA_SERVER + 2);
     private final List<MsqSum> sumList = new ArrayList<>(RICARICA_SERVER + 2);
 
+    private final ReplicationStats repRicarica = new ReplicationStats();
     private final SimulationResults batchRicarica = new SimulationResults();
     private final Distribution distr;
+    private final Rvms rvms = new Rvms();
     private final FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
 
     public Ricarica() {
@@ -348,6 +351,22 @@ public class Ricarica implements Center {
     }
 
     @Override
+    public void printIteration(boolean isFinite, int event, int runNumber, double time) {
+        double responseTime = area / index;
+        double avgPopulationInNode = area / msqT.getCurrent();
+
+        double area = this.area;
+        for(int i = 1; i == RICARICA_SERVER; i++) {
+            area -= sumList.get(i).getService();
+        }
+
+        double waitingTime = area / index;
+        double avgPopulationInQueue = area / msqT.getCurrent();
+
+        FileCSVGenerator.writeFile(isFinite, event, runNumber, time, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
+    }
+
+    @Override
     public void printResult(int runNumber, long seed) {
         DecimalFormat f = new DecimalFormat("#0.00000000");
 
@@ -368,41 +387,76 @@ public class Ricarica implements Center {
         double avgPopulationInQueue = area / msqT.getCurrent();
         System.out.println("  avg delay .......... = " + waitingTime);
         System.out.println("  avg # in queue ..... = " + avgPopulationInQueue);
+
+        double meanUtilization = 0;
         System.out.println("\nthe server statistics are:\n\n");
         System.out.println("\tserver\tutilization\t avg service\t share\n");
         for(int i = 1; i <= RICARICA_SERVER; i++) {
             System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t " + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t " + f.format(((double)sumList.get(i).getServed() / index)));
+            meanUtilization += (sumList.get(i).getService() / msqT.getCurrent());
         }
+
+        meanUtilization = meanUtilization / (RICARICA_SERVER - 1);
 
         /* Calculate recharged cost */
         rentalProfit.setRechargeCost((index * RECHARGE_COST));
 
         System.out.println("\n");
 
+        if (waitingTime <= 0.0) waitingTime = 0L;
+        if (avgPopulationInQueue <= 0.0) avgPopulationInQueue = 0L;
+
         if (runNumber > 0 && seed > 0)
-            fileCSVGenerator.saveRepResults(RICARICA, runNumber, seed, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
+            fileCSVGenerator.saveRepResults(RICARICA, runNumber, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
+
+        repRicarica.insertAvgPopulationInNode(avgPopulationInNode, runNumber - 1);
+        repRicarica.insertUtilization(meanUtilization, runNumber - 1);
+        repRicarica.insertResponseTime(responseTime, runNumber - 1);
+        repRicarica.insertWaitingTimeInQueue(waitingTime, runNumber - 1);
+        repRicarica.insertWaitingTimeInQueue(avgPopulationInQueue, runNumber - 1);
     }
 
     @Override
-    public void printStats() {
-        Rvms rvms = new Rvms();
+    public void printFinalStatsTransitorio() {
+        double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
+
+        System.out.println("\n\nRicarica\n");
+
+        repRicarica.setStandardDeviation(repRicarica.getWaitingTimeInQueue(), 4);
+        System.out.println("Critical endpoints E[T_Q] =  " + repRicarica.getMeanWaitingTimeInQueue() + " +/- " + critical_value * repRicarica.getStandardDeviation(4) / (Math.sqrt(K - 1)));
+
+        repRicarica.setStandardDeviation(repRicarica.getAvgPopulationInQueue(), 0);
+        System.out.println("Critical endpoints E[N_Q] =  " + repRicarica.getMeanPopulationInQueue() + " +/- " + critical_value * repRicarica.getStandardDeviation(0) / (Math.sqrt(K - 1)));
+
+        repRicarica.setStandardDeviation(repRicarica.getResponseTime(), 2);
+        System.out.println("Critical endpoints E[T_S] =  " + repRicarica.getMeanResponseTime() + " +/- " + critical_value * repRicarica.getStandardDeviation(2) / (Math.sqrt(K - 1)));
+
+        repRicarica.setStandardDeviation(repRicarica.getAvgPopulationInNode(), 1);
+        System.out.println("Critical endpoints E[N_S] =  " + repRicarica.getMeanPopulationInNode() + " +/- " + critical_value * repRicarica.getStandardDeviation(1) / (Math.sqrt(K - 1)));
+
+        repRicarica.setStandardDeviation(repRicarica.getUtilization(), 3);
+        System.out.println("Critical endpoints rho =  " + repRicarica.getMeanUtilization() + " +/- " + critical_value * repRicarica.getStandardDeviation(3) / (Math.sqrt(K - 1)));
+    }
+
+    @Override
+    public void printFinalStatsStazionario() {
         double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
 
         System.out.println("\n\nRicarica\n");
 
         batchRicarica.setStandardDeviation(batchRicarica.getWaitingTimeInQueue(), 4);
-        System.out.println("Critical endpoints E[T_Q] =  " + batchRicarica.getMeanWaitingTimeInQueue() + " +/- " + critical_value * batchRicarica.getStandardDeviation(4)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints E[T_Q] =  " + batchRicarica.getMeanWaitingTimeInQueue() + " +/- " + critical_value * batchRicarica.getStandardDeviation(4) / (Math.sqrt(K - 1)));
 
         batchRicarica.setStandardDeviation(batchRicarica.getAvgPopulationInQueue(), 0);
-        System.out.println("Critical endpoints E[N_Q] =  " + batchRicarica.getMeanPopulationInQueue() + " +/- " + critical_value * batchRicarica.getStandardDeviation(0)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints E[N_Q] =  " + batchRicarica.getMeanPopulationInQueue() + " +/- " + critical_value * batchRicarica.getStandardDeviation(0) / (Math.sqrt(K - 1)));
 
         batchRicarica.setStandardDeviation(batchRicarica.getResponseTime(), 2);
-        System.out.println("Critical endpoints E[T_S] =  " + batchRicarica.getMeanResponseTime() + " +/- " + critical_value * batchRicarica.getStandardDeviation(2)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints E[T_S] =  " + batchRicarica.getMeanResponseTime() + " +/- " + critical_value * batchRicarica.getStandardDeviation(2) / (Math.sqrt(K - 1)));
 
         batchRicarica.setStandardDeviation(batchRicarica.getAvgPopulationInNode(), 1);
-        System.out.println("Critical endpoints E[N_S] =  " + batchRicarica.getMeanPopulationInNode() + " +/- " + critical_value * batchRicarica.getStandardDeviation(1)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints E[N_S] =  " + batchRicarica.getMeanPopulationInNode() + " +/- " + critical_value * batchRicarica.getStandardDeviation(1) / (Math.sqrt(K - 1)));
 
         batchRicarica.setStandardDeviation(batchRicarica.getUtilization(), 3);
-        System.out.println("Critical endpoints rho =  " + batchRicarica.getMeanUtilization() + " +/- " + critical_value * batchRicarica.getStandardDeviation(3)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints rho =  " + batchRicarica.getMeanUtilization() + " +/- " + critical_value * batchRicarica.getStandardDeviation(3) / (Math.sqrt(K - 1)));
     }
 }

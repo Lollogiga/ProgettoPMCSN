@@ -4,15 +4,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FileCSVGenerator {
     private static final String RESULT = "results/";
     private static final String MAIN_PATH = "resources/";
-    private static final String FINITE_HORIZON = "finite_horizon/";
-    private static final String INFINITE_HORIZON = "infinite_horizon/";
 
     private static String directoryPath;
     private static FileCSVGenerator instance;
@@ -32,57 +30,13 @@ public class FileCSVGenerator {
 
     private void createDirectories() {
         Path folderPath = Paths.get(directoryPath, FileCSVGenerator.RESULT);
-        Path finitePath = Paths.get(directoryPath, FileCSVGenerator.RESULT, FileCSVGenerator.FINITE_HORIZON);
-        Path infinitePath = Paths.get(directoryPath, FileCSVGenerator.RESULT, FileCSVGenerator.INFINITE_HORIZON);
 
-        try {
-                if (!Files.exists(folderPath)) {
-                    Files.createDirectories(folderPath);
-                }
-
-                if (!Files.exists(finitePath)) {
-                    Files.createDirectories(finitePath);
-                }
-
-                if (!Files.exists(infinitePath)) {
-                    Files.createDirectories(infinitePath);
-                }
-            } catch (IOException ex) {
-                Logger.getAnonymousLogger().log(Level.INFO, "Results folders creation error");
-            }
-    }
-
-    public void createSeedFolders(long seed) {
-        String folderName = "Seed_" + seed + File.separator;
-        Path folderPath = Paths.get(directoryPath + FileCSVGenerator.RESULT + FileCSVGenerator.FINITE_HORIZON + folderName);
         try {
             if (!Files.exists(folderPath)) {
                 Files.createDirectories(folderPath);
             }
         } catch (IOException ex) {
-            Logger.getAnonymousLogger().log(Level.INFO, "Seed folders creation error");
-        }
-    }
-
-    public void deleteSeedDirectory() {
-        Path folderPath = Paths.get(directoryPath + FileCSVGenerator.RESULT);
-
-        try {
-            Files.walkFileTree(folderPath, new SimpleFileVisitor<>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir);
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        } catch (IOException ex) {
-            // ignore: nothing to delete
+            Logger.getAnonymousLogger().log(Level.INFO, "Results folders creation error");
         }
     }
 
@@ -91,19 +45,19 @@ public class FileCSVGenerator {
         fileWriter.append("\n");
     }
 
-    public void saveRepResults(String type, int runNumber, long seed, double responseTime, double avgPopulationInNode, double waitingTime, double avgPopulationInQueue) {
-        String fileTitle = Paths.get(directoryPath, FileCSVGenerator.RESULT, FileCSVGenerator.FINITE_HORIZON, searchSeedFileName(seed), "run_" + runNumber + ".csv").toString();
+    public void saveRepResults(String type, int runNumber, double responseTime, double avgPopulationInNode, double waitingTime, double avgPopulationInQueue) {
+        String fileTitle = Paths.get(directoryPath, FileCSVGenerator.RESULT, "finiteHorizonStats.csv").toString();
         File file = new File(fileTitle);
 
         try (FileWriter fileWriter = new FileWriter(fileTitle, true)) {
             if (file.length() == 0)
-                writeToFile(fileWriter, "Center,E[T_s],E[N_s],E[T_q],E[N_q]");
+                writeToFile(fileWriter, "Run Index,Center,E[T_S],E[N_S],E[T_Q],E[N_Q]");
             
             if (waitingTime == -Double.MAX_VALUE && avgPopulationInQueue == -Double.MAX_VALUE) {
-                writeToFile(fileWriter, type + "," + responseTime + "," +
+                writeToFile(fileWriter, runNumber + "," + type + "," + responseTime + "," +
                         avgPopulationInNode + "," + " " + "," + " ");
             } else {
-                writeToFile(fileWriter, type + "," + responseTime + "," +
+                writeToFile(fileWriter, runNumber + "," + type + "," + responseTime + "," +
                         avgPopulationInNode + "," + waitingTime + "," + avgPopulationInQueue);
             }
 
@@ -113,7 +67,7 @@ public class FileCSVGenerator {
     }
 
     public void saveBatchResults(int batchIndex, double responseTime) {
-        String fileTitle = Paths.get(directoryPath + FileCSVGenerator.RESULT + FileCSVGenerator.INFINITE_HORIZON + "waitingTime.csv").toString();
+        String fileTitle = Paths.get(directoryPath + FileCSVGenerator.RESULT  + "infiniteHorizonStats.csv").toString();
 
         try {
             Files.createDirectories(Paths.get(fileTitle).getParent());
@@ -136,23 +90,53 @@ public class FileCSVGenerator {
         }
     }
 
-    private String searchSeedFileName(long seed) {
-        Path folderPath = Paths.get(directoryPath + FileCSVGenerator.RESULT);
-        String[] fileName = {""};
+    public static void writeFile(Boolean isFinite, int event, int runNumber, double time, double responseTime, double avgPopulationInNode, double waitingTime, double avgPopulationInQueue) {
+        String center = switch (event) {
+            case 0 -> "Noleggio";
+            case 1 -> "Ricarica";
+            case 2 -> "Parcheggio";
+            case 3 -> "Strada";
+            default -> null;
+        };
+
+        if (center == null) return;
+
+        File file = new File(MAIN_PATH + RESULT + ((isFinite) ? "finite" : "infinite") + center + ".csv");
 
         try {
-            Files.walkFileTree(folderPath, new SimpleFileVisitor<>() {
-                @Override
-                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-                    if (dir.getFileName().toString().contains("Seed_" + seed)) {
-                        fileName[0] = dir.getFileName().toString();
-                        return FileVisitResult.TERMINATE;
-                    } else return FileVisitResult.CONTINUE;
-                }
-            });
+            boolean isCreated = false;
+            if (file.createNewFile()) {
+                System.out.println("File created: " + file.getAbsolutePath());
+                isCreated = true;
+            }
+
+            // Now you can open the file for writing or reading
+            FileWriter writer = new FileWriter(file, true); // 'true' for append mode
+
+            if(isCreated)
+                writer.write( "Run Index,Center,Time,E[T_S],E[N_S],E[T_Q],E[N_Q]\n");
+
+            writer.write(runNumber + "," + center + "," + time + "," + responseTime + "," +
+                    avgPopulationInNode + "," + waitingTime + "," + avgPopulationInQueue + "\n");
+
+            writer.close();
+
         } catch (IOException e) {
-            System.err.println("Errore durante la ricerca: " + e.getMessage());
+            e.printStackTrace();
         }
-        return fileName[0];
+    }
+
+    public static void deleteFolder(String stringPath) {
+        Path folderPath = Paths.get(stringPath);
+
+        try {
+            Files.walk(folderPath)
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+            System.out.println("Folder deleted successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
