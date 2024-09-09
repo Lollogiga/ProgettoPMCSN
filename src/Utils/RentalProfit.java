@@ -10,6 +10,7 @@ public class RentalProfit {
     private double carsCost;
     private double parksCost;
     private double carsProfit;
+    private int externalCars;
 
     private RentalProfit() {}
 
@@ -35,6 +36,20 @@ public class RentalProfit {
 
         return parksCost + carsCost + penalty + rechargeCost;
     }
+
+    public void incrementExternalCars() {
+        externalCars++;
+    }
+
+    public int getExternalCars() {
+        return externalCars;
+    }
+
+    public void resetExternalCars() {
+        externalCars = 0;
+    }
+
+
 
     public void setProfit(double profit) {
         carsProfit = profit;

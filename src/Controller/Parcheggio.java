@@ -96,6 +96,7 @@ public class Parcheggio implements Center {
                     return;
                 }
 
+                rentalProfit.incrementExternalCars();
                 eventListManager.incrementCars();   /* New car in system */
 
                 if (eventList.getFirst().getT() > STOP_FIN) {
@@ -149,7 +150,7 @@ public class Parcheggio implements Center {
             eventListManager.setIntQueueNoleggio(intQueueNoleggio);
 
             s = e;
-            if (eventListManager.getCarsInParcheggio() + MsqEvent.findActiveServers(eventList, PARCHEGGIO_SERVER) < PARCHEGGIO_SERVER && MsqEvent.findActiveServers(eventList, PARCHEGGIO_SERVER) != this.number) {        /* there is some jobs in queue, place another job in this server */
+            if (eventListManager.getCarsInParcheggio() + MsqEvent.findActiveServers(eventList, PARCHEGGIO_SERVER) < PARCHEGGIO_SERVER && MsqEvent.findActiveServers(eventList, PARCHEGGIO_SERVER) < this.number) {        /* there is some jobs in queue, place another job in this server */
                 service = distr.getService(1);
                 eventList.get(s).setT(msqT.getCurrent() + service);
 
@@ -195,9 +196,6 @@ public class Parcheggio implements Center {
             if (e == 0) {       /* Check if event is an external arrival */
                 eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(1));     /* Get new arrival from exogenous arrival */
 
-                BatchMeans.incrementJobInBatch();
-                jobInBatch++;
-
                 if (eventListManager.getCarsInParcheggio() + this.number > PARCHEGGIO_SERVER + SERVER_MAX_QUEUE) {      /* New arrival but Parcheggio's servers and queue are full */
                     this.number--;      /* Loss event */
 
@@ -214,6 +212,7 @@ public class Parcheggio implements Center {
                     return;
                 }
 
+                rentalProfit.incrementExternalCars();
                 eventListManager.incrementCars();   /* New car in system */
 
                 if (eventList.getFirst().getT() > STOP_INF) {
@@ -223,6 +222,17 @@ public class Parcheggio implements Center {
                 }
             } else if (e == eventList.size() - 1)
                 internalEventList.removeFirst();
+
+            BatchMeans.incrementJobInBatch();
+            jobInBatch++;
+
+            if (jobInBatch % B == 0 && jobInBatch <= B * K) {
+                batchDuration = msqT.getCurrent() - msqT.getBatchTimer();
+
+                calculateBatchStatistics();
+                nBatch++;
+                msqT.setBatchTimer(msqT.getCurrent());
+            }
 
             // Place job in a server if there is a free server
             s = MsqEvent.findOne(eventList, PARCHEGGIO_SERVER);
@@ -260,14 +270,6 @@ public class Parcheggio implements Center {
                 return; // Ho raggiunto il numero massimo di macchine nel parcheggio, devono restare in coda
             }
 
-            if (jobInBatch % B == 0 && jobInBatch <= B * K) {
-                batchDuration = msqT.getCurrent() - msqT.getBatchTimer();
-
-                calculateBatchStatistics();
-                nBatch++;
-                msqT.setBatchTimer(msqT.getCurrent());
-            }
-
             /* Routing job to rental station */
             MsqEvent event = new MsqEvent(msqT.getCurrent(), 1, true);
             List<MsqEvent> intQueueNoleggio = eventListManager.getIntQueueNoleggio();
@@ -275,7 +277,7 @@ public class Parcheggio implements Center {
             eventListManager.setIntQueueNoleggio(intQueueNoleggio);
 
             s = e;
-            if (eventListManager.getCarsInParcheggio() + MsqEvent.findActiveServers(eventList, PARCHEGGIO_SERVER) < PARCHEGGIO_SERVER && MsqEvent.findActiveServers(eventList, PARCHEGGIO_SERVER) != this.number) {        /* there is some jobs in queue, place another job in this server */
+            if (eventListManager.getCarsInParcheggio() + MsqEvent.findActiveServers(eventList, PARCHEGGIO_SERVER) < PARCHEGGIO_SERVER && MsqEvent.findActiveServers(eventList, PARCHEGGIO_SERVER) < this.number) {        /* there is some jobs in queue, place another job in this server */
                 service = distr.getService(1);
                 eventList.get(s).setT(msqT.getCurrent() + service);
 
@@ -337,6 +339,11 @@ public class Parcheggio implements Center {
 
     @Override
     public int getNumJob() {
+        return this.jobInBatch;
+    }
+
+    @Override
+    public int getJobInBatch() {
         return this.jobInBatch;
     }
 

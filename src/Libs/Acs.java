@@ -45,7 +45,7 @@ public class Acs {
     for (j = 0; j < SIZE; j++)
       cosum[j] = 0.0;
 
-    String fileName = "";
+    String fileName = "resources/results/infinite_horizon/waitingTime.csv";
     File fileCalc = new File(fileName);
 
     try {                         /* the first K + 1 data values    */

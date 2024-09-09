@@ -41,6 +41,7 @@ public class Sistema {
 
         eventListManager.resetState();
         rentalProfit.resetPenalty();
+        rentalProfit.resetExternalCars();
 
         Parcheggio parcheggio = new Parcheggio();
         Noleggio noleggio = new Noleggio();
@@ -150,8 +151,12 @@ public class Sistema {
 
     private void printProfit(double lastEventTime) {
         System.out.println("Analisi dei profitti:\n\n");
-        System.out.println("  Profit .. = " + rentalProfit.getProfit());
-        System.out.println("  Cost .... = " + rentalProfit.getCost(lastEventTime));
+        double income = rentalProfit.getProfit();
+        double cost = rentalProfit.getCost(lastEventTime);
+        System.out.println("  Income .. = " + income);
+        System.out.println("  Cost .... = " + cost);
+        System.out.println(" -----------------------------------");
+        System.out.println("  Profit .... = " + (income - cost));
     }
 
     private void printResult(int runNumber) {
@@ -190,8 +195,19 @@ public class Sistema {
         return e;
     }
 
+//    /* Check if there is a centre that has not processed B*K events */
+//    private boolean pendingEvents() {
+//        return BatchMeans.getJobInBatch() <= B * K;
+//    }
+
     /* Check if there is a centre that has not processed B*K events */
     private boolean pendingEvents() {
-        return BatchMeans.getJobInBatch() <= B * K;
+        for (Center center : centerList) {
+            if (center.getJobInBatch() <= B * K) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

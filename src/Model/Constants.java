@@ -6,8 +6,8 @@ public class Constants {
     public static final int STRADA_SERVER = Integer.MAX_VALUE; // Infinite server
     public static final int PARCHEGGIO_SERVER = 60;
 
-    public static final int SERVER_MAX_QUEUE = 5;
-    public static final int RICARICA_MAX_QUEUE = 2;
+    public static final int SERVER_MAX_QUEUE = 50;
+    public static final int RICARICA_MAX_QUEUE = 20;
 
      public static final int RICARICA_SERVER = 15;
 
@@ -74,7 +74,7 @@ public class Constants {
 
     /* Batch simulation */
     public static final int K = 64;
-    public static final int B = 128;
+    public static final int B = 1024;
     public static final double LEVEL_OF_CONFIDENCE = 0.05; // Tipically alpha = 0.05
 
     public static final int REPLICATION = 64;

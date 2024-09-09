@@ -11,5 +11,7 @@ public interface Center {
 
     int getNumJob();
 
+    int getJobInBatch();
+
     void printResult(int runNumber, long seed);
 }

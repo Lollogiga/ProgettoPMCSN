@@ -164,6 +164,15 @@ public class Strada implements Center {
             BatchMeans.incrementJobInBatch();
             jobInBatch++;
 
+            if (jobInBatch % B == 0 && jobInBatch <= B * K) {
+                batchDuration = msqT.getCurrent() - msqT.getBatchTimer();
+
+                calculateBatchStatistics();
+                nBatch++;
+                msqT.setBatchTimer(msqT.getCurrent());
+            }
+
+
             eventList.get(e).setX(0);
 
             service = distr.getService(3);
@@ -185,14 +194,6 @@ public class Strada implements Center {
 
             /* Update centralized event list */
             List<MsqEvent> systemList = eventListManager.getSystemEventsList();
-
-            if (jobInBatch % B == 0 && jobInBatch <= B * K) {
-                batchDuration = msqT.getCurrent() - msqT.getBatchTimer();
-
-                calculateBatchStatistics();
-                nBatch++;
-                msqT.setBatchTimer(msqT.getCurrent());
-            }
 
             /* Routing */
             s = e;
@@ -283,6 +284,11 @@ public class Strada implements Center {
     }
 
     @Override
+    public int getJobInBatch() {
+        return this.jobInBatch;
+    }
+
+    @Override
     public void printResult(int runNumber, long seed) {
         DecimalFormat f = new DecimalFormat("#0.00000000");
 
@@ -302,7 +308,7 @@ public class Strada implements Center {
         }
 
         /* Calculate rental profit */
-        double baseProfit = (responseTime / 3600) * index * RENTAL_PROFIT;
+        double baseProfit = (responseTime / 3600) * (index + rentalProfit.getExternalCars()) * RENTAL_PROFIT;
         double kmProfit = (MEAN_SPEED * (responseTime / 3600)) * RENTAL_KM_PROFIT * index;
         rentalProfit.setProfit((baseProfit + kmProfit));
 

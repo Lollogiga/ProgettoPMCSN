@@ -113,7 +113,7 @@ public class FileCSVGenerator {
     }
 
     public void saveBatchResults(int batchIndex, double responseTime) {
-        String fileTitle = Paths.get(directoryPath + FileCSVGenerator.RESULT + FileCSVGenerator.INFINITE_HORIZON + "responseTime.csv").toString();
+        String fileTitle = Paths.get(directoryPath + FileCSVGenerator.RESULT + FileCSVGenerator.INFINITE_HORIZON + "waitingTime.csv").toString();
 
         try {
             Files.createDirectories(Paths.get(fileTitle).getParent());
@@ -127,7 +127,7 @@ public class FileCSVGenerator {
 
         try (FileWriter fileWriter = new FileWriter(fileTitle, true)) {
             if (file.length() == 0)
-                writeToFile(fileWriter, "Batch Number,E[T_s]");
+                writeToFile(fileWriter, "Batch Number,E[T_Q]");
 
             writeToFile(fileWriter, batchIndex + "," + responseTime);
 
