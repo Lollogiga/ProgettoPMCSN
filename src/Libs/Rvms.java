@@ -1,4 +1,4 @@
-
+package Libs;
 /* ------------------------------------------------------------------------- 
  * This is a Java library that can be used to evaluate the probability 
  * density functions (pdf's), cumulative distribution functions (cdf's), and 
@@ -44,7 +44,7 @@
  * ------------------------------------------------------------------------- 
  */
 
-public class Rvms{
+public class Rvms {
     final double TINY = 1.0e-10;
     final double SQRT2PI = 2.506628274631;	/* sqrt(2 * pi) */
     

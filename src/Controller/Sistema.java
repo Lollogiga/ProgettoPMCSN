@@ -4,7 +4,6 @@ import Libs.Rngs;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
-import Utils.BatchMeans;
 import Utils.Distribution;
 import Utils.RentalProfit;
 
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static Model.Constants.*;
+import static Utils.Constants.*;
 
 public class Sistema {
     long number = 0;                     /* number of jobs in the node         */
@@ -143,40 +142,20 @@ public class Sistema {
             } else throw new Exception("Invalid event");
         }
 
-        for (int i = 0; i < 4; i++) centerList.get(i).printResult(-1, -1L);
+        for (int i = 0; i < 4; i++) centerList.get(i).printStats();
 
         /* Calculate profit */
         printProfit(msqT.getCurrent());
     }
 
     private void printProfit(double lastEventTime) {
-        System.out.println("Analisi dei profitti:\n\n");
+        System.out.println("\n\nProfit Balance:\n");
         double income = rentalProfit.getProfit();
         double cost = rentalProfit.getCost(lastEventTime);
         System.out.println("  Income .. = " + income);
         System.out.println("  Cost .... = " + cost);
         System.out.println(" -----------------------------------");
         System.out.println("  Profit .... = " + (income - cost));
-    }
-
-    private void printResult(int runNumber) {
-        System.out.println("Sistema\n\n");
-        System.out.println("for " + index + " jobs the service node statistics are:\n\n");
-        System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
-        System.out.println("  avg wait ........... = " + area / index);
-        System.out.println("  avg # in node ...... = " + area / msqT.getCurrent());
-
-        for (int i = 1; i <= NODES; i++) {
-            area -= sumList.get(i).getService();
-        }
-        System.out.println("  avg delay .......... = " + area / index);
-        System.out.println("  avg # in queue ..... = " + area / msqT.getCurrent());
-        System.out.println("\nthe server statistics are:\n\n");
-        System.out.println("    server     utilization     avg service        share\n");
-        for (int i = 1; i <= NODES; i++) {
-            System.out.println(i + "\t" + sumList.get(i).getService() / msqT.getCurrent() + "\t" + sumList.get(i).getService() / sumList.get(i).getServed() + "\t" + ((double) sumList.get(i).getServed() / index));
-        }
-        System.out.println("\n");
     }
 
     /* Fetch index of most imminent event among all servers */
@@ -194,11 +173,6 @@ public class Sistema {
         }
         return e;
     }
-
-//    /* Check if there is a centre that has not processed B*K events */
-//    private boolean pendingEvents() {
-//        return BatchMeans.getJobInBatch() <= B * K;
-//    }
 
     /* Check if there is a centre that has not processed B*K events */
     private boolean pendingEvents() {

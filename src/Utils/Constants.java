@@ -1,4 +1,4 @@
-package Model;
+package Utils;
 
 public class Constants {
     /*  Number of servers in each center  */
@@ -75,10 +75,9 @@ public class Constants {
     /* Batch simulation */
     public static final int K = 64;
     public static final int B = 1024;
-    public static final double LEVEL_OF_CONFIDENCE = 0.05; // Tipically alpha = 0.05
+    public static final double ALPHA = 0.05; // Level of confidence = 0.95
 
     public static final int REPLICATION = 64;
-//    public static final int REPLICATION = 2;
 
     /* Center constants for file generation */
     public static final String PARCHEGGIO = "Parcheggio";

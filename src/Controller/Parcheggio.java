@@ -1,5 +1,6 @@
 package Controller;
 
+import Libs.Rvms;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
@@ -9,7 +10,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import static Model.Constants.*;
+import static Utils.Constants.*;
 
 public class Parcheggio implements Center {
     private final EventListManager eventListManager;
@@ -354,7 +355,7 @@ public class Parcheggio implements Center {
         double responseTime = area / index;
         double avgPopulationInNode = area / msqT.getCurrent();
 
-        System.out.println("Parcheggio\n\n");
+        System.out.println("\n\nParcheggio\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
         System.out.println("  avg wait ........... = " + responseTime);
@@ -376,30 +377,27 @@ public class Parcheggio implements Center {
         if (runNumber > 0 && seed > 0)
             fileCSVGenerator.saveRepResults(PARCHEGGIO, runNumber, seed, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
     }
+
+    @Override
+    public void printStats() {
+        Rvms rvms = new Rvms();
+        double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
+
+        System.out.println("\n\nParcheggio\n");
+
+        batchParcheggio.setStandardDeviation(batchParcheggio.getWaitingTimeInQueue(), 4);
+        System.out.println("Critical endpoints E[T_Q] =  " + batchParcheggio.getMeanWaitingTimeInQueue() + " +/- " + critical_value * batchParcheggio.getStandardDeviation(4)/(Math.sqrt(K-1)));
+
+        batchParcheggio.setStandardDeviation(batchParcheggio.getAvgPopulationInQueue(), 0);
+        System.out.println("Critical endpoints E[N_Q] =  " + batchParcheggio.getMeanPopulationInQueue() + " +/- " + critical_value * batchParcheggio.getStandardDeviation(0)/(Math.sqrt(K-1)));
+
+        batchParcheggio.setStandardDeviation(batchParcheggio.getResponseTime(), 2);
+        System.out.println("Critical endpoints E[T_S] =  " + batchParcheggio.getMeanResponseTime() + " +/- " + critical_value * batchParcheggio.getStandardDeviation(2)/(Math.sqrt(K-1)));
+
+        batchParcheggio.setStandardDeviation(batchParcheggio.getAvgPopulationInNode(), 1);
+        System.out.println("Critical endpoints E[N_S] =  " + batchParcheggio.getMeanPopulationInNode() + " +/- " + critical_value * batchParcheggio.getStandardDeviation(1)/(Math.sqrt(K-1)));
+
+        batchParcheggio.setStandardDeviation(batchParcheggio.getUtilization(), 3);
+        System.out.println("Critical endpoints rho =  " + batchParcheggio.getMeanUtilization() + " +/- " + critical_value * batchParcheggio.getStandardDeviation(3)/(Math.sqrt(K-1)));
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

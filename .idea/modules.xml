@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ProgettoPMCSN.iml" filepath="$PROJECT_DIR$/ProgettoPMCSN.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pyGraphs/pyGraphs.iml" filepath="$PROJECT_DIR$/pyGraphs/pyGraphs.iml" />
     </modules>
   </component>
 </project>

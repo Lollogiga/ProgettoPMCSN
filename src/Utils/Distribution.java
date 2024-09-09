@@ -2,7 +2,7 @@ package Utils;
 
 import Libs.Rngs;
 
-import static Model.Constants.*;
+import static Utils.Constants.*;
 
 public class Distribution {
     private static Distribution instance = null;

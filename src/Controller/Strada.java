@@ -1,6 +1,7 @@
 package Controller;
 
 import Libs.Rngs;
+import Libs.Rvms;
 import Model.MsqEvent;
 import Model.MsqSum;
 import Model.MsqT;
@@ -10,7 +11,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import static Model.Constants.*;
+import static Utils.Constants.*;
 
 /* Modeled as an Infinite Server */
 public class Strada implements Center {
@@ -295,7 +296,7 @@ public class Strada implements Center {
         double responseTime = area / index;
         double avgPopulationInNode = area / msqT.getCurrent();
 
-        System.out.println("Strada\n\n");
+        System.out.println("\n\nStrada\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
         System.out.println("  avg wait ........... = " + responseTime);
@@ -317,6 +318,33 @@ public class Strada implements Center {
         if (runNumber > 0 && seed > 0)
             fileCSVGenerator.saveRepResults(STRADA, runNumber, seed, responseTime, avgPopulationInNode, -Double.MAX_VALUE, -Double.MAX_VALUE);
 
+    }
+
+    @Override
+    public void printStats() {
+        Rvms rvms = new Rvms();
+        double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
+
+        System.out.println("\n\nStrada\n");
+
+        batchStrada.setStandardDeviation(batchStrada.getWaitingTimeInQueue(), 4);
+        System.out.println("Critical endpoints E[T_Q] =  " + batchStrada.getMeanWaitingTimeInQueue() + " +/- " + critical_value * batchStrada.getStandardDeviation(4)/(Math.sqrt(K-1)));
+
+        batchStrada.setStandardDeviation(batchStrada.getAvgPopulationInQueue(), 0);
+        System.out.println("Critical endpoints E[N_Q] =  " + batchStrada.getMeanPopulationInQueue() + " +/- " + critical_value * batchStrada.getStandardDeviation(0)/(Math.sqrt(K-1)));
+
+        batchStrada.setStandardDeviation(batchStrada.getResponseTime(), 2);
+        System.out.println("Critical endpoints E[T_S] =  " + batchStrada.getMeanResponseTime() + " +/- " + critical_value * batchStrada.getStandardDeviation(2)/(Math.sqrt(K-1)));
+
+        batchStrada.setStandardDeviation(batchStrada.getAvgPopulationInNode(), 1);
+        System.out.println("Critical endpoints E[N_S] =  " + batchStrada.getMeanPopulationInNode() + " +/- " + critical_value * batchStrada.getStandardDeviation(1)/(Math.sqrt(K-1)));
+
+        batchStrada.setStandardDeviation(batchStrada.getUtilization(), 3);
+        System.out.println("Critical endpoints rho =  " + batchStrada.getMeanUtilization() + " +/- " + critical_value * batchStrada.getStandardDeviation(3)/(Math.sqrt(K-1)));
+
+        double baseProfit = (batchStrada.getMeanResponseTime() / 3600) * (index + rentalProfit.getExternalCars()) * RENTAL_PROFIT;
+        double kmProfit = (MEAN_SPEED * (batchStrada.getMeanResponseTime() / 3600)) * RENTAL_KM_PROFIT * index;
+        rentalProfit.setProfit((baseProfit + kmProfit));
     }
 
 }

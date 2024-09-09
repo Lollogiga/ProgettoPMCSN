@@ -1,6 +1,6 @@
 package Utils;
 
-import static Model.Constants.*;
+import static Utils.Constants.*;
 
 public class RentalProfit {
 
@@ -49,8 +49,6 @@ public class RentalProfit {
         externalCars = 0;
     }
 
-
-
     public void setProfit(double profit) {
         carsProfit = profit;
     }
@@ -58,6 +56,7 @@ public class RentalProfit {
     public void setRechargeCost(double cost){
         this.rechargeCost = cost;
     }
+
     public double getProfit() {
         return this.carsProfit;
     }

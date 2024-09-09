@@ -7,7 +7,7 @@ import Model.MsqEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import static Model.Constants.*;
+import static Utils.Constants.*;
 
 public class EventListManager {
     private static EventListManager instance = null;

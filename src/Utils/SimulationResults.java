@@ -3,7 +3,7 @@ package Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static Model.Constants.K;
+import static Utils.Constants.K;
 
 public class SimulationResults {
     /* Lists of batch's values */
@@ -83,6 +83,37 @@ public class SimulationResults {
         return meanWaitingTimeInQueue;
     }
 
+    public List<Double> getWaitingTimeInQueue() {
+        return waitingTimeInQueue;
+    }
+
+    public List<Double> getAvgPopulationInNode() {
+        return avgPopulationInNode;
+    }
+
+    public List<Double> getResponseTime() {
+        return responseTime;
+    }
+
+    public List<Double> getAvgPopulationInQueue() {
+        return avgPopulationInQueue;
+    }
+
+    public List<Double> getUtilization() {
+        return utilization;
+    }
+
+    public double getStandardDeviation(int type) {
+        return switch (type) {
+            case 0 -> devPopulationInQueue;
+            case 1 -> devPopulationInNode;
+            case 2 -> devResponseTime;
+            case 3 -> devUtilization;
+            case 4 -> devWaitingTimeInQueue;
+            default -> throw new IllegalArgumentException("Invalid type");
+        };
+    }
+
     public void setMeanPopulationInNode(double meanPopulationInNode) {
         this.meanPopulationInNode = meanPopulationInNode;
     }
@@ -102,7 +133,6 @@ public class SimulationResults {
     public void setMeanWaitingTimeInQueue(double meanWaitingTimeInQueue) {
         this.meanWaitingTimeInQueue = meanWaitingTimeInQueue;
     }
-
 
     public void setDevPopulationInQueue(double devPopulationInQueue) {
         this.devPopulationInQueue = devPopulationInQueue;
@@ -144,10 +174,9 @@ public class SimulationResults {
         this.utilization.set(batchIndex, utilization);
     }
 
-    public double getVariance(List<Double> batchMean, int type){
-        if(batchMean.isEmpty()){
+    public void setStandardDeviation(List<Double> batchMean, int type) {
+        if (batchMean.isEmpty()) {
             System.out.println("Batch mean is empty");
-            return -1;
         }
 
         //Calculate mean (μ)
@@ -159,7 +188,7 @@ public class SimulationResults {
 
         // Calculate the sum of the squares of the differences from the mean
         double temp = 0.0;
-        for (Double element: batchMean){
+        for (Double element : batchMean) {
             double difference = element - mean;
             temp += difference * difference;
         }
@@ -191,7 +220,5 @@ public class SimulationResults {
             default:
                 throw new IllegalArgumentException("Invalid type");
         }
-
-        return devStd;
     }
 }

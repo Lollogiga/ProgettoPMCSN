@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import static Model.Constants.*;
+import static Utils.Constants.*;
 
 public class Main {
     private static FileCSVGenerator fileCSVGenerator;

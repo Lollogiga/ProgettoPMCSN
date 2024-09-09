@@ -14,4 +14,6 @@ public interface Center {
     int getJobInBatch();
 
     void printResult(int runNumber, long seed);
+
+    void printStats();
 }
