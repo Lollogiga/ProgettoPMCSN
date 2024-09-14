@@ -44,7 +44,9 @@ public class Strada implements Center {
 
     public Strada() {
         eventListManager = EventListManager.getInstance();
+
         distr = Distribution.getInstance();
+
         rentalProfit = RentalProfit.getInstance();
 
         rngs = distr.getRngs();

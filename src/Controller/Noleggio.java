@@ -1,5 +1,6 @@
 package Controller;
 
+import Libs.Rngs;
 import Libs.Rvms;
 import Model.MsqEvent;
 import Model.MsqSum;
@@ -16,10 +17,10 @@ import static Utils.Constants.*;
 public class Noleggio implements Center {
     private final EventListManager eventListManager;
 
-    long number = 0;                /* number in the node                 */
+    long number = 0;                /* number in the node: Somma dei job in coda + in servizio                 */
     int e;                          /* next event index                   */
     int s;                          /* server index                       */
-    long index = 0;                 /* used to count processed jobs       */
+    long index = 0;                 /* used to count processed jobs: Tutti i job processati       */
     double service;
     double area = 0.0;              /* time integrated number in the node */
 
@@ -27,20 +28,26 @@ public class Noleggio implements Center {
     int jobInBatch = 0;
     double batchDuration = 0L;
 
-    private List<MsqEvent> eventList = new ArrayList<>(NOLEGGIO_SERVER + 2);
-    private final List<MsqSum> sumList = new ArrayList<>(NOLEGGIO_SERVER + 2);
     private final MsqT msqT = new MsqT();
+
+    // λ_ext, λ_int
+    private List<MsqEvent> eventList = new ArrayList<>(2);
+    private final List<MsqSum> sumList = new ArrayList<>(2);
+
+    private final Distribution distr;
+    private final Rvms rvms = new Rvms();
 
     private final ReplicationStats repNoleggio = new ReplicationStats();
     private final SimulationResults batchNoleggio = new SimulationResults();
-    private final Distribution distr = Distribution.getInstance();
+
     private final FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
-    private final Rvms rvms = new Rvms();
 
     public Noleggio() {
         this.eventListManager = EventListManager.getInstance();
 
-        for (s = 0; s < NOLEGGIO_SERVER + 2; s++) {
+        this.distr = Distribution.getInstance();
+
+        for (s = 0; s <  2; s++) {
             this.eventList.add(s, new MsqEvent(0, 0));
             this.sumList.add(s, new MsqSum());
         }
@@ -49,19 +56,76 @@ public class Noleggio implements Center {
         double arrival = distr.getArrival(0);
 
         // Add this new event and setting time to arrival time
-        eventList.set(0, new MsqEvent(arrival, 1));
+        eventList.set(0, new MsqEvent(arrival, 1));     // Setto l'arrivo esterno (0). Setto a 1 processabile.
 
         // Setting event list in eventListManager
         eventListManager.setServerNoleggio(eventList);
     }
 
-    /* Finite horizon simulation */
     @Override
     public void simpleSimulation() {
         eventList = eventListManager.getServerNoleggio();
-        List<MsqEvent> internalEventList = eventListManager.getIntQueueNoleggio();
+
+        /* Exit condition : There are no external or internal arrivals, and I haven't processing job. */
+        if (eventList.getFirst().getX() == 0 && eventList.size() == 1) return;
+
+        if ((e = MsqEvent.getNextEvent(eventList)) == -1) return;
+        msqT.setNext(eventList.get(e).getT());
+        area += (msqT.getNext() - msqT.getCurrent()) * number;
+        msqT.setCurrent(msqT.getNext());
+
+        if (e == 0) {
+            this.number++;
+
+            eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(1));     /* Get new user arrival */
+
+            List<MsqEvent> serverParcheggio = eventListManager.getServerParcheggio();
+            int sP;
+
+            List<MsqEvent> serverRicarica = eventListManager.getServerRicarica();
+            int sR;
+
+            /* Get avaible car in Parcheggio and ricarica*/
+            sP = MsqEvent.findAvailableCar(serverParcheggio);
+            sR = MsqEvent.findAvailableCar(serverRicarica);
+
+            if (sP == -1 && sR == -1) {     /* No car available */
+                //TODO: Devo settare come prossimo evento di noleggio, il minimo fra arrivo di utenti (che saranno in coda) e macchina disponibile
+                /*
+                * Non ho macchine disponibili
+                * Il prossimo evento può essere:
+                * - un arrivo esterno di un altro utente
+                * - una macchina che si libera da parcheggio
+                * - una macchina che si libera da ricarica
+                *
+                * Devo impostare il tempo di noleggio in sistema pari all'evento più prossimo? NO!
+                * Mi basta impostare λ* pari a 1
+                * */
+            }
+
+            if (sP != -1 && sR != -1) { /* Both parcheggio and ricarica have cars available:  */
+                if (serverParcheggio.get(sP).getT() < serverRicarica.get(sR).getT()) { /* Search for the machine that has been waiting the longest*/
+                    eventListManager.getServerParcheggio().get(sP).setX(0); /* Car in parcheggio rented */
+                } else {
+                    eventListManager.getServerRicarica().get(sR).setX(0); /* Car in ricarica rented*/
+                }
+            } else if (sP != -1) {  /* Else if I have available cars only in one center */
+                eventListManager.getServerParcheggio().get(sP).setX(0);
+            } else {
+                eventListManager.getServerRicarica().get(sR).setX(0);
+            }
+        }
+    }
+
+    /* Finite horizon simulation */
+    public void simpleSimulationOld() {
+        eventList = eventListManager.getServerNoleggio();
+        List<MsqEvent> internalEventList = eventListManager.getIntQueueNoleggio(); //Lista delle macchine disponibili
 
         /* No event to process */
+        //Prima parte: Ci sono arrivi esterni?
+        //Seconda parte: Non ci sono car dispo
+        //terza parte: centro vuoto
         if (eventList.getFirst().getX() == 0 && internalEventList.isEmpty() && this.number == 0) return;
 
         if ((e = MsqEvent.getNextEvent(eventList, eventList.size() - 1)) == -1) return;
@@ -69,11 +133,14 @@ public class Noleggio implements Center {
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
 
+        //prima parte: Arrivo esterno
+        //Seconda parte: arrivo eserno
+        //Terza parte: MAACCHINA DISPONIBILE
         if ((e == 0 || e == eventList.size() - 1) && !internalEventList.isEmpty()) {       /* External arrival (λ) and a car is ready to be rented */
             if (e == 0) {
                 this.number++;
 
-                eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */
+                eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(0)); /* Get new arrival from passenger arrival */ //Setti il prossimo arrivo esterno
             }
 
             if (eventList.get(e).getT() > STOP_FIN) {
@@ -81,8 +148,10 @@ public class Noleggio implements Center {
                 eventListManager.setServerNoleggio(eventList);
             }
 
+            //Se il server è disponibile(0 = libero)
             if (eventList.get(1).getX() == 0) {
                 /* Update number of available cars in the center depending on where the car comes from */
+                //CarsInParcheggio : # DI MACCHINE PRESENTI IN RICARICA --> Anche noleggiabile
                 if (internalEventList.getFirst().isFromParking()) {
                     if (eventListManager.reduceCarsInParcheggio() != 0)
                         return;
@@ -91,17 +160,18 @@ public class Noleggio implements Center {
                         return;
                 }
 
-                /* Set server as active */
+                /* Set server as active */ //Vedo quanto tempo ci mette a finire
                 eventList.get(1).setT(msqT.getCurrent()); /* mu_noleggio = inf -> no tempo di servizio */
                 eventList.get(1).setX(1);
-                internalEventList.removeFirst();
+                internalEventList.removeFirst(); //Tolgo una macchina --> è andata in strada
 
                 sumList.get(1).incrementServed();
             } else {
+                //il server non è disponibile, imposto il mio tempo di servizio a quando il server si libererà
                 // Il tempo che mi libera dall'attesa
                 double time = eventList.get(1).getT();
 
-                eventList.getLast().setT(time);
+                eventList.getLast().setT(time); //
 
                 // Imposto la x di lamda* a 1
                 eventList.getLast().setX(1);

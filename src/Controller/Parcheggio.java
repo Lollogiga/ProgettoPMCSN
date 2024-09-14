@@ -6,7 +6,6 @@ import Model.MsqSum;
 import Model.MsqT;
 import Utils.*;
 
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,14 +29,16 @@ public class Parcheggio implements Center {
 
     private final MsqT msqT = new MsqT();
 
-    // λ_ext, s_1, s_2, ..., s_n, λ_int
-    private final List<MsqEvent> serverList = new ArrayList<>(PARCHEGGIO_SERVER + 2);
-    private final List<MsqSum> sumList = new ArrayList<>(PARCHEGGIO_SERVER + 2);
+    // λ_ext, λ_int, s_1, s_2, ..., s_n
+    private final List<MsqEvent> serverList = new ArrayList<>(2 + PARCHEGGIO_SERVER);
+    private final List<MsqSum> sumList = new ArrayList<>(2 + PARCHEGGIO_SERVER);
+
+    private final Distribution distr;
+    private final Rvms rvms = new Rvms();
 
     private final ReplicationStats repParcheggio = new ReplicationStats();
     private final SimulationResults batchParcheggio = new SimulationResults();
-    private final Distribution distr;
-    private final Rvms rvms = new Rvms();
+
     private final FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
 
     public Parcheggio() {
@@ -52,7 +53,7 @@ public class Parcheggio implements Center {
             sumList.add(s, new MsqSum());
         }
 
-        // First arrival event (car to park)
+        // First arrival event (External arrival) (car to park)
         double arrival = distr.getArrival(1);
 
         // Add this new event and setting time to arrival time
@@ -63,6 +64,60 @@ public class Parcheggio implements Center {
 
     @Override
     public void simpleSimulation() {
+        // TODO: penalty parcheggio
+
+        List<MsqEvent> eventList = eventListManager.getServerParcheggio();
+
+        // Exit condition : There are no external or internal arrivals, and I haven't processing job.
+        if (eventList.getFirst().getX() == 0 && eventList.get(1).getX() == 0 && this.number == 0) return;
+
+        if ((e = MsqEvent.getNextEvent(eventList)) == -1) return;
+        msqT.setNext(eventList.get(e).getT());
+        area += (msqT.getNext() - msqT.getCurrent()) * number;
+        msqT.setCurrent(msqT.getNext());
+
+        // Whether it is an external or internal arrival: (e > 2, is a server processing)
+        if (e < 2) {
+            this.number++;
+
+            if (e == 0) eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(1));     /* Get new arrival from exogenous (external) arrival */
+
+            s = MsqEvent.findOne(eventList);    /* Search for an idle Server */
+            if (s != -1) {                      /* Found an idle server*/
+                service = distr.getService(1);
+
+                /* Set server as active */
+                eventList.get(s).setT(msqT.getCurrent() +  service);  /* Let's calculate the end of service time */
+                eventList.get(s).setX(1);
+
+                sumList.get(s).incrementService(service);
+                sumList.get(s).incrementServed();
+            } else {/* All servers are busy */
+                if (this.number - MsqEvent.findActiveServers(eventList) > PARCHEGGIO_MAX_QUEUE) {    /* If the queue is full */
+                    this.number--;
+
+                    rentalProfit.incrementPenalty();
+                }
+            }
+        } else {    /* Processing a job */
+            this.index++;
+            this.number--;
+
+            eventList.get(e).setX(2);       /* Current server is no more usable (e = 2 car is ready to be rented) */
+
+            // TODO: avvisare Noleggio che ho una nuova macchina a disposizione (routing)
+        }
+
+        /* Get next Parcheggio's events*/
+        int nextEvent = MsqEvent.getNextEvent(eventList);
+        if (nextEvent == -1)
+            eventListManager.getSystemEventsList().get(2).setX(0);
+
+        eventListManager.getSystemEventsList().get(2).setT(eventList.get(nextEvent).getT());
+    }
+
+//    @Override
+    public void simpleSimulatio1() {
         List<MsqEvent> eventList = eventListManager.getServerParcheggio();
         List<MsqEvent> internalEventList = eventListManager.getIntQueueParcheggio();
 
@@ -84,7 +139,7 @@ public class Parcheggio implements Center {
             if (e == 0) {       /* Check if event is an external arrival */
                 eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(1));     /* Get new arrival from exogenous arrival */
 
-                if (eventListManager.getCarsInParcheggio() + this.number > PARCHEGGIO_SERVER + SERVER_MAX_QUEUE) {      /* New arrival but Parcheggio's servers and queue are full */
+                if (eventListManager.getCarsInParcheggio() + this.number > PARCHEGGIO_SERVER + PARCHEGGIO_MAX_QUEUE) {      /* New arrival but Parcheggio's servers and queue are full */
                     this.number--;      /* Loss event */
 
                     rentalProfit.incrementPenalty();
@@ -200,7 +255,7 @@ public class Parcheggio implements Center {
             if (e == 0) {       /* Check if event is an external arrival */
                 eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(1));     /* Get new arrival from exogenous arrival */
 
-                if (eventListManager.getCarsInParcheggio() + this.number > PARCHEGGIO_SERVER + SERVER_MAX_QUEUE) {      /* New arrival but Parcheggio's servers and queue are full */
+                if (eventListManager.getCarsInParcheggio() + this.number > PARCHEGGIO_SERVER + PARCHEGGIO_MAX_QUEUE) {      /* New arrival but Parcheggio's servers and queue are full */
                     this.number--;      /* Loss event */
 
                     rentalProfit.incrementPenalty();
