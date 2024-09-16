@@ -30,7 +30,7 @@ public class EventListManager {
 
     private EventListManager() {
         this.serverStrada = new ArrayList<>(1);
-        this.serverNoleggio = new ArrayList<>(NOLEGGIO_SERVER + 1);
+        this.serverNoleggio = new ArrayList<>(2);
         this.serverRicarica = new ArrayList<>(RICARICA_SERVER + 2);
         this.serverParcheggio = new ArrayList<>(PARCHEGGIO_SERVER + 2);
 

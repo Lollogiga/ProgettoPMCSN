@@ -60,24 +60,21 @@ public class Sistema {
 
         // Initialize noleggio in system list
         List<MsqEvent> noleggioList = eventListManager.getServerNoleggio();
-        int nextEventNoleggio = MsqEvent.getNextEvent(noleggioList, NOLEGGIO_SERVER);
+        int nextEventNoleggio = MsqEvent.getNextEvent(noleggioList);
         systemList.set(0, new MsqEvent(noleggioList.get(nextEventNoleggio).getT(), 1));
 
         // Initialize ricarica in system list
         List<MsqEvent> chargingList = eventListManager.getServerRicarica();
-        int nextEventRicarica = MsqEvent.getNextEvent(chargingList, RICARICA_SERVER);
+        int nextEventRicarica = MsqEvent.getNextEvent(chargingList);
         systemList.set(1, new MsqEvent(chargingList.get(nextEventRicarica).getT(), 1));
 
         // Initialize parcheggio in system list
         List<MsqEvent> parcheggioList = eventListManager.getServerParcheggio();
-        int nextEventParcheggio = MsqEvent.getNextEvent(parcheggioList, PARCHEGGIO_SERVER);
+        int nextEventParcheggio = MsqEvent.getNextEvent(parcheggioList);
         systemList.set(2, new MsqEvent(parcheggioList.get(nextEventParcheggio).getT(), 1));
 
-        // Initialize cars in noleggio
-        List<MsqEvent> carInRentalStation = eventListManager.getIntQueueNoleggio();
-        for (int i = 0; i < INIT_PARK_CARS; i++)
-            carInRentalStation.add(i, new MsqEvent(0, 1, true));
-        eventListManager.setIntQueueNoleggio(carInRentalStation);
+        // Initialize cars in Parcheggio
+        for (int i = 0; i < INIT_PARK_CARS; i++) parcheggioList.get(i + 2).setX(2);
 
         eventListManager.setSystemEventsList(systemList);
     }
@@ -104,14 +101,6 @@ public class Sistema {
 
         while (msqT.getCurrent() < STOP_FIN) {
             if ((e = getNextEvent(eventList)) == -1) break;
-
-//            if ((eventListManager.getCarsInRicarica() + MsqEvent.findActiveServers(eventListManager.getServerRicarica(), RICARICA_SERVER)) == 14) {
-            if (eventListManager.getCarsInRicarica() == 12) {
-                System.out.println(msqT.getCurrent() + " - " + e);
-            }
-
-//            if(msqT.getCurrent() > 35557)
-//                System.out.println(msqT.getCurrent() + " - " + e);
 
             msqT.setNext(eventList.get(e).getT());
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;

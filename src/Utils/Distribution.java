@@ -56,10 +56,10 @@ public class Distribution {
 
     /** Generate the next service time
      * <ul>
-     *  <li>param 0: Rental station</li>
-     *  <li>param 1: Parking station</li>
-     *  <li>param 2: Charging station</li>
-     *  <li>param 3: Route station</li>
+     *  <li>param 0: Noleggio</li>
+     *  <li>param 1: Parcheggio</li>
+     *  <li>param 2: Ricarica</li>
+     *  <li>param 3: Strada</li>
      */
     public double getService(int serviceType) {
         rngs.selectStream(1);

@@ -135,7 +135,7 @@ public class FileCSVGenerator {
                     .map(Path::toFile)
                     .forEach(File::delete);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("No folder to delete\n");
         }
     }
 }

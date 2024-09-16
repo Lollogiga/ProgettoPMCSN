@@ -12,10 +12,10 @@ def finiteSimGraphs():
     finiteParcheggio = resultsPath + "finiteParcheggio.csv"
     finiteRicarica = resultsPath + "finiteRicarica.csv"
 
-    plot_combined_graph(finiteNoleggio, resultsPath + finiteSimFolder, "noleggio.png")
-    plot_combined_graph(finiteStrada, resultsPath + finiteSimFolder, "strada.png")
-    plot_combined_graph(finiteParcheggio, resultsPath + finiteSimFolder, "parcheggio.png")
-    plot_combined_graph(finiteRicarica, resultsPath + finiteSimFolder, "ricarica.png")
+    plot_combined_graph(finiteNoleggio, resultsPath + finiteSimFolder, "noleggio.png", "Noleggio")
+    plot_combined_graph(finiteStrada, resultsPath + finiteSimFolder, "strada.png", "Strada")
+    plot_combined_graph(finiteParcheggio, resultsPath + finiteSimFolder, "parcheggio.png", "Parcheggio")
+    plot_combined_graph(finiteRicarica, resultsPath + finiteSimFolder, "ricarica.png", "Ricarica")
 
 def main():
     finiteSimGraphs()

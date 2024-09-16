@@ -2,6 +2,8 @@ import Controller.Sistema;
 import Libs.Rngs;
 import Utils.FileCSVGenerator;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -22,10 +24,22 @@ public class Main {
         System.out.println("1 - Infinite horizon simulation ");
 
         int simType = getChoice();
-        run(simType);
+        runSim(simType);
+
+        // NON CANCELLARE, è un test per far eseguire lo script python in automatico. Non funziona perché non facciamo la flush sui file una volta terminata la simulazione, o almeno credo che sia per questo motivo
+//        try {
+//            ProcessBuilder pb = new ProcessBuilder("python", "pyGraphs\\main.py");
+//            // Inizia il processo
+//            Process process = pb.start();
+//            int exitCode = process.waitFor();
+//
+//            System.out.println("\n\nProcesso Python terminato con codice di uscita: " + exitCode);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
-    public static void run(int simulationType) throws Exception {
+    public static void runSim(int simulationType) throws Exception {
         Rngs rngs = new Rngs();
 
         switch (simulationType) {

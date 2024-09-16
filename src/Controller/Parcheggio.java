@@ -48,7 +48,7 @@ public class Parcheggio implements Center {
         distr = Distribution.getInstance();
 
         /* Initial servers setup */
-        for (s = 0; s < PARCHEGGIO_SERVER + 2; s++) {
+        for (s = 0; s < 2 + PARCHEGGIO_SERVER; s++) {
             serverList.add(s, new MsqEvent(0, 0));
             sumList.add(s, new MsqSum());
         }
@@ -82,6 +82,8 @@ public class Parcheggio implements Center {
 
             if (e == 0) eventList.getFirst().setT(msqT.getCurrent() + distr.getArrival(1));     /* Get new arrival from exogenous (external) arrival */
 
+            if (e == 1) eventList.get(1).setX(0);
+
             s = MsqEvent.findOne(eventList);    /* Search for an idle Server */
             if (s != -1) {                      /* Found an idle server*/
                 service = distr.getService(1);
@@ -92,7 +94,7 @@ public class Parcheggio implements Center {
 
                 sumList.get(s).incrementService(service);
                 sumList.get(s).incrementServed();
-            } else {/* All servers are busy */
+            } else {        /* All servers are busy */
                 if (this.number - MsqEvent.findActiveServers(eventList) > PARCHEGGIO_MAX_QUEUE) {    /* If the queue is full */
                     this.number--;
 
@@ -105,10 +107,27 @@ public class Parcheggio implements Center {
 
             eventList.get(e).setX(2);       /* Current server is no more usable (e = 2 car is ready to be rented) */
 
-            // TODO: avvisare Noleggio che ho una nuova macchina a disposizione (routing)
+            /* Routing */
+            List<MsqEvent> eventListNoleggio = eventListManager.getServerNoleggio();
+            double timeNoleggio = eventListNoleggio.get(1).getT();
+
+            // Set Noleggio's λ* time to Parcheggio's next server completition
+            int nextEventToComplete = MsqEvent.findNextServerToComplete(eventList);
+            if (nextEventToComplete != -1 && eventList.get(nextEventToComplete).getT() < timeNoleggio) {
+                eventListNoleggio.get(1).setT(eventList.get(nextEventToComplete).getT() + INFINITE_INCREMENT);
+                eventListNoleggio.get(1).setFromParking(true);
+            }
+
+            // Set Noleggio's λ* time to Ricarica's next server completition
+            List<MsqEvent> eventListRicarica = eventListManager.getServerRicarica();
+            int nextEventToCompleteRicarica = MsqEvent.findNextServerToComplete(eventListRicarica);
+            if (nextEventToCompleteRicarica != -1 && eventListRicarica.get(nextEventToCompleteRicarica).getT() < timeNoleggio) {
+                eventListNoleggio.get(1).setT(eventListRicarica.get(nextEventToCompleteRicarica).getT() + INFINITE_INCREMENT);
+                eventListNoleggio.get(1).setFromParking(false);
+            }
         }
 
-        /* Get next Parcheggio's events*/
+        /* Get next Parcheggio's events */
         int nextEvent = MsqEvent.getNextEvent(eventList);
         if (nextEvent == -1)
             eventListManager.getSystemEventsList().get(2).setX(0);

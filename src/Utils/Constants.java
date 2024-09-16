@@ -7,6 +7,9 @@ public class Constants {
 
     public static final int PARCHEGGIO_SERVER = 60;
     public static final int PARCHEGGIO_MAX_QUEUE = 5;
+//    public static final int PARCHEGGIO_MAX_QUEUE = 0; // Test simulation with 0 queue
+//    public static final int PARCHEGGIO_MAX_QUEUE = Integer.MAX_VALUE;
+//    public static final int PARCHEGGIO_MAX_QUEUE = 1;
 
     public static final int RICARICA_SERVER = 15;
     public static final int RICARICA_MAX_QUEUE = 2;
@@ -14,12 +17,12 @@ public class Constants {
     /*  Value of Start and Stop time */
     public static final double START = 0.0;
     public static final double STOP_INF = Double.MAX_VALUE; /* Infinite simulation */
-    public static final double STOP_FIN = 86400; /* Finite simulation -> check every 1 day */
+    public static final double STOP_FIN = 86400 * 365; /* Finite simulation -> check every 1 day */
 
     /* Probabilities */
     public static final double P_RICARICA = 0.1;
-//    public static final double P_LOSS = 0.2;
-    public static final double P_LOSS = 0.0002;
+    public static final double P_LOSS = 0.2;
+//    public static final double P_LOSS = 0.0002;
 
     /* Arrival rate in rental station (users/sec) */
     public static final double LAMBDA = 12 / 60.0 / 60.0;
@@ -37,7 +40,9 @@ public class Constants {
     public static final double MU_STRADA = 2 / 60.0 / 60.0;
 
     /* Exogenous rate */
-    public static final double LAMBDA_EXOGENOUS = 4 / 60.0 / 60.0;
+//    public static final double LAMBDA_EXOGENOUS = 4 / 60.0 / 60.0;
+//    public static final double LAMBDA_EXOGENOUS = 1 / 60.0 / 60.0;
+    public static final double LAMBDA_EXOGENOUS = 3 / 60.0 / 60.0;
 
     /* rental station (time to process renting service) */
     public static final double RENTAL_SERVICE = 1.0 / MU_RENTAL;
@@ -55,8 +60,7 @@ public class Constants {
     public static final int NODES = 4;
 
     /* Seed to use for the simulation */
-//    public static final long SEED = 123456789L;
-    public static final long SEED = 1186174369L;
+    public static final long SEED = 123456789L;
 
     public static final int INIT_PARK_CARS = PARCHEGGIO_SERVER / 2;
 
@@ -78,11 +82,15 @@ public class Constants {
     public static final int B = 1024;
     public static final double ALPHA = 0.05; // Level of confidence = 0.95
 
-    public static final int REPLICATION = 64;
+//    public static final int REPLICATION = 64;
+    public static final int REPLICATION = 1;
 
     /* Center constants for file generation */
     public static final String PARCHEGGIO = "Parcheggio";
     public static final String STRADA = "Strada";
     public static final String NOLEGGIO = "Noleggio";
     public static final String RICARICA = "Ricarica";
+
+    /* Simulation constants */
+    public static final double INFINITE_INCREMENT = 0.01;
 }

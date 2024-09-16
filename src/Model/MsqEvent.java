@@ -140,7 +140,7 @@ public class MsqEvent {
         if (i >= event.size()) return -1;
 
         s = i;
-        while (i < event.size()) {
+        while (i < event.size() - 1) {
             i++;
 
             if((event.get(i).x == 2) && (event.get(i).t < event.get(s).t))
@@ -148,6 +148,26 @@ public class MsqEvent {
         }
 
         return (s);
+    }
+
+    public static int findNextServerToComplete(List<MsqEvent> event) {
+        int s;
+        int i = 2;
+
+        while (i < event.size() && event.get(i).x != 1)
+            i++;
+
+        if (i >= event.size()) return -1;
+
+        s = i;
+        while (i < event.size() - 1) {
+            i++;
+
+            if((event.get(i).getX() == 1) && (event.get(i).t < event.get(s).t))
+                s = i;
+        }
+
+        return s;
     }
 
     public double getT() {

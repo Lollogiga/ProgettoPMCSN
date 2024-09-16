@@ -110,9 +110,16 @@ def delete_all_graphics(input_folder):
                         except Exception as e:
                             print(f"Errore nell'eliminazione del file {file_path}: {e}")
 
-def plot_combined_graph(file_path, img_folder, img_name):
+def plot_combined_graph(file_path, img_folder, img_name, server_name):
     # Carica i dati dal file CSV
-    df = pd.read_csv(file_path, header=None, names=['Run', 'Center', 'Time', 'E[T_S]', 'E[N_S]', 'E[T_Q]', 'E[N_Q]'])
+    df = pd.read_csv(
+        file_path,
+        header=None,
+        names=['Run', 'Center', 'Time', 'E[T_S]', 'E[N_S]', 'E[T_Q]', 'E[N_Q]'],
+        dtype={'Run': 'int', 'Center': 'str', 'Time': 'double', 'E[T_S]': 'double', 'E[N_S]': 'double', 'E[T_Q]': 'double', 'E[N_Q]': 'double'},
+        skiprows=1,
+        low_memory=False
+    )
 
     # Converti le colonne in tipo float
     df['Time'] = pd.to_numeric(df['Time'], errors='coerce')
@@ -136,7 +143,7 @@ def plot_combined_graph(file_path, img_folder, img_name):
     # Configura l'aspetto del grafico
     plt.xlabel('Time (s)')
     plt.ylabel('E[T_S]')
-    plt.title('Time vs E[T_S] for Different Runs')
+    plt.title('Time vs E[T_S] for ' + server_name)
     plt.grid(True)
 
     # Crea la cartella se non esiste
