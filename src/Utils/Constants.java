@@ -18,7 +18,7 @@ public class Constants {
 
     /* Probabilities */
     public static final double P_RICARICA = 0.1;
-    public static final double P_LOSS = 0.2;
+    public static final double P_EXIT = 0.2;
 
     /* Arrival rate in rental station (users/sec) */
     public static final double LAMBDA = 12 / 60.0 / 60.0;

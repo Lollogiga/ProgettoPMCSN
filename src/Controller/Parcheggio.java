@@ -426,7 +426,7 @@ public class Parcheggio implements Center {
     }
 
     @Override
-    public void printIteration(boolean isFinite, int event, int runNumber, double time) {
+    public void printIteration(boolean isFinite, long seed, int event, int runNumber, double time) {
         double responseTime = area / index;
         double avgPopulationInNode = area / msqT.getCurrent();
 
@@ -438,7 +438,7 @@ public class Parcheggio implements Center {
         double waitingTime = area / index;
         double avgPopulationInQueue = area / msqT.getCurrent();
 
-        FileCSVGenerator.writeFile(isFinite, event, runNumber, time, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
+        FileCSVGenerator.writeFile(isFinite, seed, event, runNumber, time, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
     }
 
     @Override

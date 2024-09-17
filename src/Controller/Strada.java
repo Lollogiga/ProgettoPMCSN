@@ -7,7 +7,6 @@ import Model.MsqSum;
 import Model.MsqT;
 import Utils.*;
 
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +97,7 @@ public class Strada implements Center {
             /* Routing */
             s = e;
             double pLoss = rngs.random();
-            if (pLoss < P_LOSS) {   /* Job exit from this system */
+            if (pLoss < P_EXIT) {   /* Job exit from this system */
                 eventListManager.decrementCars();
 
                 rentalProfit.incrementPenalty();    /* In this case, I must pay a penalty */
@@ -200,7 +199,7 @@ public class Strada implements Center {
             /* Routing */
             s = e;
             double pLoss = rngs.random();
-            if (pLoss < P_LOSS) {
+            if (pLoss < P_EXIT) {
                 eventListManager.decrementCars();
 
                 //In this case, I must pay a penalty:
@@ -291,14 +290,14 @@ public class Strada implements Center {
     }
 
     @Override
-    public void printIteration(boolean isFinite, int event, int runNumber, double time) {
+    public void printIteration(boolean isFinite, long seed, int event, int runNumber, double time) {
         double responseTime = area / index;
         double avgPopulationInNode = area / msqT.getCurrent();
 
         double waitingTime = 0;
         double avgPopulationInQueue = 0;
 
-        FileCSVGenerator.writeFile(isFinite, event, runNumber, time, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
+        FileCSVGenerator.writeFile(isFinite, seed, event, runNumber, time, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
     }
 
     @Override

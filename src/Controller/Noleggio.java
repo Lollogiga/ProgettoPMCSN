@@ -539,7 +539,7 @@ public class Noleggio implements Center {
         double waitingTime = area / index;
         double avgPopulationInQueue = area / msqT.getCurrent();
 
-        FileCSVGenerator.writeFile(isFinite, event, runNumber, time, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
+        FileCSVGenerator.writeFile(isFinite, seed, event, runNumber, time, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
     }
 
     @Override
