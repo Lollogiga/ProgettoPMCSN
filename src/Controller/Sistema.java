@@ -109,7 +109,7 @@ public class Sistema {
             if (e < 4) {
                 centerList.get(e).simpleSimulation();
 
-                centerList.get(e).printIteration(true, e, runNumber, msqT.getCurrent());
+                centerList.get(e).printIteration(true, seed, e, runNumber, msqT.getCurrent());
 
                 eventList = eventListManager.getSystemEventsList();
             } else throw new Exception("Invalid event");

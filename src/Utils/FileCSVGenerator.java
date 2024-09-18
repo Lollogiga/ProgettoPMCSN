@@ -90,7 +90,7 @@ public class FileCSVGenerator {
         }
     }
 
-    public static void writeFile(Boolean isFinite, int event, int runNumber, double time, double responseTime, double avgPopulationInNode, double waitingTime, double avgPopulationInQueue) {
+    public static void writeFile(Boolean isFinite, long seed, int event, int runNumber, double time, double responseTime, double avgPopulationInNode, double waitingTime, double avgPopulationInQueue) {
         String center = switch (event) {
             case 0 -> "Noleggio";
             case 1 -> "Ricarica";
@@ -114,9 +114,9 @@ public class FileCSVGenerator {
             FileWriter writer = new FileWriter(file, true); // 'true' for append mode
 
             if(isCreated)
-                writer.write( "Run Index,Center,Time,E[T_S],E[N_S],E[T_Q],E[N_Q]\n");
+                writer.write( "Run Index,Seed,Center,Time,E[T_S],E[N_S],E[T_Q],E[N_Q]\n");
 
-            writer.write(runNumber + "," + center + "," + time + "," + responseTime + "," +
+            writer.write(runNumber + "," + seed + "," + center + "," + time + "," + responseTime + "," +
                     avgPopulationInNode + "," + waitingTime + "," + avgPopulationInQueue + "\n");
 
             writer.close();

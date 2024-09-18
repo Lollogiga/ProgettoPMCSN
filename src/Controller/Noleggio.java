@@ -527,7 +527,7 @@ public class Noleggio implements Center {
     }
 
     @Override
-    public void printIteration(boolean isFinite, int event, int runNumber, double time) {
+    public void printIteration(boolean isFinite, long seed, int event, int runNumber, double time) {
         double responseTime = area / index;
         double avgPopulationInNode = area / msqT.getCurrent();
 
