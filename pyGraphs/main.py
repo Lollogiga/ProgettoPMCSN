@@ -2,6 +2,10 @@ import os
 from graphicDraw import plot_combined_graph
 import distribution
 
+import numpy as np
+from scipy.stats import gamma
+from scipy.optimize import minimize
+
 baseFolder = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
 resultsPath = baseFolder + "/" + "resources/results/"
@@ -19,10 +23,7 @@ def finiteSimGraphs(selected_seeds):
     plot_combined_graph(finiteParcheggio, selected_seeds, resultsPath + finiteSimFolder, "parcheggio.png", "Parcheggio")
     plot_combined_graph(finiteRicarica, selected_seeds, resultsPath + finiteSimFolder, "ricarica.png", "Ricarica")
 
-def main():
-    selected_seeds = [123456789, 382880042, 484764695, 624212696, 719463368, 928379944]  # 6 seeds
-    finiteSimGraphs(selected_seeds)
-
+def findDistribution():
     file_csv = resultsPath + "finiteStradaLambda.csv"
     tasso_medio = distribution.calcola_tasso_arrivo_medio(file_csv)
 
@@ -33,9 +34,17 @@ def main():
     print('')
     distribution.fitterAnalyses(file_csv, resultsPath + finiteSimFolder + distrAnalyses, "fitterAnalyses.png")
 
+    distribution.testKolmogorovSmirnov(file_csv)
+
+def main():
+    selected_seeds = [123456789, 382880042, 484764695, 624212696, 719463368, 928379944]  # 6 seeds
+    finiteSimGraphs(selected_seeds)
+
+    findDistribution()
+
+
     # infiniteSimFolder = "D:\\Projects\\IdeaProjects\\ProgettoPMCSN\\resources\\results\\infinite_horizon"
 
 
 if __name__ == "__main__":
     main()
-

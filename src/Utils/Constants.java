@@ -22,7 +22,7 @@ public class Constants {
 
     /* Arrival rate in rental station (users/sec) */
     public static final double LAMBDA = 12 / 60.0 / 60.0;
-//    public static final double LAMBDA = 60 / 60.0 / 60.0;
+//    public static final double LAMBDA = 1 / 60.0 / 60.0;
 
     /* Service rate in rental station (jobs/sec) */
     public static final double MU_RENTAL = LAMBDA;
