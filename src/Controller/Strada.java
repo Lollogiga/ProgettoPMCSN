@@ -100,8 +100,6 @@ public class Strada implements Center {
             if (pLoss < P_EXIT) {   /* Job exit from this system */
                 eventListManager.decrementCars();
 
-                rentalProfit.incrementPenalty();    /* In this case, I must pay a penalty */
-
                 eventList.get(s).setX(0);           /* Sets the status of the server from which the job started equal to 0 */
 
                 int nextEvent = MsqEvent.getNextEvent(eventList, eventList.size() - 1);
@@ -145,14 +143,13 @@ public class Strada implements Center {
         eventListManager.getSystemEventsList().get(3).setT(eventList.get(nextEvent).getT());
     }
 
-
     /* Infinite horizon simulation */
     @Override
     public void infiniteSimulation() {
         List<MsqEvent> eventList = eventListManager.getServerStrada();
 
         /* no external arrivals, no internal arrivals and no jobs in the server */
-        if (eventList.getFirst().getX() == 0 && eventList.size() == 1) return;
+        if (eventList.getFirst().getX() == 0 && this.number == 0) return;
 
         if ((e = MsqEvent.getNextEvent(eventList, eventList.size() - 1)) >= eventList.size()) return;
         msqT.setNext(eventList.get(e).getT());
@@ -161,6 +158,8 @@ public class Strada implements Center {
 
         if (e == 0) {
             this.number++;
+
+            eventList.getFirst().setX(0);
 
             BatchMeans.incrementJobInBatch();
             jobInBatch++;
@@ -173,13 +172,9 @@ public class Strada implements Center {
                 msqT.setBatchTimer(msqT.getCurrent());
             }
 
-
-            eventList.get(e).setX(0);
-
             service = distr.getService(3);
-            s = MsqEvent.findOne(eventList, eventList.size() - 1);
-
-            if (s == -1 || s >= eventList.size()) {     /* Setup new server */
+            s = MsqEvent.findOne(eventList);
+            if (s == -1) {     /* Setup new server */
                 eventList.add(new MsqEvent(msqT.getCurrent() +  service, 1));
                 sumList.add(new MsqSum(service, 1));
             } else {        /* Set existing server as active */
@@ -199,14 +194,10 @@ public class Strada implements Center {
             /* Routing */
             s = e;
             double pLoss = rngs.random();
-            if (pLoss < P_EXIT) {
+            if (pLoss < P_EXIT) {   /* Job exit from this system */
                 eventListManager.decrementCars();
 
-                //In this case, I must pay a penalty:
-                rentalProfit.incrementPenalty();
-
-                // Sets the status of the server from which the job started equal to 0
-                eventList.get(s).setX(0);
+                eventList.get(s).setX(0);           /* Sets the status of the server from which the job started equal to 0 */
 
                 int nextEvent = MsqEvent.getNextEvent(eventList, eventList.size() - 1);
                 if (nextEvent == -1) {
@@ -215,32 +206,31 @@ public class Strada implements Center {
                 }
 
                 eventListManager.getSystemEventsList().get(3).setT(eventList.get(nextEvent).getT());
-            } else {
-                /* Job stays in this system */
+            } else {                /* Job stays in this system */
                 double pRicarica = rngs.random();
                 if (pRicarica < P_RICARICA) {
                     // Event sent to Ricarica
-                    List<MsqEvent> intQueueRicarica = eventListManager.getIntQueueRicarica();
-                    intQueueRicarica.add(eventList.get(s));
-                    eventListManager.setIntQueueRicarica(intQueueRicarica);
+                    List<MsqEvent> eventListRicarica = eventListManager.getServerRicarica();
+                    eventListRicarica.get(1).setT(eventList.get(s).getT());
+                    eventListRicarica.get(1).setX(1);
 
-                    systemList.get(1).setX(1);
                     systemList.get(1).setT(eventList.get(s).getT());
+                    systemList.get(1).setX(1);
                 } else {
                     // Event sent to Parcheggio
-                    List<MsqEvent> intQueueParcheggio = eventListManager.getIntQueueParcheggio();
-                    intQueueParcheggio.add(eventList.get(s));
-                    eventListManager.setIntQueueParcheggio(intQueueParcheggio);
+                    List<MsqEvent> eventListParchegio = eventListManager.getServerParcheggio();
+                    eventListParchegio.get(1).setT(eventList.get(s).getT());
+                    eventListParchegio.get(1).setX(1);
 
-                    systemList.get(2).setX(1);
                     systemList.get(2).setT(eventList.get(s).getT());
+                    systemList.get(2).setX(1);
                 }
+
                 eventList.get(s).setX(0);   /* Set server as idle */
             }
         }
 
-        eventListManager.setServerStrada(eventList);
-
+        /* Get next Strada's events */
         int nextEvent = MsqEvent.getNextEvent(eventList, eventList.size() - 1);
         if (nextEvent == -1) {
             eventListManager.getSystemEventsList().get(3).setX(0);
@@ -297,7 +287,7 @@ public class Strada implements Center {
         double waitingTime = 0;
         double avgPopulationInQueue = 0;
 
-        FileCSVGenerator.writeFile(isFinite, seed, event, runNumber, time, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
+        FileCSVGenerator.writeRepData(isFinite, seed, event, runNumber, time, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
     }
 
     @Override

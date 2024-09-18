@@ -181,7 +181,7 @@ public class ReplicationStats {
         if (statList.isEmpty())
             throw new IllegalArgumentException("List cannot be empty");
 
-        //Calculate mean (μ)
+        // Calculate mean (μ)
         double mean = 0.0;
         for (double elemento : statList) {
             mean += elemento;
@@ -195,7 +195,7 @@ public class ReplicationStats {
             temp += difference * difference;
         }
 
-        //Calculate standard deviation (σ)
+        // Calculate standard deviation (σ)
         double devStd = Math.sqrt(temp / K);
 
         switch (type) {

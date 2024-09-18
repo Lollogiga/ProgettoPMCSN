@@ -1,10 +1,11 @@
 import os
 from graphicDraw import plot_combined_graph
+from distribution import calcola_tasso_arrivo_medio
 
 baseFolder = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
-resultsPath = baseFolder + "\\" + "resources\\results\\"
-finiteSimFolder = "finiteSimImg\\"
+resultsPath = baseFolder + "/" + "resources/results/"
+finiteSimFolder = "finiteSimImg/"
 
 def finiteSimGraphs(selected_seeds):
     finiteNoleggio = resultsPath + "finiteNoleggio.csv"
@@ -19,8 +20,12 @@ def finiteSimGraphs(selected_seeds):
 
 def main():
     selected_seeds = [123456789, 382880042, 484764695, 624212696, 719463368, 928379944]  # 6 seeds
-    # 322564328,
     finiteSimGraphs(selected_seeds)
+
+    file_csv = resultsPath + "finiteStradaLambda.csv"
+    tasso_medio = calcola_tasso_arrivo_medio(file_csv)
+
+    print(f"Tasso di arrivo medio: {tasso_medio}")
 
     # infiniteSimFolder = "D:\\Projects\\IdeaProjects\\ProgettoPMCSN\\resources\\results\\infinite_horizon"
 

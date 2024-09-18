@@ -107,6 +107,8 @@ public class Sistema {
             msqT.setCurrent(msqT.getNext());
 
             if (e < 4) {
+                if (e == 3) FileCSVGenerator.writeStradaArrival(true, seed, 3, msqT.getCurrent());
+
                 centerList.get(e).simpleSimulation();
 
                 centerList.get(e).printIteration(true, seed, e, runNumber, msqT.getCurrent());

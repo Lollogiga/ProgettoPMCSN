@@ -90,7 +90,7 @@ public class FileCSVGenerator {
         }
     }
 
-    public static void writeFile(Boolean isFinite, long seed, int event, int runNumber, double time, double responseTime, double avgPopulationInNode, double waitingTime, double avgPopulationInQueue) {
+    public static void writeRepData(Boolean isFinite, long seed, int event, int runNumber, double time, double responseTime, double avgPopulationInNode, double waitingTime, double avgPopulationInQueue) {
         String center = switch (event) {
             case 0 -> "Noleggio";
             case 1 -> "Ricarica";
@@ -121,6 +121,40 @@ public class FileCSVGenerator {
 
             writer.close();
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void writeStradaArrival(Boolean isFinite, long seed, int event, double time) {
+        String center = switch (event) {
+            case 0 -> "Noleggio";
+            case 1 -> "Ricarica";
+            case 2 -> "Parcheggio";
+            case 3 -> "Strada";
+            default -> null;
+        };
+
+        if (center == null) return;
+
+        File file = new File(MAIN_PATH + RESULT + ((isFinite) ? "finite" : "infinite") + center + "Lambda.csv");
+
+        try {
+            boolean isCreated = false;
+            if (file.createNewFile()) {
+                System.out.println("File created: " + file.getAbsolutePath());
+                isCreated = true;
+            }
+
+            // Now you can open the file for writing or reading
+            FileWriter writer = new FileWriter(file, true); // 'true' for append mode
+
+            if(isCreated)
+                writer.write( "Seed,Center,Time\n");
+
+            writer.write(seed + "," + center + "," + time +  "\n");
+
+            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
