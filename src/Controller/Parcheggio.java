@@ -105,25 +105,6 @@ public class Parcheggio implements Center {
             this.number--;
 
             eventList.get(e).setX(2);       /* Current server is no more usable (e = 2 car is ready to be rented) */
-
-            /* Routing */
-            List<MsqEvent> eventListNoleggio = eventListManager.getServerNoleggio();
-            double timeNoleggio = eventListNoleggio.get(1).getT();
-
-            // Set Noleggio's λ* time to Parcheggio's next server completition
-            int nextEventToComplete = MsqEvent.findNextServerToComplete(eventList);
-            if (nextEventToComplete != -1 && eventList.get(nextEventToComplete).getT() < timeNoleggio) {
-                eventListNoleggio.get(1).setT(eventList.get(nextEventToComplete).getT() + INFINITE_INCREMENT);
-                eventListNoleggio.get(1).setFromParking(true);
-            }
-
-            // Set Noleggio's λ* time to Ricarica's next server completition
-            List<MsqEvent> eventListRicarica = eventListManager.getServerRicarica();
-            int nextEventToCompleteRicarica = MsqEvent.findNextServerToComplete(eventListRicarica);
-            if (nextEventToCompleteRicarica != -1 && eventListRicarica.get(nextEventToCompleteRicarica).getT() < timeNoleggio) {
-                eventListNoleggio.get(1).setT(eventListRicarica.get(nextEventToCompleteRicarica).getT() + INFINITE_INCREMENT);
-                eventListNoleggio.get(1).setFromParking(false);
-            }
         }
 
         /* Get next Parcheggio's events */

@@ -106,8 +106,12 @@ public class Sistema {
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
             msqT.setCurrent(msqT.getNext());
 
+//            if (msqT.getCurrent() > 27190)
+//                System.out.println(msqT.getCurrent() + " - " + e);
+
             if (e < 4) {
-                if (e == 3) FileCSVGenerator.writeStradaArrival(true, seed, 3, msqT.getCurrent());
+                if (e == 3 && MsqEvent.getNextEvent(eventListManager.getServerStrada()) == 0)
+                    FileCSVGenerator.writeStradaArrival(true, seed, 3, msqT.getCurrent());
 
                 centerList.get(e).simpleSimulation();
 

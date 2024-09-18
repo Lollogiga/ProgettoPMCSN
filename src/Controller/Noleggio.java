@@ -111,7 +111,47 @@ public class Noleggio implements Center {
                 *
                 * Così facendo gestisco tutti e tre i casi!
                 * */
+
                 eventList.get(1).setX(1);
+
+//                // Set Noleggio's λ* time to Parcheggio's next server completition
+                int nextEventToCompleteParcheggio = MsqEvent.findNextServerToComplete(serverParcheggio);
+                int nextEventToCompleteRicarica = MsqEvent.findNextServerToComplete(serverRicarica);
+                if (nextEventToCompleteParcheggio == -1 && nextEventToCompleteRicarica == -1) { // No server to complete, wait for the next arrival
+                    List<MsqEvent> serverStrada = eventListManager.getServerStrada();
+
+                    int nextStrada = MsqEvent.getNextEvent(serverStrada);
+                    int nextRicarica = MsqEvent.getNextEvent(serverRicarica);
+                    int nextParcheggio = MsqEvent.getNextEvent(serverParcheggio);
+
+                    double timeStrada = Double.MAX_VALUE;
+                    double timeRicarica = Double.MAX_VALUE;
+                    double timeParcheggio = Double.MAX_VALUE;
+
+                    if (nextStrada != -1)
+                        timeStrada = serverStrada.get(nextStrada).getT();
+
+                    if (nextRicarica != -1)
+                        timeRicarica = serverRicarica.get(nextRicarica).getT();
+
+                    if (nextParcheggio != -1)
+                        timeParcheggio = serverParcheggio.get(nextParcheggio).getT();
+
+                    double minTime = Math.min(timeStrada, timeParcheggio);
+                    minTime = Math.min(timeRicarica, minTime);
+
+                    eventList.get(1).setT(minTime + INFINITE_INCREMENT);
+                } else if (nextEventToCompleteParcheggio != -1 && nextEventToCompleteRicarica != -1) {
+                    if (serverParcheggio.get(nextEventToCompleteParcheggio).getT() < serverRicarica.get(nextEventToCompleteRicarica).getT()) {
+                        eventList.get(1).setT(serverParcheggio.get(nextEventToCompleteParcheggio).getT() + INFINITE_INCREMENT);
+                    } else {
+                        eventList.get(1).setT(serverRicarica.get(nextEventToCompleteRicarica).getT() + INFINITE_INCREMENT);
+                    }
+                } else if (nextEventToCompleteParcheggio != -1) {
+                    eventList.get(1).setT(serverParcheggio.get(nextEventToCompleteParcheggio).getT() + INFINITE_INCREMENT);
+                } else {
+                    eventList.get(1).setT(serverRicarica.get(nextEventToCompleteRicarica).getT() + INFINITE_INCREMENT);
+                }
 
                 int nextEvent = MsqEvent.getNextEvent(eventList);
                 if (nextEvent == -1) {
