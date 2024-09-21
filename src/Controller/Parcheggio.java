@@ -206,7 +206,7 @@ public class Parcheggio implements Center {
         batchParcheggio.insertAvgPopulationInNode(avgPopulationInNode, nBatch);
         batchParcheggio.insertResponseTime(responseTime, nBatch);
 
-        System.out.println("Parcheggio batch statistics\n\n");
+        System.out.println("\n\nParcheggio batch statistics\n");
         System.out.println("E[N_s]: " + avgPopulationInNode);
         System.out.println("E[T_s]: " + responseTime);
 

@@ -343,7 +343,7 @@ public class Noleggio implements Center {
         double avgPopulationInNode = area / batchDuration;
         double responseTime = area / index;
 
-        System.out.println("Noleggio batch statistics\n\n");
+        System.out.println("\n\nNoleggio batch statistics\n");
         System.out.println("E[N_s]: " + avgPopulationInNode);
         System.out.println("E[T_s]: " + responseTime);
 

@@ -248,7 +248,7 @@ public class Strada implements Center {
         batchStrada.insertAvgPopulationInNode(avgPopulationInNode, nBatch);
         batchStrada.insertResponseTime(responseTime, nBatch);
 
-        System.out.println("Strada batch statistics\n\n");
+        System.out.println("\n\nStrada batch statistics\n");
         System.out.println("E[N_s]: " + avgPopulationInNode);
         System.out.println("E[T_s]: " + responseTime);
 
@@ -262,7 +262,7 @@ public class Strada implements Center {
         double utilization = sum / (batchDuration * eventListManager.getServerStrada().size());
 
         batchStrada.insertUtilization(utilization, nBatch);
-        System.out.println("Rho: " + utilization);
+        System.out.println("Utilization: " + utilization);
 
         /* Reset parameters */
         area = 0;
@@ -359,13 +359,13 @@ public class Strada implements Center {
         System.out.println("\n\nStrada\n");
 
         batchStrada.setStandardDeviation(batchStrada.getWaitingTimeInQueue(), 4);
-        System.out.println("Critical endpoints E[T_Q] =  " + batchStrada.getMeanWaitingTimeInQueue() + " +/- " + critical_value * batchStrada.getStandardDeviation(4) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints E[T_Q] =  " + batchStrada.getMeanWaitingTimeInQueue() / 60 + " +/- " + (critical_value * batchStrada.getStandardDeviation(4) / (Math.sqrt(K - 1))) / 60);
 
         batchStrada.setStandardDeviation(batchStrada.getAvgPopulationInQueue(), 0);
         System.out.println("Critical endpoints E[N_Q] =  " + batchStrada.getMeanPopulationInQueue() + " +/- " + critical_value * batchStrada.getStandardDeviation(0) / (Math.sqrt(K - 1)));
 
         batchStrada.setStandardDeviation(batchStrada.getResponseTime(), 2);
-        System.out.println("Critical endpoints E[T_S] =  " + batchStrada.getMeanResponseTime() + " +/- " + critical_value * batchStrada.getStandardDeviation(2) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints E[T_S] =  " + batchStrada.getMeanResponseTime() / 60 + " +/- " + (critical_value * batchStrada.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);
 
         batchStrada.setStandardDeviation(batchStrada.getAvgPopulationInNode(), 1);
         System.out.println("Critical endpoints E[N_S] =  " + batchStrada.getMeanPopulationInNode() + " +/- " + critical_value * batchStrada.getStandardDeviation(1) / (Math.sqrt(K - 1)));
