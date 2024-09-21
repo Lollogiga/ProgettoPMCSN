@@ -471,13 +471,13 @@ public class Noleggio implements Center {
         System.out.println("\n\nNoleggio\n");
 
         batchNoleggio.setStandardDeviation(batchNoleggio.getWaitingTimeInQueue(), 4);
-        System.out.println("Critical endpoints E[T_Q] =  " + batchNoleggio.getMeanWaitingTimeInQueue() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(4) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints E[T_Q] =  " + batchNoleggio.getMeanWaitingTimeInQueue() / 60 + " +/- " + (critical_value * batchNoleggio.getStandardDeviation(4) / (Math.sqrt(K - 1))) / 60);
 
         batchNoleggio.setStandardDeviation(batchNoleggio.getAvgPopulationInQueue(), 0);
         System.out.println("Critical endpoints E[N_Q] =  " + batchNoleggio.getMeanPopulationInQueue() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(0) / (Math.sqrt(K - 1)));
 
         batchNoleggio.setStandardDeviation(batchNoleggio.getResponseTime(), 2);
-        System.out.println("Critical endpoints E[T_S] =  " + batchNoleggio.getMeanResponseTime() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(2) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints E[T_S] =  " + batchNoleggio.getMeanResponseTime() / 60 + " +/- " + (critical_value * batchNoleggio.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);
 
         batchNoleggio.setStandardDeviation(batchNoleggio.getAvgPopulationInNode(), 1);
         System.out.println("Critical endpoints E[N_S] =  " + batchNoleggio.getMeanPopulationInNode() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(1) / (Math.sqrt(K - 1)));

@@ -335,13 +335,13 @@ public class Ricarica implements Center {
         System.out.println("\n\nRicarica\n");
 
         batchRicarica.setStandardDeviation(batchRicarica.getWaitingTimeInQueue(), 4);
-        System.out.println("Critical endpoints E[T_Q] =  " + batchRicarica.getMeanWaitingTimeInQueue() + " +/- " + critical_value * batchRicarica.getStandardDeviation(4) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints E[T_Q] =  " + batchRicarica.getMeanWaitingTimeInQueue() / 60 + " +/- " + critical_value * batchRicarica.getStandardDeviation(4) / (Math.sqrt(K - 1)));
 
         batchRicarica.setStandardDeviation(batchRicarica.getAvgPopulationInQueue(), 0);
         System.out.println("Critical endpoints E[N_Q] =  " + batchRicarica.getMeanPopulationInQueue() + " +/- " + critical_value * batchRicarica.getStandardDeviation(0) / (Math.sqrt(K - 1)));
 
         batchRicarica.setStandardDeviation(batchRicarica.getResponseTime(), 2);
-        System.out.println("Critical endpoints E[T_S] =  " + batchRicarica.getMeanResponseTime() + " +/- " + critical_value * batchRicarica.getStandardDeviation(2) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints E[T_S] =  " + batchRicarica.getMeanResponseTime() / 60 + " +/- " + critical_value * batchRicarica.getStandardDeviation(2) / (Math.sqrt(K - 1)));
 
         batchRicarica.setStandardDeviation(batchRicarica.getAvgPopulationInNode(), 1);
         System.out.println("Critical endpoints E[N_S] =  " + batchRicarica.getMeanPopulationInNode() + " +/- " + critical_value * batchRicarica.getStandardDeviation(1) / (Math.sqrt(K - 1)));

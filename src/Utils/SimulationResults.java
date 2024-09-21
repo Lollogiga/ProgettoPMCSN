@@ -199,7 +199,7 @@ public class SimulationResults {
         switch (type) {
             case 0:
                 setMeanPopulationInQueue(mean);
-                setDevPopulationInNode(devStd);
+                setDevPopulationInQueue(devStd);
                 break;
             case 1:
                 setMeanPopulationInNode(mean);
