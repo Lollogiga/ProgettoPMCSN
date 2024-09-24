@@ -6,10 +6,12 @@ public class Constants {
     public static final int STRADA_SERVER = Integer.MAX_VALUE; // Infinite server
 
     public static final int PARCHEGGIO_SERVER = 60;
-    public static final int PARCHEGGIO_MAX_QUEUE = 5;
+    //public static final int PARCHEGGIO_MAX_QUEUE = 5;
+    public static final int PARCHEGGIO_MAX_QUEUE = 0;
 
     public static final int RICARICA_SERVER = 15;
-    public static final int RICARICA_MAX_QUEUE = 2;
+    //public static final int RICARICA_MAX_QUEUE = 2;
+    public static final int RICARICA_MAX_QUEUE = 0;
 
     /*  Value of Start and Stop time */
     public static final double START = 0.0;
@@ -58,8 +60,8 @@ public class Constants {
     /* Seed to use for the simulation */
     public static final long SEED = 123456789L;
 
-    public static final int INIT_PARK_CARS = PARCHEGGIO_SERVER / 2;
-
+    //public static final int INIT_PARK_CARS = PARCHEGGIO_SERVER / 2;
+    public static final int INIT_PARK_CARS = 0;
 
     /* Cost constants */
     public static final int CAR_COST = 5; /* Yen/hour for each car */

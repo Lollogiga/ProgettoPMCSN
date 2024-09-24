@@ -336,12 +336,6 @@ public class Strada implements Center {
 
         System.out.println("\n\nStrada\n");
 
-        repStrada.setStandardDeviation(repStrada.getWaitingTimeInQueue(), 4);
-        System.out.println("Critical endpoints E[T_Q] =  " + repStrada.getMeanWaitingTimeInQueue() + " +/- " + critical_value * repStrada.getStandardDeviation(4) / (Math.sqrt(K - 1)));
-
-        repStrada.setStandardDeviation(repStrada.getAvgPopulationInQueue(), 0);
-        System.out.println("Critical endpoints E[N_Q] =  " + repStrada.getMeanPopulationInQueue() + " +/- " + critical_value * repStrada.getStandardDeviation(0) / (Math.sqrt(K - 1)));
-
         repStrada.setStandardDeviation(repStrada.getResponseTime(), 2);
         System.out.println("Critical endpoints E[T_S] =  " + repStrada.getMeanResponseTime() + " +/- " + critical_value * repStrada.getStandardDeviation(2) / (Math.sqrt(K - 1)));
 
@@ -357,12 +351,6 @@ public class Strada implements Center {
         double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
 
         System.out.println("\n\nStrada\n");
-
-        batchStrada.setStandardDeviation(batchStrada.getWaitingTimeInQueue(), 4);
-        System.out.println("Critical endpoints E[T_Q] =  " + batchStrada.getMeanWaitingTimeInQueue() / 60 + " +/- " + (critical_value * batchStrada.getStandardDeviation(4) / (Math.sqrt(K - 1))) / 60);
-
-        batchStrada.setStandardDeviation(batchStrada.getAvgPopulationInQueue(), 0);
-        System.out.println("Critical endpoints E[N_Q] =  " + batchStrada.getMeanPopulationInQueue() + " +/- " + critical_value * batchStrada.getStandardDeviation(0) / (Math.sqrt(K - 1)));
 
         batchStrada.setStandardDeviation(batchStrada.getResponseTime(), 2);
         System.out.println("Critical endpoints E[T_S] =  " + batchStrada.getMeanResponseTime() / 60 + " +/- " + (critical_value * batchStrada.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);

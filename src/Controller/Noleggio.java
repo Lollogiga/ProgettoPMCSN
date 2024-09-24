@@ -220,6 +220,7 @@ public class Noleggio implements Center {
     @Override
     public void infiniteSimulation() {
         eventList = eventListManager.getServerNoleggio();
+        rentalProfit = RentalProfit.getInstance();
 
         /* Exit condition : There are no external or internal arrivals, and I haven't processing job. */
         if (eventList.getFirst().getX() == 0 && eventList.size() == 1) return;
@@ -260,7 +261,9 @@ public class Noleggio implements Center {
             sR = MsqEvent.findAvailableCar(serverRicarica);
 
             if (sP == -1 && sR == -1) {     /* No car available */
+                //If there is a user, I would like to serve him. I have to pay a penalty if I can't.
                 rentalProfit.incrementPenalty();
+
                 /*
                  * Non ho macchine disponibili
                  * Il prossimo evento può essere:
@@ -273,7 +276,47 @@ public class Noleggio implements Center {
                  *
                  * Così facendo gestisco tutti e tre i casi!
                  * */
+
                 eventList.get(1).setX(1);
+
+//                // Set Noleggio's λ* time to Parcheggio's next server completition
+                int nextEventToCompleteParcheggio = MsqEvent.findNextServerToComplete(serverParcheggio);
+                int nextEventToCompleteRicarica = MsqEvent.findNextServerToComplete(serverRicarica);
+                if (nextEventToCompleteParcheggio == -1 && nextEventToCompleteRicarica == -1) { // No server to complete, wait for the next arrival
+                    List<MsqEvent> serverStrada = eventListManager.getServerStrada();
+
+                    int nextStrada = MsqEvent.getNextEvent(serverStrada);
+                    int nextRicarica = MsqEvent.getNextEvent(serverRicarica);
+                    int nextParcheggio = MsqEvent.getNextEvent(serverParcheggio);
+
+                    double timeStrada = Double.MAX_VALUE;
+                    double timeRicarica = Double.MAX_VALUE;
+                    double timeParcheggio = Double.MAX_VALUE;
+
+                    if (nextStrada != -1)
+                        timeStrada = serverStrada.get(nextStrada).getT();
+
+                    if (nextRicarica != -1)
+                        timeRicarica = serverRicarica.get(nextRicarica).getT();
+
+                    if (nextParcheggio != -1)
+                        timeParcheggio = serverParcheggio.get(nextParcheggio).getT();
+
+                    double minTime = Math.min(timeStrada, timeParcheggio);
+                    minTime = Math.min(timeRicarica, minTime);
+
+                    eventList.get(1).setT(minTime + INFINITE_INCREMENT);
+                } else if (nextEventToCompleteParcheggio != -1 && nextEventToCompleteRicarica != -1) {
+                    if (serverParcheggio.get(nextEventToCompleteParcheggio).getT() < serverRicarica.get(nextEventToCompleteRicarica).getT()) {
+                        eventList.get(1).setT(serverParcheggio.get(nextEventToCompleteParcheggio).getT() + INFINITE_INCREMENT);
+                    } else {
+                        eventList.get(1).setT(serverRicarica.get(nextEventToCompleteRicarica).getT() + INFINITE_INCREMENT);
+                    }
+                } else if (nextEventToCompleteParcheggio != -1) {
+                    eventList.get(1).setT(serverParcheggio.get(nextEventToCompleteParcheggio).getT() + INFINITE_INCREMENT);
+                } else {
+                    eventList.get(1).setT(serverRicarica.get(nextEventToCompleteRicarica).getT() + INFINITE_INCREMENT);
+                }
 
                 int nextEvent = MsqEvent.getNextEvent(eventList);
                 if (nextEvent == -1) {
@@ -356,17 +399,10 @@ public class Noleggio implements Center {
             sumList.get(i).setService(0);
             sumList.get(i).setServed(0);
         }
-
-        double waitingTimeInQueue = (area - sum) / index;
-        double avgPopulationInQueue = (area - sum) / batchDuration;
         double utilization = sum / (batchDuration * NOLEGGIO_SERVER);
 
-        batchNoleggio.insertWaitingTimeInQueue(waitingTimeInQueue, nBatch);
-        batchNoleggio.insertAvgPopulationInQueue(avgPopulationInQueue, nBatch);
         batchNoleggio.insertUtilization(utilization, nBatch);
 
-        System.out.println("E[T_q]: " + waitingTimeInQueue);
-        System.out.println("E[N_q]: " + avgPopulationInQueue);
         System.out.println("Utilization: " + utilization);
 
         /* Reset parameters */
@@ -417,28 +453,18 @@ public class Noleggio implements Center {
             area -= sumList.get(i).getService();
         }
 
-        double waitingTime = area / index;
-        double avgPopulationInQueue = area / msqT.getCurrent();
-
-        System.out.println("  avg delay .......... = " + waitingTime);
-        System.out.println("  avg # in queue ..... = " + avgPopulationInQueue);
         System.out.println("\tserver\tutilization\t avg service\t share\n");
         for(int i = 1; i == NOLEGGIO_SERVER; i++) {
             System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t" + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t" + f.format(((double)sumList.get(i).getServed() / index)));
         }
         System.out.println("\n");
 
-        if (waitingTime <= 0.0) waitingTime = 0L;
-        if (avgPopulationInQueue <= 0.0) avgPopulationInQueue = 0L;
-
         if (runNumber > 0 && seed > 0)
-            fileCSVGenerator.saveRepResults(NOLEGGIO, runNumber, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
+            fileCSVGenerator.saveRepResults(NOLEGGIO, runNumber, responseTime, avgPopulationInNode, 0, 0);
 
         repNoleggio.insertAvgPopulationInNode(avgPopulationInNode, runNumber - 1);
         repNoleggio.insertUtilization(0.0, runNumber - 1);
         repNoleggio.insertResponseTime(responseTime, runNumber - 1);
-        repNoleggio.insertWaitingTimeInQueue(waitingTime, runNumber - 1);
-        repNoleggio.insertWaitingTimeInQueue(avgPopulationInQueue, runNumber - 1);
     }
 
     @Override
@@ -446,12 +472,6 @@ public class Noleggio implements Center {
         double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
 
         System.out.println("\n\nNoleggio\n");
-
-        repNoleggio.setStandardDeviation(repNoleggio.getWaitingTimeInQueue(), 4);
-        System.out.println("Critical endpoints E[T_Q] =  " + repNoleggio.getMeanWaitingTimeInQueue() + " +/- " + critical_value * repNoleggio.getStandardDeviation(4) / (Math.sqrt(K - 1)));
-
-        repNoleggio.setStandardDeviation(repNoleggio.getAvgPopulationInQueue(), 0);
-        System.out.println("Critical endpoints E[N_Q] =  " + repNoleggio.getMeanPopulationInQueue() + " +/- " + critical_value * repNoleggio.getStandardDeviation(0) / (Math.sqrt(K - 1)));
 
         repNoleggio.setStandardDeviation(repNoleggio.getResponseTime(), 2);
         System.out.println("Critical endpoints E[T_S] =  " + repNoleggio.getMeanResponseTime() + " +/- " + critical_value * repNoleggio.getStandardDeviation(2) / (Math.sqrt(K - 1)));
@@ -469,12 +489,6 @@ public class Noleggio implements Center {
         double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
 
         System.out.println("\n\nNoleggio\n");
-
-        batchNoleggio.setStandardDeviation(batchNoleggio.getWaitingTimeInQueue(), 4);
-        System.out.println("Critical endpoints E[T_Q] =  " + batchNoleggio.getMeanWaitingTimeInQueue() / 60 + " +/- " + (critical_value * batchNoleggio.getStandardDeviation(4) / (Math.sqrt(K - 1))) / 60);
-
-        batchNoleggio.setStandardDeviation(batchNoleggio.getAvgPopulationInQueue(), 0);
-        System.out.println("Critical endpoints E[N_Q] =  " + batchNoleggio.getMeanPopulationInQueue() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(0) / (Math.sqrt(K - 1)));
 
         batchNoleggio.setStandardDeviation(batchNoleggio.getResponseTime(), 2);
         System.out.println("Critical endpoints E[T_S] =  " + batchNoleggio.getMeanResponseTime() / 60 + " +/- " + (critical_value * batchNoleggio.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);
