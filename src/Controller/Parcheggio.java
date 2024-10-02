@@ -27,6 +27,8 @@ public class Parcheggio implements Center {
     int jobInBatch = 0;
     double batchDuration = 0L;
 
+    private long seed = 0L;
+
     private final MsqT msqT = new MsqT();
 
     // λ_ext, λ_int, s_1, s_2, ..., s_n
@@ -224,6 +226,11 @@ public class Parcheggio implements Center {
     @Override
     public int getJobInBatch() {
         return this.jobInBatch;
+    }
+
+    @Override
+    public void setSeed(long seed) {
+        this.seed = seed;
     }
 
     @Override

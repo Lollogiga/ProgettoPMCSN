@@ -1,10 +1,7 @@
 import os
 from graphicDraw import plot_combined_graph
 import distribution
-
-import numpy as np
-from scipy.stats import gamma
-from scipy.optimize import minimize
+import carParkRicMu
 
 baseFolder = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -23,7 +20,7 @@ def finiteSimGraphs(selected_seeds):
     plot_combined_graph(finiteParcheggio, selected_seeds, resultsPath + finiteSimFolder, "parcheggio.png", "Parcheggio")
     plot_combined_graph(finiteRicarica, selected_seeds, resultsPath + finiteSimFolder, "ricarica.png", "Ricarica")
 
-def findDistribution():
+def findDistribution(verbose=True):
     file_csv = resultsPath + "finiteStradaLambda.csv"
     tasso_medio = distribution.calcola_tasso_arrivo_medio(file_csv)
 
@@ -34,16 +31,32 @@ def findDistribution():
     print('')
     distribution.fitterAnalyses(file_csv, resultsPath + finiteSimFolder + distrAnalyses, "fitterAnalyses.png")
 
-    distribution.testKolmogorovSmirnov(file_csv)
+    distribution.testKolmogorovSmirnov(file_csv, verbose)
 
 def main():
     selected_seeds = [123456789, 382880042, 484764695, 624212696, 719463368, 928379944]  # 6 seeds
-    finiteSimGraphs(selected_seeds)
+    if (os.path.exists(resultsPath + "finiteNoleggio.csv") and
+            os.path.exists(resultsPath + "finiteStrada.csv") and
+            os.path.exists(resultsPath + "finiteParcheggio.csv") and
+            os.path.exists(resultsPath + "finiteRicarica.csv")):
+        finiteSimGraphs(selected_seeds)
 
-    findDistribution()
+    if os.path.exists(resultsPath + "finiteStradaLambda.csv"):
+        findDistribution(verbose=False)
 
+    fileCarMu_csv = resultsPath + "infiniteCarMu.csv"
+    if os.path.exists(fileCarMu_csv):
+        mu_parcheggio, mu_ricarica = carParkRicMu.calcola_mu_inf(fileCarMu_csv)
+        print("\nCaso di studio INFINITO")
+        print(f"Tasso mu per la stazione di parcheggio: {mu_parcheggio} job per unità di tempo")
+        print(f"Tasso mu per la stazione di ricarica: {mu_ricarica} job per unità di tempo")
 
-    # infiniteSimFolder = "D:\\Projects\\IdeaProjects\\ProgettoPMCSN\\resources\\results\\infinite_horizon"
+    fileCarMu_csv = resultsPath + "finiteCarMu.csv"
+    if os.path.exists(fileCarMu_csv):
+        mu_parcheggio, mu_ricarica = carParkRicMu.calcola_mu_fin(fileCarMu_csv)
+        print("\nCaso di studio FINITO")
+        print(f"Tasso mu per la stazione di parcheggio: {mu_parcheggio} job per unità di tempo")
+        print(f"Tasso mu per la stazione di ricarica: {mu_ricarica} job per unità di tempo")
 
 
 if __name__ == "__main__":

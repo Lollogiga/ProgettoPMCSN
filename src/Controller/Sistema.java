@@ -87,7 +87,7 @@ public class Sistema {
                 simpleSimulation(seed, runNumber);
                 break;
             case 1:
-                infiniteSimulation();
+                infiniteSimulation(seed);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid simulation choice");
@@ -106,12 +106,13 @@ public class Sistema {
             this.area = this.area + (msqT.getNext() - msqT.getCurrent()) * number;
             msqT.setCurrent(msqT.getNext());
 
-//            if (msqT.getCurrent() > 27190)
-//                System.out.println(msqT.getCurrent() + " - " + e);
-
             if (e < 4) {
-                if (e == 3 && MsqEvent.getNextEvent(eventListManager.getServerStrada()) == 0)
+                centerList.get(e).setSeed(seed);
+
+                // Generate CSV file to calculate Stada's lambda
+                if (e == 3 && MsqEvent.getNextEvent(eventListManager.getServerStrada()) == 0) {
                     FileCSVGenerator.writeStradaArrival(true, seed, 3, msqT.getCurrent());
+                }
 
                 centerList.get(e).simpleSimulation();
 
@@ -130,7 +131,7 @@ public class Sistema {
     }
 
     /* Infinite horizon simulation */
-    public void infiniteSimulation() throws Exception {
+    public void infiniteSimulation(long seed) throws Exception {
         int e;
 
         msqT.setCurrent(START);
@@ -146,6 +147,8 @@ public class Sistema {
             msqT.setCurrent(msqT.getNext());
 
             if (e < 4) {
+                centerList.get(e).setSeed(seed);
+
                 centerList.get(e).infiniteSimulation();
                 eventList = eventListManager.getSystemEventsList();
             } else throw new Exception("Invalid event");

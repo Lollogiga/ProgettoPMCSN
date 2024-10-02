@@ -160,6 +160,30 @@ public class FileCSVGenerator {
         }
     }
 
+    public static void writeTimeCars(Boolean isFinite, long seed, String center, double completionTime, double takenTime) {
+        File file = new File(MAIN_PATH + RESULT + ((isFinite) ? "finite" : "infinite") + "CarMu.csv");
+
+        try {
+            boolean isCreated = false;
+            if (file.createNewFile()) {
+                System.out.println("File created: " + file.getAbsolutePath());
+                isCreated = true;
+            }
+
+            // Now you can open the file for writing or reading
+            FileWriter writer = new FileWriter(file, true); // 'true' for append mode
+
+            if(isCreated)
+                writer.write( "Seed,Center,Completion Time,Taken Time\n");
+
+            writer.write(seed + "," + center + "," + completionTime + "," + takenTime + "\n");
+
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void deleteFolder(String stringPath) {
         Path folderPath = Paths.get(stringPath);
 

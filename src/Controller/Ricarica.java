@@ -27,6 +27,8 @@ public class Ricarica implements Center {
     private final EventListManager eventListManager;
     private final RentalProfit rentalProfit;
 
+    private long seed = 0L;
+
     private final MsqT msqT = new MsqT();
 
     private final List<MsqEvent> serverList = new ArrayList<>(2 + RICARICA_SERVER);
@@ -49,6 +51,7 @@ public class Ricarica implements Center {
             serverList.add(s, new MsqEvent(0, 0));
             sumList.add(s, new MsqSum());
         }
+
 
         // First arrival event (car to charge)
         double arrival = distr.getArrival(2);
@@ -219,6 +222,11 @@ public class Ricarica implements Center {
     @Override
     public int getJobInBatch() {
         return this.jobInBatch;
+    }
+
+    @Override
+    public void setSeed(long seed) {
+        this.seed = seed;
     }
 
     @Override

@@ -15,6 +15,8 @@ public interface Center {
 
     int getJobInBatch();
 
+    void setSeed(long seed);
+
     void printIteration(boolean isFinite, long seed, int event, int runNumber, double time);
 
     void printResult(int runNumber, long seed);

@@ -28,6 +28,8 @@ public class Noleggio implements Center {
     int jobInBatch = 0;
     double batchDuration = 0L;
 
+    private long seed = 0L;
+
     private final MsqT msqT = new MsqT();
 
     // λ_ext, λ_int
@@ -99,22 +101,9 @@ public class Noleggio implements Center {
                 //If there is a user, I would like to serve him. I have to pay a penalty if I can't.
                 rentalProfit.incrementPenalty();
 
-                /*
-                * Non ho macchine disponibili
-                * Il prossimo evento può essere:
-                * - un arrivo esterno di un altro utente
-                * - una macchina che si libera da parcheggio
-                * - una macchina che si libera da ricarica
-                *
-                * Devo impostare il tempo di noleggio in sistema pari all'evento più prossimo? NO!
-                * Mi basta impostare λ* pari a 1
-                *
-                * Così facendo gestisco tutti e tre i casi!
-                * */
-
                 eventList.get(1).setX(1);
 
-//                // Set Noleggio's λ* time to Parcheggio's next server completition
+                // Set Noleggio's λ* time to Parcheggio's next server completition
                 int nextEventToCompleteParcheggio = MsqEvent.findNextServerToComplete(serverParcheggio);
                 int nextEventToCompleteRicarica = MsqEvent.findNextServerToComplete(serverRicarica);
                 if (nextEventToCompleteParcheggio == -1 && nextEventToCompleteRicarica == -1) { // No server to complete, wait for the next arrival
@@ -165,15 +154,29 @@ public class Noleggio implements Center {
             }
 
             if (sP != -1 && sR != -1) {     /* Both parcheggio and ricarica have cars available:  */
-                if (serverParcheggio.get(sP).getT() < serverRicarica.get(sR).getT())    /* Search for the machine that has been waiting the longest*/
+                /* Search for the machine that has been waiting the longest*/
+                if (serverParcheggio.get(sP).getT() < serverRicarica.get(sR).getT()) {
                     eventListManager.getServerParcheggio().get(sP).setX(0);             /* Car in parcheggio rented */
-                else eventListManager.getServerRicarica().get(sR).setX(0);              /* Car in ricarica rented*/
+
+                    if (eventListManager.getServerParcheggio().get(sP).getT() != 0)
+                        FileCSVGenerator.writeTimeCars(true, seed, "Parcheggio", eventListManager.getServerParcheggio().get(sP).getT(), msqT.getCurrent());
+                } else {
+                    eventListManager.getServerRicarica().get(sR).setX(0);              /* Car in ricarica rented*/
+
+                    if (eventListManager.getServerParcheggio().get(sP).getT() != 0)
+                        FileCSVGenerator.writeTimeCars(true, seed, "Ricarica", eventListManager.getServerParcheggio().get(sP).getT(), msqT.getCurrent());
+                }
 
             } else if (sP != -1) {          /* Available cars only in Parcheggio */
                 eventListManager.getServerParcheggio().get(sP).setX(0);
 
+                if (eventListManager.getServerParcheggio().get(sP).getT() != 0)
+                    FileCSVGenerator.writeTimeCars(true, seed, "Parcheggio", eventListManager.getServerParcheggio().get(sP).getT(), msqT.getCurrent());
             } else {                        /* Available cars only in Ricarica */
                 eventListManager.getServerRicarica().get(sR).setX(0);
+
+                if (eventListManager.getServerParcheggio().get(sR).getT() != 0)
+                    FileCSVGenerator.writeTimeCars(true, seed, "Ricarica", eventListManager.getServerParcheggio().get(sR).getT(), msqT.getCurrent());
             }
 
             service = distr.getService(0);
@@ -264,22 +267,9 @@ public class Noleggio implements Center {
                 //If there is a user, I would like to serve him. I have to pay a penalty if I can't.
                 rentalProfit.incrementPenalty();
 
-                /*
-                 * Non ho macchine disponibili
-                 * Il prossimo evento può essere:
-                 * - un arrivo esterno di un altro utente
-                 * - una macchina che si libera da parcheggio
-                 * - una macchina che si libera da ricarica
-                 *
-                 * Devo impostare il tempo di noleggio in sistema pari all'evento più prossimo? NO!
-                 * Mi basta impostare λ* pari a 1
-                 *
-                 * Così facendo gestisco tutti e tre i casi!
-                 * */
-
                 eventList.get(1).setX(1);
 
-//                // Set Noleggio's λ* time to Parcheggio's next server completition
+                // Set Noleggio's λ* time to Parcheggio's next server completition
                 int nextEventToCompleteParcheggio = MsqEvent.findNextServerToComplete(serverParcheggio);
                 int nextEventToCompleteRicarica = MsqEvent.findNextServerToComplete(serverRicarica);
                 if (nextEventToCompleteParcheggio == -1 && nextEventToCompleteRicarica == -1) { // No server to complete, wait for the next arrival
@@ -330,15 +320,28 @@ public class Noleggio implements Center {
             }
 
             if (sP != -1 && sR != -1) {     /* Both parcheggio and ricarica have cars available:  */
-                if (serverParcheggio.get(sP).getT() < serverRicarica.get(sR).getT())    /* Search for the machine that has been waiting the longest*/
+                if (serverParcheggio.get(sP).getT() < serverRicarica.get(sR).getT()) {   /* Search for the machine that has been waiting the longest*/
                     eventListManager.getServerParcheggio().get(sP).setX(0);             /* Car in parcheggio rented */
-                else eventListManager.getServerRicarica().get(sR).setX(0);              /* Car in ricarica rented*/
+
+                    if (eventListManager.getServerParcheggio().get(sP).getT() != 0)
+                        FileCSVGenerator.writeTimeCars(false, seed, "Parcheggio", eventListManager.getServerParcheggio().get(sP).getT(), msqT.getCurrent());
+                } else {
+                    eventListManager.getServerRicarica().get(sR).setX(0);              /* Car in ricarica rented*/
+
+                    if (eventListManager.getServerParcheggio().get(sP).getT() != 0)
+                        FileCSVGenerator.writeTimeCars(false, seed, "Ricarica", eventListManager.getServerParcheggio().get(sP).getT(), msqT.getCurrent());
+                }
 
             } else if (sP != -1) {          /* Available cars only in Parcheggio */
                 eventListManager.getServerParcheggio().get(sP).setX(0);
 
+                if (eventListManager.getServerParcheggio().get(sP).getT() != 0)
+                    FileCSVGenerator.writeTimeCars(false, seed, "Parcheggio", eventListManager.getServerParcheggio().get(sP).getT(), msqT.getCurrent());
             } else {                        /* Available cars only in Ricarica */
                 eventListManager.getServerRicarica().get(sR).setX(0);
+
+                if (eventListManager.getServerParcheggio().get(sR).getT() != 0)
+                    FileCSVGenerator.writeTimeCars(false, seed, "Ricarica", eventListManager.getServerParcheggio().get(sP).getT(), msqT.getCurrent());
             }
 
             service = distr.getService(0);
@@ -418,6 +421,11 @@ public class Noleggio implements Center {
     @Override
     public int getJobInBatch() {
         return this.jobInBatch;
+    }
+
+    @Override
+    public void setSeed(long seed) {
+        this.seed = seed;
     }
 
     @Override

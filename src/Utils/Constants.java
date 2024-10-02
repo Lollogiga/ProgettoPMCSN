@@ -7,11 +7,11 @@ public class Constants {
 
     public static final int PARCHEGGIO_SERVER = 60;
     //public static final int PARCHEGGIO_MAX_QUEUE = 5;
-    public static final int PARCHEGGIO_MAX_QUEUE = 0;
+    public static final int PARCHEGGIO_MAX_QUEUE = Integer.MAX_VALUE;
 
     public static final int RICARICA_SERVER = 15;
     //public static final int RICARICA_MAX_QUEUE = 2;
-    public static final int RICARICA_MAX_QUEUE = 0;
+    public static final int RICARICA_MAX_QUEUE = Integer.MAX_VALUE;
 
     /*  Value of Start and Stop time */
     public static final double START = 0.0;
@@ -30,8 +30,7 @@ public class Constants {
     public static final double MU_RENTAL = LAMBDA;
 
     /* Service rate (jobs/sec), 37,5 parked cars in one hour */
-    public static final double MU_PARKING = 37.5 / 60.0 / 60.0;
-
+    public static final double MU_PARKING = 37.5 / 60.0 / 60.0;;
     /* Charging rate (jobs/sec), one battery is fully charged in 45 minutes */
     public static final double MU_CHARGING = 1.33 / 60.0 / 60.0;
 
@@ -61,7 +60,7 @@ public class Constants {
     public static final long SEED = 123456789L;
 
     //public static final int INIT_PARK_CARS = PARCHEGGIO_SERVER / 2;
-    public static final int INIT_PARK_CARS = 0;
+    public static final int INIT_PARK_CARS = 60;
 
     /* Cost constants */
     public static final int CAR_COST = 5; /* Yen/hour for each car */
@@ -91,4 +90,5 @@ public class Constants {
 
     /* Simulation constants */
     public static final double INFINITE_INCREMENT = 0.01;
+
 }

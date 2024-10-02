@@ -92,7 +92,7 @@ def exponentialAnalyses(file_csv, img_folder, img_name):
     plt.savefig(output_path)
     plt.close()
 
-def testKolmogorovSmirnov(file_csv):
+def testKolmogorovSmirnov(file_csv, verbose=True):
     # Legge il file CSV
     df = pd.read_csv(file_csv)
 
@@ -150,6 +150,9 @@ def testKolmogorovSmirnov(file_csv):
         ks_results[distribuzione] = kstest_result
 
         # Stampa i risultati
+        if not verbose:
+            return
+
         for distribuzione, result in ks_results.items():
             print(f"Test di Kolmogorov-Smirnov per distribuzione {distribuzione}: {result}")
 

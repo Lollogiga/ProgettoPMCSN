@@ -29,6 +29,8 @@ public class Strada implements Center {
     int jobInBatch = 0;
     double batchDuration = 0L;
 
+    private long seed = 0L;
+
     private final MsqT msqT = new MsqT();
 
     private final List<MsqEvent> serverList = new ArrayList<>(1);
@@ -277,6 +279,11 @@ public class Strada implements Center {
     @Override
     public int getJobInBatch() {
         return this.jobInBatch;
+    }
+
+    @Override
+    public void setSeed(long seed) {
+        this.seed = seed;
     }
 
     @Override
