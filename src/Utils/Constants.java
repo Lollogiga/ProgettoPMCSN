@@ -36,7 +36,6 @@ public class Constants {
     public static final double MU_STRADA = 2 / 60.0 / 60.0;
 
     /* Exogenous rate */
-//    public static final double LAMBDA_EXOGENOUS = 4 / 60.0 / 60.0; // Seems not working... System explode
     public static final double LAMBDA_EXOGENOUS = 3 / 60.0 / 60.0;
 
     /* rental station (time to process renting service) */
@@ -57,7 +56,6 @@ public class Constants {
     /* Seed to use for the simulation */
     public static final long SEED = 123456789L;
 
-    //public static final int INIT_PARK_CARS = PARCHEGGIO_SERVER / 2;
     public static final int INIT_PARK_CARS = 0;
 
     /* Cost constants */

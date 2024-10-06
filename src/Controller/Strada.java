@@ -261,7 +261,7 @@ public class Strada implements Center {
             sumList.get(i).setServed(0);
         }
 
-        double utilization = sum / (batchDuration * eventListManager.getServerStrada().size());
+        double utilization = sum / (batchDuration * (eventListManager.getServerStrada().size() - 1));
 
         batchStrada.insertUtilization(utilization, nBatch);
         System.out.println("Utilization: " + utilization);

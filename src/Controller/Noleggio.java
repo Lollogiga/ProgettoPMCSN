@@ -402,7 +402,7 @@ public class Noleggio implements Center {
             sumList.get(i).setService(0);
             sumList.get(i).setServed(0);
         }
-        double utilization = sum / (batchDuration * eventListManager.getServerNoleggio().size());
+        double utilization = sum / (batchDuration * (eventListManager.getServerNoleggio().size() - 2));
 
         batchNoleggio.insertUtilization(utilization, nBatch);
 
@@ -434,7 +434,7 @@ public class Noleggio implements Center {
         double avgPopulationInNode = area / msqT.getCurrent();
 
         double area = this.area;
-        for(int i = 1; i < eventListManager.getServerNoleggio().size(); i++) {
+        for(int i = 2; i < eventListManager.getServerNoleggio().size(); i++) {
             area -= sumList.get(i).getService();
         }
 
@@ -457,12 +457,12 @@ public class Noleggio implements Center {
         System.out.println("  avg wait ........... = " + responseTime);
         System.out.println("  avg # in node ...... = " + avgPopulationInNode);
 
-        for(int i = 1; i == NOLEGGIO_SERVER; i++) {
+        for(int i = 2; i == eventListManager.getServerNoleggio().size(); i++) {
             area -= sumList.get(i).getService();
         }
 
         System.out.println("\tserver\tutilization\t avg service\t share\n");
-        for(int i = 1; i == NOLEGGIO_SERVER; i++) {
+        for(int i = 2; i == eventListManager.getServerNoleggio().size(); i++) {
             System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t" + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t" + f.format(((double)sumList.get(i).getServed() / index)));
         }
         System.out.println("\n");

@@ -72,6 +72,7 @@ public class Parcheggio implements Center {
         if (eventList.getFirst().getX() == 0 && eventList.get(1).getX() == 0 && this.number == 0) return;
 
         if ((e = MsqEvent.getNextEvent(eventList)) == -1) return;
+
         msqT.setNext(eventList.get(e).getT());
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
@@ -125,6 +126,7 @@ public class Parcheggio implements Center {
         if (eventList.getFirst().getX() == 0 && eventList.get(1).getX() == 0 && this.number == 0) return;
 
         if ((e = MsqEvent.getNextEvent(eventList)) == -1) return;
+
         msqT.setNext(eventList.get(e).getT());
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
@@ -190,10 +192,10 @@ public class Parcheggio implements Center {
 
         System.out.println("\n\nParcheggio batch statistics\n");
         System.out.println("E[N_s]: " + avgPopulationInNode);
-        System.out.println("E[T_s]: " + responseTime);
+        System.out.println("E[T_s]: " + responseTime / 60);
 
         double sum = 0;
-        for(int i = 1; i <= PARCHEGGIO_SERVER; i++) {
+        for(int i = 2; i < PARCHEGGIO_SERVER + 2; i++) {
             sum += sumList.get(i).getService();
             sumList.get(i).setService(0);
             sumList.get(i).setServed(0);
@@ -201,9 +203,9 @@ public class Parcheggio implements Center {
 
         double utilization = sum / (batchDuration * PARCHEGGIO_SERVER);
 
-        System.out.println("Utilization: " + utilization);
-
         batchParcheggio.insertUtilization(utilization, nBatch);
+
+        System.out.println("Utilization: " + utilization);
 
         fileCSVGenerator.saveBatchResults(nBatch, avgPopulationInNode);
 
@@ -232,13 +234,8 @@ public class Parcheggio implements Center {
         double responseTime = area / index;
         double avgPopulationInNode = area / msqT.getCurrent();
 
-        double area = this.area;
-        for(int i = 1; i == PARCHEGGIO_SERVER; i++) {
-            area -= sumList.get(i).getService();
-        }
-
-        double waitingTime = area / index;
-        double avgPopulationInQueue = area / msqT.getCurrent();
+        double waitingTime = 0;
+        double avgPopulationInQueue = 0;
 
         FileCSVGenerator.writeRepData(isFinite, seed, event, runNumber, time, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
     }
@@ -256,25 +253,23 @@ public class Parcheggio implements Center {
         System.out.println("  avg wait ........... = " + responseTime);
         System.out.println("  avg # in node ...... = " + avgPopulationInNode);
 
-        for(int i = 1; i <= PARCHEGGIO_SERVER; i++) {
+        for(int i = 2; i <= PARCHEGGIO_SERVER + 1; i++) {
             area -= sumList.get(i).getService();
         }
 
         double waitingTime = area / index;
         double avgPopulationInQueue = area / msqT.getCurrent();
-        System.out.println("  avg delay .......... = " + waitingTime);
-        System.out.println("  avg # in queue ..... = " + avgPopulationInQueue);
 
         double meanUtilization = 0;
         System.out.println("\nthe server statistics are:\n\n");
         System.out.println("\tserver\tutilization\t avg service\t share\n");
-        for(int i = 1; i <= PARCHEGGIO_SERVER; i++) {
-            System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t " + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t " + f.format(((double) sumList.get(i).getServed() / index)));
+        for(int i = 2; i <= PARCHEGGIO_SERVER + 1; i++) {
+            System.out.println("\t" + (i-1) + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t " + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t " + f.format(((double) sumList.get(i).getServed() / index)));
             meanUtilization += (sumList.get(i).getService() / msqT.getCurrent());
         }
         System.out.println("\n");
 
-        meanUtilization = meanUtilization / (PARCHEGGIO_SERVER - 1);
+        meanUtilization = meanUtilization / PARCHEGGIO_SERVER;
 
         if (waitingTime <= 0.0) waitingTime = 0L;
         if (avgPopulationInQueue <= 0.0) avgPopulationInQueue = 0L;
