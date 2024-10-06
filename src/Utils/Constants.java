@@ -1,17 +1,15 @@
 package Utils;
 
 public class Constants {
-    /*  Number of servers in each center  */
-    public static final int NOLEGGIO_SERVER = Integer.MAX_VALUE; // Infinite server
-    public static final int STRADA_SERVER = Integer.MAX_VALUE; // Infinite server
-
+    /* Number of servers in each center */
     public static final int PARCHEGGIO_SERVER = 60;
-    public static final int PARCHEGGIO_MAX_QUEUE = 0;
-
     public static final int RICARICA_SERVER = 15;
+
+    /* Max capacity of the queue */
+    public static final int PARCHEGGIO_MAX_QUEUE = 0;
     public static final int RICARICA_MAX_QUEUE = 0;
 
-    /*  Value of Start and Stop time */
+    /* Value of Start and Stop time */
     public static final double START = 0.0;
     public static final double STOP_INF = Double.MAX_VALUE; /* Infinite simulation */
     public static final double STOP_FIN = 86400; /* Finite simulation -> check every 1 day */

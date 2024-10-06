@@ -335,14 +335,14 @@ public class Noleggio implements Center {
             } else if (sP != -1) {          /* Available cars only in Parcheggio */
                 eventListManager.getServerParcheggio().get(sP).setX(0);
 
-                if (eventListManager.getServerParcheggio().get(sP).getT() != 0)
+                /*if (eventListManager.getServerParcheggio().get(sP).getT() != 0)
                     FileCSVGenerator.writeTimeCars(false, seed, "Parcheggio", eventListManager.getServerParcheggio().get(sP).getT(), msqT.getCurrent());
-            } else {                        /* Available cars only in Ricarica */
+            */} else {                        /* Available cars only in Ricarica */
                 eventListManager.getServerRicarica().get(sR).setX(0);
 
-                if (eventListManager.getServerParcheggio().get(sR).getT() != 0)
+                /*if (eventListManager.getServerParcheggio().get(sR).getT() != 0)
                     FileCSVGenerator.writeTimeCars(false, seed, "Ricarica", eventListManager.getServerParcheggio().get(sP).getT(), msqT.getCurrent());
-            }
+            */}
 
             service = distr.getService(0);
             s = MsqEvent.findOne(eventList);
@@ -433,13 +433,8 @@ public class Noleggio implements Center {
         double responseTime = area / index;
         double avgPopulationInNode = area / msqT.getCurrent();
 
-        double area = this.area;
-        for(int i = 2; i < eventListManager.getServerNoleggio().size(); i++) {
-            area -= sumList.get(i).getService();
-        }
-
-        double waitingTime = area / index;
-        double avgPopulationInQueue = area / msqT.getCurrent();
+        double waitingTime = 0;
+        double avgPopulationInQueue = 0;
 
         FileCSVGenerator.writeRepData(isFinite, seed, event, runNumber, time, responseTime, avgPopulationInNode, waitingTime, avgPopulationInQueue);
     }
@@ -457,7 +452,7 @@ public class Noleggio implements Center {
         System.out.println("  avg wait ........... = " + responseTime);
         System.out.println("  avg # in node ...... = " + avgPopulationInNode);
 
-        for(int i = 2; i == eventListManager.getServerNoleggio().size(); i++) {
+        for(int i = 2; i < eventListManager.getServerNoleggio().size(); i++) {
             area -= sumList.get(i).getService();
         }
 
@@ -482,7 +477,7 @@ public class Noleggio implements Center {
         System.out.println("\n\nNoleggio\n");
 
         repNoleggio.setStandardDeviation(repNoleggio.getResponseTime(), 2);
-        System.out.println("Critical endpoints E[T_S] =  " + repNoleggio.getMeanResponseTime() + " +/- " + critical_value * repNoleggio.getStandardDeviation(2) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints E[T_S] =  " + repNoleggio.getMeanResponseTime() / 60 + " +/- " + (critical_value * repNoleggio.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);
 
         repNoleggio.setStandardDeviation(repNoleggio.getAvgPopulationInNode(), 1);
         System.out.println("Critical endpoints E[N_S] =  " + repNoleggio.getMeanPopulationInNode() + " +/- " + critical_value * repNoleggio.getStandardDeviation(1) / (Math.sqrt(K - 1)));

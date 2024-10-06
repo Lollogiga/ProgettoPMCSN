@@ -124,6 +124,7 @@ public class Ricarica implements Center {
         if (eventList.getFirst().getX() == 0 && eventList.get(1).getX() == 0 && this.number == 0) return;
 
         if ((e = MsqEvent.getNextEvent(eventList)) == -1) return;
+
         msqT.setNext(eventList.get(e).getT());
         area += (msqT.getNext() - msqT.getCurrent()) * number;
         msqT.setCurrent(msqT.getNext());
@@ -254,8 +255,6 @@ public class Ricarica implements Center {
 
         double waitingTime = area / index;
         double avgPopulationInQueue = area / msqT.getCurrent();
-        System.out.println("  avg delay .......... = " + waitingTime);
-        System.out.println("  avg # in queue ..... = " + avgPopulationInQueue);
 
         double meanUtilization = 0;
         System.out.println("\nthe server statistics are:\n\n");
@@ -265,7 +264,7 @@ public class Ricarica implements Center {
             meanUtilization += (sumList.get(i).getService() / msqT.getCurrent());
         }
 
-        meanUtilization = meanUtilization / (RICARICA_SERVER - 1);
+        meanUtilization = meanUtilization / RICARICA_SERVER;
 
         /* Calculate recharged cost */
         rentalProfit.setRechargeCost((index * RECHARGE_COST));
@@ -292,7 +291,7 @@ public class Ricarica implements Center {
         System.out.println("\n\nRicarica\n");
 
         repRicarica.setStandardDeviation(repRicarica.getResponseTime(), 2);
-        System.out.println("Critical endpoints E[T_S] =  " + repRicarica.getMeanResponseTime() + " +/- " + critical_value * repRicarica.getStandardDeviation(2) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints E[T_S] =  " + repRicarica.getMeanResponseTime() / 60 + " +/- " + (critical_value * repRicarica.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);
 
         repRicarica.setStandardDeviation(repRicarica.getAvgPopulationInNode(), 1);
         System.out.println("Critical endpoints E[N_S] =  " + repRicarica.getMeanPopulationInNode() + " +/- " + critical_value * repRicarica.getStandardDeviation(1) / (Math.sqrt(K - 1)));

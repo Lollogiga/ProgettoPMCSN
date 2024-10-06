@@ -151,7 +151,7 @@ public class Parcheggio implements Center {
             }
 
             s = MsqEvent.findOne(eventList);    /* Search for an idle Server */
-            if (s != -1) {                      /* Found an idle server*/
+            if (s != -1) {                      /* Found an idle server */
                 service = distr.getService(1);
 
                 /* Set server as active */
@@ -291,7 +291,7 @@ public class Parcheggio implements Center {
         System.out.println("\n\nParcheggio\n");
 
         repParcheggio.setStandardDeviation(repParcheggio.getResponseTime(), 2);
-        System.out.println("Critical endpoints E[T_S] =  " + repParcheggio.getMeanResponseTime() + " +/- " + critical_value * repParcheggio.getStandardDeviation(2) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints E[T_S] =  " + repParcheggio.getMeanResponseTime() / 60 + " +/- " + (critical_value * repParcheggio.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);
 
         repParcheggio.setStandardDeviation(repParcheggio.getAvgPopulationInNode(), 1);
         System.out.println("Critical endpoints E[N_S] =  " + repParcheggio.getMeanPopulationInNode() + " +/- " + critical_value * repParcheggio.getStandardDeviation(1) / (Math.sqrt(K - 1)));

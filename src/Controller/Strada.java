@@ -344,7 +344,7 @@ public class Strada implements Center {
         System.out.println("\n\nStrada\n");
 
         repStrada.setStandardDeviation(repStrada.getResponseTime(), 2);
-        System.out.println("Critical endpoints E[T_S] =  " + repStrada.getMeanResponseTime() + " +/- " + critical_value * repStrada.getStandardDeviation(2) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints E[T_S] =  " + repStrada.getMeanResponseTime() / 60 + " +/- " + (critical_value * repStrada.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);
 
         repStrada.setStandardDeviation(repStrada.getAvgPopulationInNode(), 1);
         System.out.println("Critical endpoints E[N_S] =  " + repStrada.getMeanPopulationInNode() + " +/- " + critical_value * repStrada.getStandardDeviation(1) / (Math.sqrt(K - 1)));
