@@ -199,19 +199,13 @@ public class Parcheggio implements Center {
             sumList.get(i).setServed(0);
         }
 
-        double waitingTimeInQueue = (area - sum) / index;
-        double avgPopulationInQueue = (area - sum) / batchDuration;
         double utilization = sum / (batchDuration * PARCHEGGIO_SERVER);
 
-        System.out.println("E[T_q]: " + waitingTimeInQueue);
-        System.out.println("E[N_q]: " + avgPopulationInQueue);
         System.out.println("Utilization: " + utilization);
 
-        batchParcheggio.insertWaitingTimeInQueue(waitingTimeInQueue, nBatch);
-        batchParcheggio.insertAvgPopulationInQueue(avgPopulationInQueue, nBatch);
         batchParcheggio.insertUtilization(utilization, nBatch);
 
-        fileCSVGenerator.saveBatchResults(nBatch, avgPopulationInQueue);
+        fileCSVGenerator.saveBatchResults(nBatch, avgPopulationInNode);
 
         /* Reset parameters */
         area = 0;
@@ -301,12 +295,6 @@ public class Parcheggio implements Center {
 
         System.out.println("\n\nParcheggio\n");
 
-        repParcheggio.setStandardDeviation(repParcheggio.getWaitingTimeInQueue(), 4);
-        System.out.println("Critical endpoints E[T_Q] =  " + repParcheggio.getMeanWaitingTimeInQueue() + " +/- " + critical_value * repParcheggio.getStandardDeviation(4) / (Math.sqrt(K - 1)));
-
-        repParcheggio.setStandardDeviation(repParcheggio.getAvgPopulationInQueue(), 0);
-        System.out.println("Critical endpoints E[N_Q] =  " + repParcheggio.getMeanPopulationInQueue() + " +/- " + critical_value * repParcheggio.getStandardDeviation(0) / (Math.sqrt(K - 1)));
-
         repParcheggio.setStandardDeviation(repParcheggio.getResponseTime(), 2);
         System.out.println("Critical endpoints E[T_S] =  " + repParcheggio.getMeanResponseTime() + " +/- " + critical_value * repParcheggio.getStandardDeviation(2) / (Math.sqrt(K - 1)));
 
@@ -315,7 +303,6 @@ public class Parcheggio implements Center {
 
         repParcheggio.setStandardDeviation(repParcheggio.getUtilization(), 3);
         System.out.println("Critical endpoints rho =  " + repParcheggio.getMeanUtilization() + " +/- " + critical_value * repParcheggio.getStandardDeviation(3) / (Math.sqrt(K - 1)));
-
     }
 
     @Override
@@ -323,12 +310,6 @@ public class Parcheggio implements Center {
         double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
 
         System.out.println("\n\nParcheggio\n");
-
-        batchParcheggio.setStandardDeviation(batchParcheggio.getWaitingTimeInQueue(), 4);
-        System.out.println("Critical endpoints E[T_Q] =  " + batchParcheggio.getMeanWaitingTimeInQueue() / 60 + " +/- " + (critical_value * batchParcheggio.getStandardDeviation(4) / (Math.sqrt(K - 1))) / 60);
-
-        batchParcheggio.setStandardDeviation(batchParcheggio.getAvgPopulationInQueue(), 0);
-        System.out.println("Critical endpoints E[N_Q] =  " + batchParcheggio.getMeanPopulationInQueue() + " +/- " + critical_value * batchParcheggio.getStandardDeviation(0) / (Math.sqrt(K - 1)));
 
         batchParcheggio.setStandardDeviation(batchParcheggio.getResponseTime(), 2);
         System.out.println("Critical endpoints E[T_S] =  " + batchParcheggio.getMeanResponseTime() / 60 + " +/- " + (critical_value * batchParcheggio.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);

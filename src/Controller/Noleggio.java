@@ -397,12 +397,12 @@ public class Noleggio implements Center {
         batchNoleggio.insertResponseTime(responseTime, nBatch);
 
         double sum = 0;
-        for(int i = 1; i == NOLEGGIO_SERVER; i++) {
+        for(int i = 1; i < eventListManager.getServerNoleggio().size(); i++) {
             sum += sumList.get(i).getService();
             sumList.get(i).setService(0);
             sumList.get(i).setServed(0);
         }
-        double utilization = sum / (batchDuration * NOLEGGIO_SERVER);
+        double utilization = sum / (batchDuration * eventListManager.getServerNoleggio().size());
 
         batchNoleggio.insertUtilization(utilization, nBatch);
 
@@ -434,7 +434,7 @@ public class Noleggio implements Center {
         double avgPopulationInNode = area / msqT.getCurrent();
 
         double area = this.area;
-        for(int i = 1; i == NOLEGGIO_SERVER; i++) {
+        for(int i = 1; i < eventListManager.getServerNoleggio().size(); i++) {
             area -= sumList.get(i).getService();
         }
 
