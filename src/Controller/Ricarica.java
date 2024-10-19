@@ -35,11 +35,17 @@ public class Ricarica implements Center {
     private final List<MsqEvent> serverList = new ArrayList<>(2 + RICARICA_SERVER);
     private final List<MsqSum> sumList = new ArrayList<>(2 + RICARICA_SERVER);
 
-    private final ReplicationStats repRicarica = new ReplicationStats();
     private final SimulationResults batchRicarica = new SimulationResults();
     private final Distribution distr;
     private final Rvms rvms = new Rvms();
     private final FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
+
+    /* Singleton types
+    * 0 -> Strada
+    * 1 -> Ricarica
+    * 2 -> Parcheggio
+    * 3 -> Noleggio */
+    private final ReplicationStats repRicarica = ReplicationStats.getInstance(1);
 
     public Ricarica() {
         eventListManager = EventListManager.getInstance();
@@ -245,11 +251,11 @@ public class Ricarica implements Center {
 
         System.out.println("\n\nRicarica\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
-        System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
-        System.out.println("  avg wait ........... = " + responseTime);
+        System.out.println("  avg interarrivals .. = " + (eventListManager.getSystemEventsList().getFirst().getT() / index) / 60);
+        System.out.println("  avg wait ........... = " + responseTime / 60);
         System.out.println("  avg # in node ...... = " + avgPopulationInNode);
 
-        for(int i = 2; i <= RICARICA_SERVER; i++) {
+        for(int i = 2; i < RICARICA_SERVER + 2; i++) {
             area -= sumList.get(i).getService();
         }
 
@@ -259,7 +265,7 @@ public class Ricarica implements Center {
         double meanUtilization = 0;
         System.out.println("\nthe server statistics are:\n\n");
         System.out.println("\tserver\tutilization\t avg service\t share\n");
-        for(int i = 2; i <= RICARICA_SERVER; i++) {
+        for(int i = 2; i < RICARICA_SERVER + 2; i++) {
             System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t " + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t " + f.format(((double)sumList.get(i).getServed() / index)));
             meanUtilization += (sumList.get(i).getService() / msqT.getCurrent());
         }

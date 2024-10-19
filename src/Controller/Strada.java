@@ -36,12 +36,18 @@ public class Strada implements Center {
     private final List<MsqEvent> serverList = new ArrayList<>(1);
     private final List<MsqSum> sumList = new ArrayList<>(1);
 
-    private final ReplicationStats repStrada = new ReplicationStats();
     private final SimulationResults batchStrada = new SimulationResults();
     private final Distribution distr;
     private final Rngs rngs;
     private final Rvms rvms = new Rvms();
     private final FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
+
+    /* Singleton types
+     * 0 -> Strada
+     * 1 -> Ricarica
+     * 2 -> Parcheggio
+     * 3 -> Noleggio */
+    private final ReplicationStats repStrada = ReplicationStats.getInstance(0);
 
     public Strada() {
         eventListManager = EventListManager.getInstance();
@@ -306,8 +312,8 @@ public class Strada implements Center {
 
         System.out.println("\n\nStrada\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
-        System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
-        System.out.println("  avg wait ........... = " + responseTime);
+        System.out.println("  avg interarrivals .. = " + (eventListManager.getSystemEventsList().getFirst().getT() / index) / 60);
+        System.out.println("  avg wait ........... = " + responseTime / 60);
         System.out.println("  avg # in node ...... = " + avgPopulationInNode);
 
         double meanUtilization = 0;

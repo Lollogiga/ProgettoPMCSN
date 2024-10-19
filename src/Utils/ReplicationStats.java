@@ -1,15 +1,15 @@
 package Utils;
 
-import Libs.Rvms;
+import Libs.Rngs;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static Utils.Constants.*;
-import static Utils.Constants.RENTAL_KM_PROFIT;
 
+/* Like a singleton class */
 public class ReplicationStats {
-    /* Lists of batch's values */
+    /* Lists of replication's values */
     private List<Double> avgPopulationInNode;
     private List<Double> responseTime;
     private List<Double> avgPopulationInQueue;
@@ -29,6 +29,35 @@ public class ReplicationStats {
     private double devResponseTime;
     private double devPopulationInNode;
     private double devUtilization;
+
+    /* Singleton instances */
+    public static ReplicationStats repStrada = null;
+    public static ReplicationStats repRicarica = null;
+    public static ReplicationStats repParcheggio = null;
+    public static ReplicationStats repNoleggio = null;
+
+    public static ReplicationStats getInstance(int instanceType) {
+        switch (instanceType) {
+            case 0:
+                if (repStrada == null)
+                    repStrada = new ReplicationStats();
+                return repStrada;
+            case 1:
+                if (repRicarica == null)
+                    repRicarica = new ReplicationStats();
+                return repRicarica;
+            case 2:
+                if (repParcheggio == null)
+                    repParcheggio = new ReplicationStats();
+                return repParcheggio;
+            case 3:
+                if (repNoleggio == null)
+                    repNoleggio = new ReplicationStats();
+                return repNoleggio;
+            default:
+                throw new IllegalArgumentException("Invalid instance type");
+        }
+    }
 
     public ReplicationStats() {
         this.avgPopulationInNode = new ArrayList<>(REPLICATION);
@@ -201,7 +230,7 @@ public class ReplicationStats {
         switch (type) {
             case 0:
                 setMeanPopulationInQueue(mean);
-                setDevPopulationInNode(devStd);
+                setDevPopulationInQueue(devStd);
                 break;
             case 1:
                 setMeanPopulationInNode(mean);

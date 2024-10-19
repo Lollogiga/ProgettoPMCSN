@@ -39,10 +39,15 @@ public class Noleggio implements Center {
     private final Distribution distr;
     private final Rvms rvms = new Rvms();
 
-    private final ReplicationStats repNoleggio = new ReplicationStats();
     private final SimulationResults batchNoleggio = new SimulationResults();
-
     private final FileCSVGenerator fileCSVGenerator = FileCSVGenerator.getInstance();
+
+    /* Singleton types
+     * 0 -> Strada
+     * 1 -> Ricarica
+     * 2 -> Parcheggio
+     * 3 -> Noleggio */
+    private final ReplicationStats repNoleggio = ReplicationStats.getInstance(3);
 
     public Noleggio() {
         this.eventListManager = EventListManager.getInstance();
@@ -397,7 +402,7 @@ public class Noleggio implements Center {
         batchNoleggio.insertResponseTime(responseTime, nBatch);
 
         double sum = 0;
-        for(int i = 1; i < eventListManager.getServerNoleggio().size(); i++) {
+        for(int i = 2; i < eventListManager.getServerNoleggio().size(); i++) {
             sum += sumList.get(i).getService();
             sumList.get(i).setService(0);
             sumList.get(i).setServed(0);
@@ -448,8 +453,8 @@ public class Noleggio implements Center {
 
         System.out.println("\n\nNoleggio\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
-        System.out.println("  avg interarrivals .. = " + eventListManager.getSystemEventsList().getFirst().getT() / index);
-        System.out.println("  avg wait ........... = " + responseTime);
+        System.out.println("  avg interarrivals .. = " + (eventListManager.getSystemEventsList().getFirst().getT() / index) / 60);
+        System.out.println("  avg wait ........... = " + responseTime / 60);
         System.out.println("  avg # in node ...... = " + avgPopulationInNode);
 
         for(int i = 2; i < eventListManager.getServerNoleggio().size(); i++) {

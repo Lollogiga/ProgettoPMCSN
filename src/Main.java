@@ -1,6 +1,7 @@
 import Controller.Sistema;
 import Libs.Rngs;
 import Utils.FileCSVGenerator;
+import Utils.ReplicationStats;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
