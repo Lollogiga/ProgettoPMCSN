@@ -195,8 +195,8 @@ public class Ricarica implements Center {
         batchRicarica.insertResponseTime(responseTime, nBatch);
 
         System.out.println("\n\nRicarica batch statistics\n");
-        System.out.println("E[N_s]: " + avgPopulationInNode);
-        System.out.println("E[T_s]: " + responseTime / 60);
+        System.out.println("E[N_S]: " + avgPopulationInNode);
+        System.out.println("E[T_S]: " + responseTime / 60);
 
         double sum = 0;
         for(int i = 2; i < RICARICA_SERVER + 2; i++) {

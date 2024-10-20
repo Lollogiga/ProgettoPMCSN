@@ -257,8 +257,8 @@ public class Strada implements Center {
         batchStrada.insertResponseTime(responseTime, nBatch);
 
         System.out.println("\n\nStrada batch statistics\n");
-        System.out.println("E[N_s]: " + avgPopulationInNode);
-        System.out.println("E[T_s]: " + responseTime);
+        System.out.println("E[N_S]: " + avgPopulationInNode);
+        System.out.println("E[T_S]: " + responseTime);
 
         double sum = 0;
         for(int i = 1; i < eventListManager.getServerStrada().size(); i++) {

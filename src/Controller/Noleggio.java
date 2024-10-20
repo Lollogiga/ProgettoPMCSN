@@ -395,8 +395,8 @@ public class Noleggio implements Center {
         double responseTime = area / index;
 
         System.out.println("\n\nNoleggio batch statistics\n");
-        System.out.println("E[N_s]: " + avgPopulationInNode);
-        System.out.println("E[T_s]: " + responseTime);
+        System.out.println("E[N_S]: " + avgPopulationInNode);
+        System.out.println("E[T_S]: " + responseTime);
 
         batchNoleggio.insertAvgPopulationInNode(avgPopulationInNode, nBatch);
         batchNoleggio.insertResponseTime(responseTime, nBatch);
@@ -407,10 +407,17 @@ public class Noleggio implements Center {
             sumList.get(i).setService(0);
             sumList.get(i).setServed(0);
         }
+
         double utilization = sum / (batchDuration * (eventListManager.getServerNoleggio().size() - 2));
+        double waitingTime = (area - sum) / index;
+        double populationInQueue = (area - sum) / batchDuration;
 
         batchNoleggio.insertUtilization(utilization, nBatch);
+        batchNoleggio.insertWaitingTimeInQueue(waitingTime, nBatch);
+        batchNoleggio.insertAvgPopulationInQueue(populationInQueue, nBatch);
 
+        System.out.println("E[N_Q]: " + populationInQueue);
+        System.out.println("E[T_Q]: " + waitingTime);
         System.out.println("Utilization: " + utilization);
 
         /* Reset parameters */
@@ -461,15 +468,22 @@ public class Noleggio implements Center {
             area -= sumList.get(i).getService();
         }
 
+        System.out.println("  avg delay .......... =   " + f.format((area / index) / 60));
+        System.out.println("  avg # in queue ..... =   " + f.format(area / msqT.getCurrent()));
         System.out.println("\tserver\tutilization\t avg service\t share\n");
         for(int i = 2; i == eventListManager.getServerNoleggio().size(); i++) {
             System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t" + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t" + f.format(((double)sumList.get(i).getServed() / index)));
         }
         System.out.println("\n");
 
+        double avgPopulationInQueue = area / msqT.getCurrent();
+        double waitingTimeInQueue = area / index;
+
         if (runNumber > 0 && seed > 0)
             fileCSVGenerator.saveRepResults(NOLEGGIO, runNumber, responseTime, avgPopulationInNode, 0, 0);
 
+        repNoleggio.insertWaitingTimeInQueue(waitingTimeInQueue, runNumber - 1);
+        repNoleggio.insertAvgPopulationInQueue(avgPopulationInQueue, runNumber - 1);
         repNoleggio.insertAvgPopulationInNode(avgPopulationInNode, runNumber - 1);
         repNoleggio.insertUtilization(0.0, runNumber - 1);
         repNoleggio.insertResponseTime(responseTime, runNumber - 1);
@@ -480,6 +494,12 @@ public class Noleggio implements Center {
         double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
 
         System.out.println("\n\nNoleggio\n");
+
+        repNoleggio.setStandardDeviation(repNoleggio.getWaitingTimeInQueue(), 4);
+        System.out.println("Critical endpoints E[T_Q] =  " + repNoleggio.getMeanWaitingTimeInQueue() / 60 + " +/- " + (critical_value * repNoleggio.getStandardDeviation(4) / (Math.sqrt(K - 1))) / 60);
+
+        repNoleggio.setStandardDeviation(repNoleggio.getAvgPopulationInQueue(), 0);
+        System.out.println("Critical endpoints E[N_Q] =  " + repNoleggio.getMeanPopulationInQueue() + " +/- " + (critical_value * repNoleggio.getStandardDeviation(0) / (Math.sqrt(K - 1))));
 
         repNoleggio.setStandardDeviation(repNoleggio.getResponseTime(), 2);
         System.out.println("Critical endpoints E[T_S] =  " + repNoleggio.getMeanResponseTime() / 60 + " +/- " + (critical_value * repNoleggio.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);
@@ -497,6 +517,12 @@ public class Noleggio implements Center {
         double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
 
         System.out.println("\n\nNoleggio\n");
+
+        batchNoleggio.setStandardDeviation(batchNoleggio.getWaitingTimeInQueue(), 4);
+        System.out.println("Critical endpoints E[T_Q] =  " + batchNoleggio.getMeanWaitingTimeInQueue() / 60 + " +/- " + (critical_value * batchNoleggio.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);
+
+        batchNoleggio.setStandardDeviation(batchNoleggio.getAvgPopulationInQueue(), 0);
+        System.out.println("Critical endpoints E[N_Q] =  " + batchNoleggio.getMeanPopulationInQueue() + " +/- " + critical_value * batchNoleggio.getStandardDeviation(1) / (Math.sqrt(K - 1)));
 
         batchNoleggio.setStandardDeviation(batchNoleggio.getResponseTime(), 2);
         System.out.println("Critical endpoints E[T_S] =  " + batchNoleggio.getMeanResponseTime() / 60 + " +/- " + (critical_value * batchNoleggio.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);
