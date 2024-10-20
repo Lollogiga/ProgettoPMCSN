@@ -468,24 +468,30 @@ public class Noleggio implements Center {
             area -= sumList.get(i).getService();
         }
 
-        System.out.println("  avg delay .......... =   " + f.format((area / index) / 60));
-        System.out.println("  avg # in queue ..... =   " + f.format(area / msqT.getCurrent()));
+        double meanUtilization = 0.0;
+
+        System.out.println("  avg delay .......... = " + (area / index) / 60);
+        System.out.println("  avg # in queue ..... = " + area / msqT.getCurrent());
+        System.out.println("\nthe server statistics are:\n");
         System.out.println("\tserver\tutilization\t avg service\t share\n");
         for(int i = 2; i == eventListManager.getServerNoleggio().size(); i++) {
-            System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t" + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t" + f.format(((double)sumList.get(i).getServed() / index)));
+            System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t " + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t " + f.format(((double)sumList.get(i).getServed() / index)));
+            meanUtilization += (sumList.get(i).getService() / msqT.getCurrent());
         }
         System.out.println("\n");
+
+        meanUtilization = meanUtilization / (eventListManager.getServerStrada().size() - 1);
 
         double avgPopulationInQueue = area / msqT.getCurrent();
         double waitingTimeInQueue = area / index;
 
         if (runNumber > 0 && seed > 0)
-            fileCSVGenerator.saveRepResults(NOLEGGIO, runNumber, responseTime, avgPopulationInNode, 0, 0);
+            fileCSVGenerator.saveRepResults(NOLEGGIO, runNumber, responseTime, avgPopulationInNode, waitingTimeInQueue, avgPopulationInQueue);
 
         repNoleggio.insertWaitingTimeInQueue(waitingTimeInQueue, runNumber - 1);
         repNoleggio.insertAvgPopulationInQueue(avgPopulationInQueue, runNumber - 1);
         repNoleggio.insertAvgPopulationInNode(avgPopulationInNode, runNumber - 1);
-        repNoleggio.insertUtilization(0.0, runNumber - 1);
+        repNoleggio.insertUtilization(meanUtilization, runNumber - 1);
         repNoleggio.insertResponseTime(responseTime, runNumber - 1);
     }
 

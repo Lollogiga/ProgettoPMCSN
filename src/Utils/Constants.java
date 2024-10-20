@@ -54,7 +54,8 @@ public class Constants {
     /* Seed to use for the simulation */
     public static final long SEED = 123456789L;
 
-    public static final int INIT_PARK_CARS = 0;
+    /*  */
+    public static final int INIT_PARK_CARS = 15;
 
     /* Cost constants */
     public static final int CAR_COST = 5; /* Yen/hour for each car */
