@@ -1,12 +1,12 @@
 import os
 from graphicDraw import plot_combined_graph
-import distribution
 import carParkRicMu
 
 baseFolder = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
 resultsPath = baseFolder + "/" + "resources/results/"
 finiteSimFolder = "finiteSimImg/"
+meanFiniteSimFolder = "meanFiniteSimImg/"
 distrAnalyses = "distrAnalyses/"
 
 def finiteSimGraphs(selected_seeds):
@@ -20,29 +20,13 @@ def finiteSimGraphs(selected_seeds):
     plot_combined_graph(finiteParcheggio, selected_seeds, resultsPath + finiteSimFolder, "parcheggio.png", "Parcheggio")
     plot_combined_graph(finiteRicarica, selected_seeds, resultsPath + finiteSimFolder, "ricarica.png", "Ricarica")
 
-def findDistribution(verbose=True):
-    file_csv = resultsPath + "finiteStradaLambda.csv"
-    tasso_medio = distribution.calcola_tasso_arrivo_medio(file_csv)
-
-    print(f"Tasso di arrivo medio: {tasso_medio * 60 * 60}")
-
-    distribution.exponentialAnalyses(file_csv, resultsPath + finiteSimFolder + distrAnalyses, "exponentialAnalyses.png")
-
-    print('')
-    distribution.fitterAnalyses(file_csv, resultsPath + finiteSimFolder + distrAnalyses, "fitterAnalyses.png")
-
-    distribution.testKolmogorovSmirnov(file_csv, verbose)
-
 def main():
-    selected_seeds = [123456789, 382880042, 484764695, 624212696, 719463368, 928379944]  # 6 seeds
+    selected_seeds = [123456789, 49341648, 624212696, 928379944, 382880042]  # 5 seeds
     if (os.path.exists(resultsPath + "finiteNoleggio.csv") and
             os.path.exists(resultsPath + "finiteStrada.csv") and
             os.path.exists(resultsPath + "finiteParcheggio.csv") and
             os.path.exists(resultsPath + "finiteRicarica.csv")):
         finiteSimGraphs(selected_seeds)
-
-    if os.path.exists(resultsPath + "finiteStradaLambda.csv"):
-        findDistribution(verbose=False)
 
     fileCarMu_csv = resultsPath + "infiniteCarMu.csv"
     if os.path.exists(fileCarMu_csv):

@@ -28,11 +28,11 @@ def plot_combined_graph(file_path, selected_seeds, img_folder, img_name, server_
     unique_seeds = df['Seed'].unique()
     for seed in unique_seeds:
         df_run = df[df['Seed'] == seed]
-        plt.plot(df_run['Time'], df_run['E[T_S]'], marker='.', linestyle='-', markersize=4, label=seed)
+        plt.plot(df_run['Time']/60, df_run['E[T_S]']/60, marker='.', linestyle='-', markersize=4, label=seed)
 
     # Configura l'aspetto del grafico
-    plt.xlabel('Time (s)')
-    plt.ylabel('E[T_S]')
+    plt.xlabel('Time (min)')
+    plt.ylabel('E[T_S] (min)')
     plt.title('Time vs E[T_S] for ' + server_name)
     plt.grid(True)
     plt.legend()
@@ -44,4 +44,3 @@ def plot_combined_graph(file_path, selected_seeds, img_folder, img_name, server_
     output_path = os.path.join(img_folder, img_name)
     plt.savefig(output_path)
     plt.close()
-

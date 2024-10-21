@@ -120,7 +120,6 @@ public class FileCSVGenerator {
                     avgPopulationInNode + "," + waitingTime + "," + avgPopulationInQueue + "\n");
 
             writer.close();
-
         } catch (IOException e) {
             e.printStackTrace();
         }

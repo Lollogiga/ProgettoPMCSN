@@ -474,13 +474,13 @@ public class Noleggio implements Center {
         System.out.println("  avg # in queue ..... = " + area / msqT.getCurrent());
         System.out.println("\nthe server statistics are:\n");
         System.out.println("\tserver\tutilization\t avg service\t share\n");
-        for(int i = 2; i == eventListManager.getServerNoleggio().size(); i++) {
+        for(int i = 2; i < eventListManager.getServerNoleggio().size(); i++) {
             System.out.println("\t" + i + "\t\t" + f.format(sumList.get(i).getService() / msqT.getCurrent()) + "\t " + f.format(sumList.get(i).getService() / sumList.get(i).getServed()) + "\t " + f.format(((double)sumList.get(i).getServed() / index)));
             meanUtilization += (sumList.get(i).getService() / msqT.getCurrent());
         }
         System.out.println("\n");
 
-        meanUtilization = meanUtilization / (eventListManager.getServerStrada().size() - 1);
+        meanUtilization = meanUtilization / (eventListManager.getServerNoleggio().size() - 1);
 
         double avgPopulationInQueue = area / msqT.getCurrent();
         double waitingTimeInQueue = area / index;
