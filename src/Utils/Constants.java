@@ -71,7 +71,7 @@ public class Constants {
 
     /* Batch simulation */
     public static final int K = 64;
-    public static final int B = 1024;
+    public static final int B = 2048;
     public static final double ALPHA = 0.05; // Level of confidence = 0.95
 
     public static final int REPLICATION = 64;

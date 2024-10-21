@@ -81,11 +81,12 @@ public class FileCSVGenerator {
 
         try (FileWriter fileWriter = new FileWriter(fileTitle, true)) {
             if (file.length() == 0) {
-                writeToFile(fileWriter, "Batch Number,E[T_S]");
-                writeToFile(fileWriter, batchIndex + "," + 0);
+                //writeToFile(fileWriter, "Batch Number,E[T_S]");
+                //writeToFile(fileWriter, batchIndex + "," + 0);
             }
 
-            writeToFile(fileWriter, (batchIndex + 1) + "," + responseTime);
+            //writeToFile(fileWriter, (batchIndex + 1) + "," + responseTime);
+            writeToFile(fileWriter, String.valueOf(responseTime));
 
         } catch (IOException e) {
             Logger.getAnonymousLogger().log(Level.INFO, "An error occurred while generating release info", e);
