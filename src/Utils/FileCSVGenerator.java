@@ -66,8 +66,8 @@ public class FileCSVGenerator {
         }
     }
 
-    public void saveBatchResults(int batchIndex, double responseTime) {
-        String fileTitle = Paths.get(directoryPath + FileCSVGenerator.RESULT  + "infiniteHorizonStats.csv").toString();
+    public void saveBatchResults(int batchIndex, double responseTime, String centerName) {
+        String fileTitle = Paths.get(directoryPath + FileCSVGenerator.RESULT  + "infiniteHorizonStats" + centerName + ".csv").toString();
 
         try {
             Files.createDirectories(Paths.get(fileTitle).getParent());
@@ -80,10 +80,12 @@ public class FileCSVGenerator {
         File file = new File(fileTitle);
 
         try (FileWriter fileWriter = new FileWriter(fileTitle, true)) {
-            if (file.length() == 0)
-                writeToFile(fileWriter, "Batch Number,E[T_Q]");
+            if (file.length() == 0) {
+                writeToFile(fileWriter, "Batch Number,E[T_S]");
+                writeToFile(fileWriter, batchIndex + "," + 0);
+            }
 
-            writeToFile(fileWriter, batchIndex + "," + responseTime);
+            writeToFile(fileWriter, (batchIndex + 1) + "," + responseTime);
 
         } catch (IOException e) {
             Logger.getAnonymousLogger().log(Level.INFO, "An error occurred while generating release info", e);

@@ -396,7 +396,7 @@ public class Noleggio implements Center {
 
         System.out.println("\n\nNoleggio batch statistics\n");
         System.out.println("E[N_S]: " + avgPopulationInNode);
-        System.out.println("E[T_S]: " + responseTime);
+        System.out.println("E[T_S]: " + responseTime / 60);
 
         batchNoleggio.insertAvgPopulationInNode(avgPopulationInNode, nBatch);
         batchNoleggio.insertResponseTime(responseTime, nBatch);
@@ -417,8 +417,10 @@ public class Noleggio implements Center {
         batchNoleggio.insertAvgPopulationInQueue(populationInQueue, nBatch);
 
         System.out.println("E[N_Q]: " + populationInQueue);
-        System.out.println("E[T_Q]: " + waitingTime);
+        System.out.println("E[T_Q]: " + waitingTime / 60);
         System.out.println("Utilization: " + utilization);
+
+        fileCSVGenerator.saveBatchResults(nBatch, responseTime, "Noleggio");
 
         /* Reset parameters */
         area = 0;

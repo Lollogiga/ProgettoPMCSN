@@ -208,8 +208,9 @@ public class Ricarica implements Center {
         double utilization = sum / (batchDuration * RICARICA_SERVER);
 
         batchRicarica.insertUtilization(utilization, nBatch);
-
         System.out.println("Utilization: " + utilization);
+
+        fileCSVGenerator.saveBatchResults(nBatch, responseTime, "Ricarica");
 
         /* Reset parameters */
         area = 0;

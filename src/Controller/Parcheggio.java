@@ -212,7 +212,7 @@ public class Parcheggio implements Center {
 
         System.out.println("Utilization: " + utilization);
 
-        fileCSVGenerator.saveBatchResults(nBatch, avgPopulationInNode);
+        fileCSVGenerator.saveBatchResults(nBatch, responseTime, "Parcheggio");
 
         /* Reset parameters */
         area = 0;

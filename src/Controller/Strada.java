@@ -258,7 +258,7 @@ public class Strada implements Center {
 
         System.out.println("\n\nStrada batch statistics\n");
         System.out.println("E[N_S]: " + avgPopulationInNode);
-        System.out.println("E[T_S]: " + responseTime);
+        System.out.println("E[T_S]: " + responseTime / 60);
 
         double sum = 0;
         for(int i = 1; i < eventListManager.getServerStrada().size(); i++) {
@@ -271,6 +271,8 @@ public class Strada implements Center {
 
         batchStrada.insertUtilization(utilization, nBatch);
         System.out.println("Utilization: " + utilization);
+
+        fileCSVGenerator.saveBatchResults(nBatch, responseTime, "Strada");
 
         /* Reset parameters */
         area = 0;
