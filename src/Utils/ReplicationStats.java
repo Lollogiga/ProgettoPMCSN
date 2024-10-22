@@ -215,7 +215,8 @@ public class ReplicationStats {
         for (double elemento : statList) {
             mean += elemento;
         }
-        mean /= K;
+
+        mean /= REPLICATION;
 
         // Calculate the sum of the squares of the differences from the mean
         double temp = 0.0;
@@ -225,7 +226,7 @@ public class ReplicationStats {
         }
 
         // Calculate standard deviation (σ)
-        double devStd = Math.sqrt(temp / K);
+        double devStd = Math.sqrt(temp / REPLICATION);
 
         switch (type) {
             case 0:
