@@ -16,8 +16,9 @@ def plot_finite_graph(file_path, selected_seeds, img_folder, img_name, server_na
         skiprows=1,
         low_memory=False
     )
-
     df = df[df['Seed'].isin(selected_seeds)]
+    df.dropna(inplace=True)
+    df = df[~df.isin([np.inf, -np.inf]).any(axis=1)]
 
     # Imposta il limite di tempo a 86400 secondi (24 ore)
     df = df[df['Time'] <= 86400]
@@ -29,7 +30,13 @@ def plot_finite_graph(file_path, selected_seeds, img_folder, img_name, server_na
     unique_seeds = df['Seed'].unique()
     for seed in unique_seeds:
         df_run = df[df['Seed'] == seed]
-        plt.plot(df_run['Time']/60, df_run['E[T_S]']/60, marker='.', linestyle='-', markersize=4, label=seed)
+        # Calcola i tempi di risposta, iniziando da 0
+        response_time = [0] + (df_run['E[T_S]']/60).tolist()  # Aggiungi 0 all'inizio
+        # Crea un nuovo asse X che inizia da 0 e ha la stessa lunghezza di response_time
+        time_values = [0] + (df_run['Time']/60).tolist()  # Aggiungi 0 all'inizio
+        # Plot dei dati
+        plt.plot(time_values, response_time, marker='.', linestyle='-', markersize=4, label=seed)
+
 
     # Configura l'aspetto del grafico
     plt.xlabel('Time (min)')
