@@ -37,11 +37,4 @@
       </library>
     </orderEntry>
   </component>
-  <component name="PyNamespacePackagesService">
-    <option name="namespacePackageFolders">
-      <list>
-        <option value="$MODULE_DIR$/pyGraphs/venv" />
-      </list>
-    </option>
-  </component>
 </module>

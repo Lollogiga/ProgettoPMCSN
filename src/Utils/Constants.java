@@ -70,8 +70,8 @@ public class Constants {
     public static final int RECHARGE_COST = 20; /* Yen for each recharge */
 
     /* Batch simulation */
-    public static final int K = 64;
-    public static final int B = 2048;
+    public static final int K = 128;
+    public static final int B = 1512 ;
     public static final double ALPHA = 0.05; // Level of confidence = 0.95
 
     public static final int REPLICATION = 64;

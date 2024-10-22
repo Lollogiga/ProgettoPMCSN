@@ -58,8 +58,8 @@ def plot_infinite_graph(file_path, img_folder, img_name, server_name):
     )
 
     # Verifica che ci siano almeno 64 righe
-    if len(df) < 64:
-        raise ValueError("Il file CSV deve contenere almeno 64 righe.")
+    if len(df) < 128:
+        raise ValueError("Il file CSV deve contenere almeno 128 righe.")
 
     # Crea il grafico unico
     plt.figure(figsize=(12, 8))
@@ -68,7 +68,7 @@ def plot_infinite_graph(file_path, img_folder, img_name, server_name):
     cumulative_sum = 0
 
     # Calcola la media cumulativa per i primi 64 batch
-    for i in range(64):
+    for i in range(128):
         cumulative_sum += df.at[i, 'E[T_S]']
         if i == 0:
             mean = cumulative_sum / (i + 1)  # i+1 per evitare divisione per zero
@@ -77,14 +77,30 @@ def plot_infinite_graph(file_path, img_folder, img_name, server_name):
             mean /= 60
         response_time.append(mean)
 
+    batch_number_reduced = df['Batch Number'][:128:2]
+    response_time_reduced = response_time[::2]
+
     # Disegna il grafico
-    plt.plot(df['Batch Number'][:64], response_time, marker='.', linestyle='-', markersize=8)
+    plt.plot(batch_number_reduced, response_time_reduced, marker='.', linestyle='-', markersize=8, zorder=2)
+    plt.yscale('linear')
+
+    theoretical_values = {
+        "Ricarica": 45.07377,
+        "Noleggio": 4.99576,
+        "Strada": 30.03523,
+        "Parcheggio": 1.59983
+    }
+
+    if server_name in theoretical_values:
+        plt.axhline(y=theoretical_values[server_name], color='red', linestyle='--', label='Valore teorico', zorder=1)
+
 
     # Configura l'aspetto del grafico
-    plt.xlabel('Batch Number')
+    plt.xlabel('Batch Index')
     plt.ylabel('E[T_S] (min)')
-    plt.title('Batch vs E[T_S] for ' + server_name)
+    plt.title('Batch index vs E[T_S] for ' + server_name)
     plt.grid(True)
+    plt.legend()
 
     # Crea la cartella se non esiste
     if not os.path.exists(img_folder):
