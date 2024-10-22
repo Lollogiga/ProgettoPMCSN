@@ -82,7 +82,7 @@ def plot_infinite_graph(file_path, img_folder, img_name, server_name):
 
     # Disegna il grafico
     plt.plot(batch_number_reduced, response_time_reduced, marker='.', linestyle='-', markersize=8, zorder=2)
-    plt.yscale('linear')
+    plt.yscale('log')
 
     theoretical_values = {
         "Ricarica": 45.07377,
@@ -92,15 +92,13 @@ def plot_infinite_graph(file_path, img_folder, img_name, server_name):
     }
 
     if server_name in theoretical_values:
-        plt.axhline(y=theoretical_values[server_name], color='red', linestyle='--', label='Valore teorico', zorder=1)
-
+        plt.axhline(y=theoretical_values[server_name], color='red', linestyle='--', zorder=1)
 
     # Configura l'aspetto del grafico
     plt.xlabel('Batch Index')
     plt.ylabel('E[T_S] (min)')
     plt.title('Batch index vs E[T_S] for ' + server_name)
     plt.grid(True)
-    plt.legend()
 
     # Crea la cartella se non esiste
     if not os.path.exists(img_folder):
