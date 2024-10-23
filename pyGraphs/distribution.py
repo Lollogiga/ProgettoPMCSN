@@ -1,13 +1,12 @@
 import os
 
-import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 from fitter import Fitter
 from scipy import stats
 from scipy.stats import pareto, expon, gamma
-from six import print_
 
 matplotlib.use('Agg')
 
