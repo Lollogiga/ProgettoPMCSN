@@ -1,4 +1,5 @@
 import os
+import distribution
 from graphicDraw import plot_finite_graph, plot_infinite_graph
 import carParkRicMu
 
@@ -19,6 +20,20 @@ def finiteSimGraphs(selected_seeds):
     plot_finite_graph(finiteStrada, selected_seeds, resultsPath + finiteSimFolder, "strada.png", "Strada")
     plot_finite_graph(finiteParcheggio, selected_seeds, resultsPath + finiteSimFolder, "parcheggio.png", "Parcheggio")
     plot_finite_graph(finiteRicarica, selected_seeds, resultsPath + finiteSimFolder, "ricarica.png", "Ricarica")
+
+def findDistribution(verbose=True):
+    file_csv = resultsPath + "finiteStradaLambda.csv"
+    tasso_medio = distribution.calcola_tasso_arrivo_medio(file_csv)
+
+    print(f"Tasso di arrivo medio: {tasso_medio * 60 * 60}")
+
+    distribution.exponentialAnalyses(file_csv, resultsPath + finiteSimFolder + distrAnalyses, "exponentialAnalyses.png")
+
+    print('')
+    distribution.fitterAnalyses(file_csv, resultsPath + finiteSimFolder + distrAnalyses, "fitterAnalyses.png")
+
+    distribution.testKolmogorovSmirnov(file_csv, verbose)
+
 
 def infiniteSimGraphs():
     infiniteHorizonStatsNoleggio = resultsPath + "infiniteHorizonStatsNoleggio.csv"
@@ -44,6 +59,9 @@ def main():
                 os.path.exists(resultsPath + "infiniteHorizonStatsParcheggio.csv") and
                 os.path.exists(resultsPath + "infiniteHorizonStatsRicarica.csv")):
         infiniteSimGraphs()
+
+    if os.path.exists(resultsPath + "finiteStradaLambda.csv"):
+        findDistribution(verbose=False)
 
     fileCarMu_csv = resultsPath + "infiniteCarMu.csv"
     if os.path.exists(fileCarMu_csv):
