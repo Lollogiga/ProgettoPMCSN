@@ -347,18 +347,18 @@ public class Strada implements Center {
 
     @Override
     public void printFinalStatsTransitorio() {
-        double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
+        double critical_value = rvms.idfStudent(REPLICATION - 1, 1 - ALPHA/2);
 
         System.out.println("\n\nStrada\n");
 
         repStrada.setStandardDeviation(repStrada.getResponseTime(), 2);
-        System.out.println("Critical endpoints E[T_S] =  " + repStrada.getMeanResponseTime() / 60 + " +/- " + (critical_value * repStrada.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);
+        System.out.println("Critical endpoints E[T_S] =  " + repStrada.getMeanResponseTime() / 60 + " +/- " + (critical_value * repStrada.getStandardDeviation(2) / (Math.sqrt(REPLICATION - 1))) / 60);
 
         repStrada.setStandardDeviation(repStrada.getAvgPopulationInNode(), 1);
-        System.out.println("Critical endpoints E[N_S] =  " + repStrada.getMeanPopulationInNode() + " +/- " + critical_value * repStrada.getStandardDeviation(1) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints E[N_S] =  " + repStrada.getMeanPopulationInNode() + " +/- " + critical_value * repStrada.getStandardDeviation(1) / (Math.sqrt(REPLICATION - 1)));
 
         repStrada.setStandardDeviation(repStrada.getUtilization(), 3);
-        System.out.println("Critical endpoints rho =  " + repStrada.getMeanUtilization() + " +/- " + critical_value * repStrada.getStandardDeviation(3) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints rho =  " + repStrada.getMeanUtilization() + " +/- " + critical_value * repStrada.getStandardDeviation(3) / (Math.sqrt(REPLICATION - 1)));
     }
 
     @Override

@@ -215,7 +215,6 @@ public class ReplicationStats {
         for (double elemento : statList) {
             mean += elemento;
         }
-
         mean /= REPLICATION;
 
         // Calculate the sum of the squares of the differences from the mean

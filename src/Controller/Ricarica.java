@@ -293,18 +293,18 @@ public class Ricarica implements Center {
 
     @Override
     public void printFinalStatsTransitorio() {
-        double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
+        double critical_value = rvms.idfStudent(REPLICATION - 1, 1 - ALPHA/2);
 
         System.out.println("\n\nRicarica\n");
 
         repRicarica.setStandardDeviation(repRicarica.getResponseTime(), 2);
-        System.out.println("Critical endpoints E[T_S] =  " + repRicarica.getMeanResponseTime() / 60 + " +/- " + (critical_value * repRicarica.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);
+        System.out.println("Critical endpoints E[T_S] =  " + repRicarica.getMeanResponseTime() / 60 + " +/- " + (critical_value * repRicarica.getStandardDeviation(2) / (Math.sqrt(REPLICATION - 1))) / 60);
 
         repRicarica.setStandardDeviation(repRicarica.getAvgPopulationInNode(), 1);
-        System.out.println("Critical endpoints E[N_S] =  " + repRicarica.getMeanPopulationInNode() + " +/- " + critical_value * repRicarica.getStandardDeviation(1) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints E[N_S] =  " + repRicarica.getMeanPopulationInNode() + " +/- " + critical_value * repRicarica.getStandardDeviation(1) / (Math.sqrt(REPLICATION - 1)));
 
         repRicarica.setStandardDeviation(repRicarica.getUtilization(), 3);
-        System.out.println("Critical endpoints rho =  " + repRicarica.getMeanUtilization() + " +/- " + critical_value * repRicarica.getStandardDeviation(3) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints rho =  " + repRicarica.getMeanUtilization() + " +/- " + critical_value * repRicarica.getStandardDeviation(3) / (Math.sqrt(REPLICATION - 1)));
     }
 
     @Override

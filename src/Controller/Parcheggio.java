@@ -291,18 +291,18 @@ public class Parcheggio implements Center {
 
     @Override
     public void printFinalStatsTransitorio() {
-        double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
+        double critical_value = rvms.idfStudent(REPLICATION - 1, 1 - ALPHA/2);
 
         System.out.println("\n\nParcheggio\n");
 
         repParcheggio.setStandardDeviation(repParcheggio.getResponseTime(), 2);
-        System.out.println("Critical endpoints E[T_S] =  " + repParcheggio.getMeanResponseTime() / 60 + " +/- " + (critical_value * repParcheggio.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);
+        System.out.println("Critical endpoints E[T_S] =  " + repParcheggio.getMeanResponseTime() / 60 + " +/- " + (critical_value * repParcheggio.getStandardDeviation(2) / (Math.sqrt(REPLICATION - 1))) / 60);
 
         repParcheggio.setStandardDeviation(repParcheggio.getAvgPopulationInNode(), 1);
-        System.out.println("Critical endpoints E[N_S] =  " + repParcheggio.getMeanPopulationInNode() + " +/- " + critical_value * repParcheggio.getStandardDeviation(1) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints E[N_S] =  " + repParcheggio.getMeanPopulationInNode() + " +/- " + critical_value * repParcheggio.getStandardDeviation(1) / (Math.sqrt(REPLICATION - 1)));
 
         repParcheggio.setStandardDeviation(repParcheggio.getUtilization(), 3);
-        System.out.println("Critical endpoints rho =  " + repParcheggio.getMeanUtilization() + " +/- " + critical_value * repParcheggio.getStandardDeviation(3) / (Math.sqrt(K - 1)));
+        System.out.println("Critical endpoints rho =  " + repParcheggio.getMeanUtilization() + " +/- " + critical_value * repParcheggio.getStandardDeviation(3) / (Math.sqrt(REPLICATION - 1)));
     }
 
     @Override
