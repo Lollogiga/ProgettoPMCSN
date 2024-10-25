@@ -1,10 +1,7 @@
 import Controller.Sistema;
 import Libs.Rngs;
 import Utils.FileCSVGenerator;
-import Utils.ReplicationStats;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -26,18 +23,6 @@ public class Main {
 
         int simType = getChoice();
         runSim(simType);
-
-        // NON CANCELLARE, è un test per far eseguire lo script python in automatico. Non funziona perché non facciamo la flush sui file una volta terminata la simulazione, o almeno credo che sia per questo motivo
-//        try {
-//            ProcessBuilder pb = new ProcessBuilder("python", "pyGraphs\\main.py");
-//            // Inizia il processo
-//            Process process = pb.start();
-//            int exitCode = process.waitFor();
-//
-//            System.out.println("\n\nProcesso Python terminato con codice di uscita: " + exitCode);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
     }
 
     public static void runSim(int simulationType) throws Exception {
@@ -55,7 +40,7 @@ public class Main {
 
                 /* Simulate REPLICATION = 64 run */
                 for (int i = 0; i < REPLICATION; i++) {
-                    rngs.plantSeeds(seedList.get(i));;
+                    rngs.plantSeeds(seedList.get(i));
 
                     /* Start simulation with seed[i] */
                     Sistema sys = new Sistema(rngs);
