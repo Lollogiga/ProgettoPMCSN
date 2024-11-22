@@ -90,16 +90,7 @@ def plot_infinite_graph(file_path, img_folder, img_name, server_name):
 
     # Disegna il grafico
     plt.plot(batch_number_reduced, response_time_reduced, marker='.', linestyle='-', markersize=8, zorder=2)
-    #plt.yscale('log')
-
-    theoretical_values = {
-        "Ricarica": 45.10599,
-        "Strada": 30,
-        "Riconsegna": 1.6
-    }
-
-    if server_name in theoretical_values:
-        plt.axhline(y=theoretical_values[server_name], color='red', linestyle='--', zorder=1)
+    plt.yscale('log')
 
     # Configura l'aspetto del grafico
     plt.xlabel('Batch Index')
