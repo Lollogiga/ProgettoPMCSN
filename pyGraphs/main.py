@@ -19,7 +19,7 @@ def finiteSimGraphs(selected_seeds):
 
     plot_finite_graph(finiteNoleggio, selected_seeds, resultsPath + finiteSimFolder, "noleggio.png", "Noleggio")
     plot_finite_graph(finiteStrada, selected_seeds, resultsPath + finiteSimFolder, "strada.png", "Strada")
-    plot_finite_graph(finiteParcheggio, selected_seeds, resultsPath + finiteSimFolder, "parcheggio.png", "Parcheggio")
+    plot_finite_graph(finiteParcheggio, selected_seeds, resultsPath + finiteSimFolder, "riconsegna.png", "Riconsegna")
     plot_finite_graph(finiteRicarica, selected_seeds, resultsPath + finiteSimFolder, "ricarica.png", "Ricarica")
 
 
@@ -138,7 +138,7 @@ def infiniteSimGraphs():
 
     plot_infinite_graph(infiniteHorizonStatsNoleggio, resultsPath + infiniteSimFolder, "noleggio.png", "Noleggio")
     plot_infinite_graph(infiniteHorizonStatsStrada, resultsPath + infiniteSimFolder, "strada.png", "Strada")
-    plot_infinite_graph(infiniteHorizonStatsParcheggio, resultsPath + infiniteSimFolder, "parcheggio.png", "Parcheggio")
+    plot_infinite_graph(infiniteHorizonStatsParcheggio, resultsPath + infiniteSimFolder, "riconsegna.png", "Riconsegna")
     plot_infinite_graph(infiniteHorizonStatsRicarica, resultsPath + infiniteSimFolder, "ricarica.png", "Ricarica")
 
 

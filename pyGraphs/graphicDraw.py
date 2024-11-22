@@ -90,13 +90,12 @@ def plot_infinite_graph(file_path, img_folder, img_name, server_name):
 
     # Disegna il grafico
     plt.plot(batch_number_reduced, response_time_reduced, marker='.', linestyle='-', markersize=8, zorder=2)
-    plt.yscale('log')
+    #plt.yscale('log')
 
     theoretical_values = {
-        "Ricarica": 45.07377,
-        "Noleggio": 4.99576,
-        "Strada": 30.03523,
-        "Parcheggio": 1.59983
+        "Ricarica": 45.10599,
+        "Strada": 30,
+        "Riconsegna": 1.6
     }
 
     if server_name in theoretical_values:

@@ -195,7 +195,7 @@ public class Parcheggio implements Center {
         batchParcheggio.insertAvgPopulationInNode(avgPopulationInNode, nBatch);
         batchParcheggio.insertResponseTime(responseTime, nBatch);
 
-        System.out.println("\n\nParcheggio batch statistics\n");
+        System.out.println("\n\nRiconsegna batch statistics\n");
         System.out.println("E[N_S]: " + avgPopulationInNode);
         System.out.println("E[T_S]: " + responseTime / 60);
 
@@ -252,7 +252,7 @@ public class Parcheggio implements Center {
         double responseTime = area / index;
         double avgPopulationInNode = area / msqT.getCurrent();
 
-        System.out.println("\n\nParcheggio\n");
+        System.out.println("\n\nRiconsegna\n");
         System.out.println("for " + index + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + (eventListManager.getSystemEventsList().getFirst().getT() / index) / 60);
         System.out.println("  avg wait ........... = " + responseTime / 60);
@@ -293,7 +293,7 @@ public class Parcheggio implements Center {
     public void printFinalStatsTransitorio() {
         double critical_value = rvms.idfStudent(REPLICATION - 1, 1 - ALPHA/2);
 
-        System.out.println("\n\nParcheggio\n");
+        System.out.println("\n\nRiconsegna\n");
 
         repParcheggio.setStandardDeviation(repParcheggio.getResponseTime(), 2);
         System.out.println("Critical endpoints E[T_S] =  " + repParcheggio.getMeanResponseTime() / 60 + " +/- " + (critical_value * repParcheggio.getStandardDeviation(2) / (Math.sqrt(REPLICATION - 1))) / 60);
@@ -309,7 +309,7 @@ public class Parcheggio implements Center {
     public void printFinalStatsStazionario() {
         double critical_value = rvms.idfStudent(K - 1, 1 - ALPHA/2);
 
-        System.out.println("\n\nParcheggio\n");
+        System.out.println("\n\nRiconsegna\n");
 
         batchParcheggio.setStandardDeviation(batchParcheggio.getResponseTime(), 2);
         System.out.println("Critical endpoints E[T_S] =  " + batchParcheggio.getMeanResponseTime() / 60 + " +/- " + (critical_value * batchParcheggio.getStandardDeviation(2) / (Math.sqrt(K - 1))) / 60);
