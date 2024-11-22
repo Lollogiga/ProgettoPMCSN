@@ -13,6 +13,7 @@ public class Constants {
     public static final double START = 0.0;
     public static final double STOP_INF = Double.MAX_VALUE; /* Infinite simulation */
     public static final double STOP_FIN = 86400; /* Finite simulation -> check every 1 day */
+//    public static final double STOP_FIN = 21600; // Used to simulate distribution in Python on Strada
 
     /* Probabilities */
     public static final double P_RICARICA = 0.1;
@@ -56,6 +57,7 @@ public class Constants {
 
     /* Parked car in Noleggio */
     public static final int INIT_PARK_CARS = 15;
+//    public static final int INIT_PARK_CARS = 0;   // Used to simulate distribution in Python on Strada
 
     /* Cost constants */
     public static final int CAR_COST = 5; /* Yen/hour for each car */

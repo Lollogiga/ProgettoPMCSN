@@ -47,9 +47,12 @@ def fitterAnalyses(file_csv, fitterDistributions, verbose=True):
     f.fit()
     f.summary()
 
+    max_length = max(len(distr) for distr in f.fitted_param)
+
     # Stampa i parametri stimati per le distribuzioni migliori
     for distr in f.fitted_param:
-        print(f"{distr}, {f.fitted_param[distr]}")
+        print(f"{distr:<{max_length}} = {f.fitted_param[distr]}")
+    print('')
 
 
 def test_kolmogorov_smirnov(file_csv, distr_list, distr_args, verbose=True):
@@ -77,4 +80,7 @@ def test_kolmogorov_smirnov(file_csv, distr_list, distr_args, verbose=True):
 
     max_length = max(len(distr) for distr, _ in sorted_ks_results)
     for distr, result in sorted_ks_results:
-        print(f"Test K-S: [{distr:<{max_length}}], p-value= {result[1]}")
+        if result[1] > 0.05:
+            print(f"Test K-S: [{distr:<{max_length}}], p-value= \033[32m{result[1]}\033[0m")
+        else:
+            print(f"Test K-S: [{distr:<{max_length}}], p-value= \033[31m{result[1]}\033[0m")

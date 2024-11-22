@@ -1,9 +1,9 @@
 import os
-import pandas as pd
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.stats import pareto, expon, gamma, lognorm, weibull_min, beta
+import pandas as pd
 
 matplotlib.use('Agg')
 
@@ -143,7 +143,7 @@ def plot_histogram(file_csv, img_folder, img_name):
     plt.savefig(output_path)
     plt.close()
 
-def plot_distributions(file_csv, exponParam, paretoParam, gammaParam, lognormParam, weibullParam, betaParam, img_folder, img_name):
+def plot_distributions(file_csv, distr_names, distr_params, img_folder, img_name):
     # Legge il file CSV
     df = pd.read_csv(file_csv)
 
@@ -157,58 +157,14 @@ def plot_distributions(file_csv, exponParam, paretoParam, gammaParam, lognormPar
     plt.figure(figsize=(10, 6))  # Definisce la dimensione della finestra di plot
     plt.hist(differenze_tempo, bins=30, density=True, alpha=0.6, color='g')
 
-    # Esponenziale
-    loc_expon = exponParam[0]
-    scale_expon = exponParam[1]
-
-    # Calcola i valori della curva Esponenziale
-    x = np.linspace(differenze_tempo.min(), differenze_tempo.max(), 100)
-    y_expon = expon.pdf(x, loc=loc_expon, scale=scale_expon)
-    plt.plot(x, y_expon, '-', color="orange", lw=2, label='Distribuzione Esponenziale')
-
-    # Pareto
-    shape_pareto = paretoParam[0]
-    loc_pareto = paretoParam[1]
-    scale_pareto = paretoParam[2]
-
-    y = pareto.pdf(x, shape_pareto, loc=loc_pareto, scale=scale_pareto)
-
-    plt.plot(x, y, '-', color="purple", lw=3, label='Distribuzione Pareto')
-
-    # Gamma
-    a_gamma = gammaParam[0]
-    loc_gamma = gammaParam[1]
-    scale_gamma = gammaParam[2]
-
-    # Calcola i valori della curva Gamma
+    # x = np.linspace(differenze_tempo.min(), differenze_tempo.max(), 100)
     x = np.linspace(1.5, differenze_tempo.max(), 100)
-    y_gamma = gamma.pdf(x, a_gamma, loc=loc_gamma, scale=scale_gamma)
-    plt.plot(x, y_gamma, '-', color="#1e81b0", lw=2, label='Distribuzione Gamma')
 
-    # Lognorm
-    shape_lognorm = lognormParam[0]
-    loc_lognorm = lognormParam[1]
-    scale_lognorm = lognormParam[2]
+    for i in range(len(distr_names)):
+        distr_name = distr_names[i]
+        distr_param = distr_params[i]
 
-    y_lognorm = lognorm.pdf(x, shape_lognorm, loc=loc_lognorm, scale=scale_lognorm)
-    plt.plot(x, y_lognorm, '-', color="red", lw=2, label='Distribuzione Lognormale')
-
-    # Weibull
-    shape_weibull = weibullParam[0]
-    loc_weibull = weibullParam[1]
-    scale_weibull = weibullParam[2]
-
-    y_weibull = weibull_min.pdf(x, shape_weibull, loc=loc_weibull, scale=scale_weibull)
-    plt.plot(x, y_weibull, '-', color="blue", lw=2, label='Distribuzione Weibull')
-
-    # Beta
-    a_beta = betaParam[0]
-    b_beta = betaParam[1]
-    loc_beta = betaParam[2]
-    scale_beta = betaParam[3]
-
-    y_beta = beta.pdf(x, a_beta, b_beta, loc=loc_beta, scale=scale_beta)
-    plt.plot(x, y_beta, '-', color="green", lw=2, label='Distribuzione Beta')
+        plot_general_distr(distr_name, x, distr_param)
 
     plt.title('Istogramma dei tempi di inter-arrivo')
     plt.xlabel('Tempo inter-arrivo')
@@ -221,3 +177,46 @@ def plot_distributions(file_csv, exponParam, paretoParam, gammaParam, lognormPar
     output_path = os.path.join(img_folder, img_name)
     plt.savefig(output_path)
     plt.close()
+
+    img_folder = img_folder + "singleDistr/"
+
+    # Plot single figures
+    for i in range(len(distr_names)):
+        # Plot dell'istogramma (usando plt.hist, che è corretto)
+        plt.figure(figsize=(10, 6))  # Definisce la dimensione della finestra di plot
+        plt.hist(differenze_tempo, bins=30, density=True, alpha=0.6, color='g')
+
+        distr_name = distr_names[i]
+        distr_param = distr_params[i]
+
+        plot_general_distr(distr_name, x, distr_param)
+
+        plt.title(f'Distribuzione {distr_name}')
+        plt.xlabel('Tempo inter-arrivo')
+        plt.ylabel('Densità')
+        plt.legend()
+
+        if not os.path.exists(img_folder):
+            os.makedirs(img_folder)
+
+        output_path = os.path.join(img_folder, "istogramAnalyses" + distr_name.capitalize() + ".png")
+        plt.savefig(output_path)
+        plt.close()
+
+def plot_general_distr(distr_name, x, distr_param, color=""):
+    import scipy.stats as stats
+
+    # Retrieve the distribution by name
+    distribution = getattr(stats, distr_name, None)
+    if distribution is None:
+        print(f"Distribution '{distr_name}' not found in scipy.stats")
+
+        return
+
+    *other_params, loc, scale = distr_param
+    y = distribution.pdf(x, *other_params, loc=loc, scale=scale)
+
+    if color != "":
+        plt.plot(x, y, '-', color=color, lw=2, label=f'distr {distr_name}')
+    else:
+        plt.plot(x, y, '-', lw=2, label=f'distr {distr_name}')
